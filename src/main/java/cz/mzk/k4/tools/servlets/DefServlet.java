@@ -1,13 +1,9 @@
 package cz.mzk.k4.tools.servlets;
 
 import java.io.*;
-
 import javax.servlet.*;
 import javax.servlet.http.*;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +11,6 @@ import java.util.Map;
 import java.util.Properties;
 import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
-import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
 
 /**
