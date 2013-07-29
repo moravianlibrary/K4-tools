@@ -3,21 +3,24 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
-
-
 	<display-name>K4 tools</display-name>
 
-	<welcome-file-list>
-		<welcome-file>checkLogs</welcome-file>
-	</welcome-file-list>
-
 	<servlet>
-		<servlet-name>CheckLogsServlet</servlet-name>
-		<servlet-class>cz.mzk.k4.tools.servlets.CheckLogsServlet</servlet-class>
+		<servlet-name>SearchServlet</servlet-name>
+		<servlet-class>cz.mzk.k4.tools.servlets.SearchServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>CheckLogsServlet</servlet-name>
-		<url-pattern>/checkLogs</url-pattern>
+		<servlet-name>SearchServlet</servlet-name>
+		<url-pattern>/searchServlet</url-pattern>
 	</servlet-mapping>
-	
+
+	<servlet>
+		<servlet-name>DefServlet</servlet-name>
+		<servlet-class>cz.mzk.k4.tools.servlets.DefServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DefServlet</servlet-name>
+		<url-pattern>/defServlet</url-pattern>
+	</servlet-mapping>
+
 </web-app>
