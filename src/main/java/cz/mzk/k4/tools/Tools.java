@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools;
 
+import cz.mzk.k4.tools.servlets.RepairLinksForReplication;
 import cz.mzk.k4.tools.servlets.Search;
 
 /**
@@ -17,6 +18,8 @@ public class Tools {
             //CheckLogs.run();
         } else if (args[0].equals("search")) {
             Search.run();
+        } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
+            RepairLinksForReplication.run(args[1]);
         }
 
     }
