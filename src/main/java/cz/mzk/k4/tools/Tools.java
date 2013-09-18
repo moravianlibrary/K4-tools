@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools;
 
+import cz.mzk.k4.tools.servlets.ChangeImageUrl;
 import cz.mzk.k4.tools.servlets.RepairLinksForReplication;
 import cz.mzk.k4.tools.servlets.Search;
 
@@ -18,9 +19,12 @@ public class Tools {
             //CheckLogs.run();
         } else if (args[0].equals("search")) {
             Search.run();
+        } else if (args[0].equals("changeLinks")) {
+                ChangeImageUrl.run();
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
             RepairLinksForReplication.run(args[1]);
         }
+
 
     }
 
@@ -28,6 +32,7 @@ public class Tools {
         System.out.println("Mozne parametry:");
         //System.out.println("checkLogs");
         System.out.println("search");
+        System.out.println("opraveniOdkazuProReplikaci");
 
     }
 
