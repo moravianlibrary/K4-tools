@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.servlets;
+package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
