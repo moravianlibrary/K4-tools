@@ -1,25 +1,16 @@
-package cz.mzk.k4.tools.servlets;
+package cz.mzk.k4.tools.scripts;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import org.apache.log4j.Logger;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
-import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
 
 /**
@@ -27,17 +18,21 @@ import cz.mzk.k4.tools.utils.ProcessManager;
  * @author holmanj
  * 
  */
-public class CheckLogsServlet extends HttpServlet {
+public class DefServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -2635991662902637019L;
 	private String host;
 	private static ProcessManager pm;
-	private static Integer defSize; // default number of processes fetched from  Kramerius
+	private static Integer defSize; // default number of processes fetched from Kramerius
 	private InputStream inputStream;
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(DefServlet.class);
 	static final String CONF_FILE_NAME = "k4_tools_config.properties";
 	private Knihovna knihovna;
 
+	/**
+	 * Ukazka servletu s nactenim config. souboru
+	 * 
+	 */
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -52,13 +47,14 @@ public class CheckLogsServlet extends HttpServlet {
 		} catch (IOException e) {
 			LOGGER.fatal("Cannot load properties file");
 		}
-		
+
 		defSize = Integer.parseInt(properties.getProperty("resultSize"));
 		knihovna = Knihovna.valueOf(properties.getProperty("knihovna"));
 		host = properties.getProperty(knihovna + ".host");
 		String username = properties.getProperty(knihovna + ".username");
 		String password = properties.getProperty(knihovna + ".password");
-		pm = new ProcessManager(host, username, password);
+
+        pm = new ProcessManager(host, username, password);
 
 		try {
 			// handle URL parameters
@@ -73,9 +69,6 @@ public class CheckLogsServlet extends HttpServlet {
 			if (!params.containsKey("resultSize")) {
 				params.put("resultSize", defSize.toString());
 			}
-			if (!params.containsKey("state")) {
-				params.put("state", "FINISHED");
-			}
 			int resultSize = Integer.parseInt(params.get("resultSize")
 					.toString());
 
@@ -88,50 +81,11 @@ public class CheckLogsServlet extends HttpServlet {
 				resultSize = processes.size();
 			}
 
-			int count = 0;
-			int errorCount = 0;
-			int notFoundCount = 0;
-			BufferedWriter writer = null;
-			File file = null;
-			for (int i = 0; i < processes.size(); i++) {
-				count++;
-				KrameriusProcess p = processes.get(i);
-				try {
-					ProcessLog log = pm.getLog(p.getUuid());
-					if (!log.getSerr().equals("")) {
-						LOGGER.info(p.getUuid() + ": " + log.getSerr());
-						try {
-							file = new File("logs/" + p.getUuid() + ".txt");
-							writer = new BufferedWriter(new FileWriter(file));
-							writer.write(log.getSerr());
-						} catch (IOException ex) {
-							LOGGER.log(Level.ERROR, ex.getMessage());
-						} finally {
-							try {
-								writer.close();
-							} catch (Exception ex) {
-								LOGGER.log(Level.ERROR, ex.getMessage());
-							}
-						}
-						errorCount++;
-					}
-				} catch (IllegalStateException ex) {
-					notFoundCount++;
-					continue;
-				} finally {
-					if (count == 100) {
-						LOGGER.info(i + 1 + " / " + processes.size()
-								+ "; logs not found: " + notFoundCount);
-						count = 0;
-						notFoundCount = 0;
-					}
-				}
-			}
-			LOGGER.info("DONE");
-			LOGGER.info("Found " + errorCount + " possible errors.");
+			// handle processes
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
+
 }

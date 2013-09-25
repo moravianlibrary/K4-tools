@@ -1,8 +1,8 @@
 package cz.mzk.k4.tools;
 
-import cz.mzk.k4.tools.servlets.ChangeImageUrl;
-import cz.mzk.k4.tools.servlets.RepairLinksForReplication;
-import cz.mzk.k4.tools.servlets.Search;
+import cz.mzk.k4.tools.scripts.FindNullCharacterInOcr;
+import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.scripts.Search;
 
 /**
  * @author: Martin Rumanek
@@ -19,8 +19,8 @@ public class Tools {
             //CheckLogs.run();
         } else if (args[0].equals("search")) {
             Search.run();
-        } else if (args[0].equals("changeLinks")) {
-                ChangeImageUrl.run();
+        } else if (args[0].equals("findNullCharacterInOcr")) {
+            FindNullCharacterInOcr.run();
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
             RepairLinksForReplication.run(args[1]);
         }

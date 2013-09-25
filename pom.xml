@@ -3,9 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cz.mzk.k4</groupId>
     <artifactId>tools</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
     <name>K4 tools Maven Webapp</name>
     <url>http://maven.apache.org</url>
+
+    <properties>
+        <generatedSources>target/generated-sources/</generatedSources>
+    </properties>
 
     <repositories>
         <repository>
@@ -153,6 +158,11 @@
             <version>3.6.2</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0-rc2</version>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -180,6 +190,33 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.jvnet.jax-ws-commons</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>FedoraAPI</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>${basedir}/src/wsdl/FedoraAPI-A.wsdl</wsdlFile>
+                                <wsdlFile>${basedir}/src/wsdl/FedoraAPI-M.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <staleFile>
+                                ${project.build.directory}/jaxws/stale/FedoraAPI.stale
+                            </staleFile>
+                            <packageName>org.fedora.api</packageName>
+                            <sourceDestDir>${generatedSources}</sourceDestDir>
+                            <target>2.1</target>
+                        </configuration>
+                        <phase>generate-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
