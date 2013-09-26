@@ -1,5 +1,9 @@
 package cz.mzk.k4.tools;
 
+//import cz.mzk.k4.tools.scripts.FindNullCharacterInOcr;
+//import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+//import cz.mzk.k4.tools.scripts.Search;
+
 import cz.mzk.k4.tools.scripts.FindNullCharacterInOcr;
 import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
 import cz.mzk.k4.tools.scripts.Search;
@@ -24,6 +28,7 @@ public class Tools {
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
             RepairLinksForReplication.run(args[1]);
         }
+
 
 
     }

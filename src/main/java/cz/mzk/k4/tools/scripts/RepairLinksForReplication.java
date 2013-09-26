@@ -31,7 +31,7 @@ public class RepairLinksForReplication {
     public static final String OCR_PATH = "txt" + File.separator;
 
     public static void run(String path) {
-        Iterator<File> iterator =  FileUtils.iterateFiles(new File(path),new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
+        Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
 
         while(iterator.hasNext()) {
             File file = iterator.next();

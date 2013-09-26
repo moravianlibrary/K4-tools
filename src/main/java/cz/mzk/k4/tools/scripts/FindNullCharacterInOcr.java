@@ -1,17 +1,11 @@
 package cz.mzk.k4.tools.scripts;
 
-import org.fcrepo.client.FedoraClient;
-import org.fcrepo.server.management.FedoraAPIM;
+import cz.mzk.k4.tools.fedoraUtils.FedoraUtils;
+import cz.mzk.k4.tools.fedoraUtils.domain.DigitalObjectModel;
 
-import javax.xml.rpc.ServiceException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: Martin Rumanek
@@ -19,39 +13,47 @@ import java.util.logging.Logger;
  */
 public class FindNullCharacterInOcr {
 
-    private static final String FEDORA_URL = "http://krameriustest.mzk.cz/fedora/get/";//"http://fedora.mzk.cz/fedora/get/";
-    private static String USER = "";//fedora user
-    private static String PASS = "";//fedora password
-    static final String CONF_FILE_NAME = "k4_tools_config.properties";
+    private static FedoraUtils fu = new FedoraUtils();
 
     public static void run() {
-        String home = System.getProperty("user.home");
-        File f = new File(home + "/" + CONF_FILE_NAME);
 
-        Properties properties = new Properties();
-
-        InputStream inputStream;
+        List<String> list;
         try {
-            inputStream = new FileInputStream(f);
-            properties.load(inputStream);
-        } catch (IOException ex) {
-            Logger.getLogger(ConvertDjvuToJP2.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            list = getChildren("uuid:ae864f11-435d-11dd-b505-00145e5790ea", new ArrayList<String>());
 
-        USER = properties.getProperty("fedora.username");
-        PASS = properties.getProperty("fedora.password");
-
-        try {
-            FedoraClient fc = new FedoraClient(FEDORA_URL, USER, PASS);
-            FedoraAPIM apim = fc.getAPIM();
-            //apim.get
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ServiceException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            for (String uuid: list) {
+                System.out.println(fu.getOcr(uuid));
+            }
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
+
+    }
+
+    private static List<String> getChildren(String uuid, List<String> uuidList) throws IOException {
+        if (DigitalObjectModel.PAGE.equals(FedoraUtils.getModel(uuid))) {
+            uuidList.add(uuid);
+            findBadCharacter(fu.getOcr(uuid));
+        }
+        DigitalObjectModel parentModel = null;
+        ArrayList<ArrayList<String>> children = fu.getAllChildren(uuid);
+
+        if (children != null) {
+            for (ArrayList<String> child : children) {
+                getChildren(child.get(0), uuidList);
+            }
+        }
+
+        return uuidList;
+    }
+
+    private static void findBadCharacter(String text) {
+        for (char ch : text.toCharArray()) {
+            if (ch == '\0xdafb') {
+                System.out.println("GOTCHA");
+            }
+
+        }
     }
 }
