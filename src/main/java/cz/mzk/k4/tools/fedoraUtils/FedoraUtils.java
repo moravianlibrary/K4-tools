@@ -1,20 +1,32 @@
 package cz.mzk.k4.tools.fedoraUtils;
 
+import cz.mzk.k4.tools.fedoraUtils.domain.DigitalObjectModel;
+import cz.mzk.k4.tools.fedoraUtils.domain.FedoraNamespaces;
+import cz.mzk.k4.tools.fedoraUtils.exception.ConnectionException;
+import cz.mzk.k4.tools.fedoraUtils.exception.LexerException;
 import cz.mzk.k4.tools.fedoraUtils.util.IOUtils;
+import cz.mzk.k4.tools.fedoraUtils.util.PIDParser;
 import cz.mzk.k4.tools.fedoraUtils.util.RESTHelper;
+import cz.mzk.k4.tools.fedoraUtils.util.XMLUtils;
 import org.apache.log4j.Logger;
 import org.fedora.api.RelationshipTuple;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 /**
  * @author: Martin Rumanek, incad
@@ -22,14 +34,14 @@ import java.util.logging.Level;
  */
 public class FedoraUtils {
 
+    static final String CONF_FILE_NAME = "k4_tools_config.properties";
     /**
      * The Constant LOGGER.
      */
     private static final Logger LOGGER = Logger.getLogger(FedoraUtils.class);
-    private static final String FEDORA_URL = "http://krameriustest.mzk.cz/fedora/get/";//"http://fedora.mzk.cz/fedora/get/";
+    private static String FEDORA_URL = "";//"http://fedora.mzk.cz/fedora/";
     private static String USER = "";//fedora user
     private static String PASS = "";//fedora password
-    static final String CONF_FILE_NAME = "k4_tools_config.properties";
 
     public FedoraUtils() {
         String home = System.getProperty("user.home");
@@ -48,6 +60,9 @@ public class FedoraUtils {
 
         USER = properties.getProperty("fedora.username");
         PASS = properties.getProperty("fedora.password");
+        FEDORA_URL = properties.getProperty("fedora.url");
+
+
     }
 
     @SuppressWarnings("serial")
@@ -103,7 +118,7 @@ public class FedoraUtils {
                             USER, PASS,
 //                            configuration.getFedoraLogin(),
 //                            configuration.getFedoraPassword(),
-            true);
+                            true);
             if (stream == null) return null;
             String result = IOUtils.readAsString(stream, Charset.forName("UTF-8"), true);
             String[] lines = result.split("\n");
@@ -132,5 +147,157 @@ public class FedoraUtils {
         }
         return retval;
     }
+
+    public static DigitalObjectModel getModel(String uuid) throws IOException {
+        DigitalObjectModel model = null;
+        try {
+            model = getDigitalObjectModel(uuid);
+        } catch (ConnectionException e) {
+            LOGGER.error("Digital object " + uuid + " is not in the repository. " + e.getMessage());
+            throw e;
+        } catch (IOException e) {
+            LOGGER.warn("Could not get model of object " + uuid + ". Using generic model handler.", e);
+            throw e;
+        }
+        return model;
+    }
+
+    /*
+ * (non-Javadoc)
+ * @see cz.mzk.editor.server.fedora.FedoraAccess#getKrameriusModel
+ * (java.lang.String)
+ */
+
+    public static Document getRelsExt(String uuid) throws IOException {
+        String relsExtUrl = relsExtUrl(uuid);
+        LOGGER.debug("Reading rels ext +" + relsExtUrl);
+        InputStream docStream =
+                RESTHelper.get(relsExtUrl,
+                        USER,
+                        PASS,
+                        true);
+        if (docStream == null) {
+            throw new ConnectionException("Cannot get RELS EXT stream.");
+        }
+        try {
+            return XMLUtils.parseDocument(docStream, true);
+        } catch (ParserConfigurationException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IOException(e);
+        } catch (SAXException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IOException(e);
+        } finally {
+            docStream.close();
+        }
+    }
+
+    public static String relsExtUrl(String uuid) {
+        String url = FEDORA_URL + "/get/" + uuid + "/RELS-EXT";
+        return url;
+    }
+
+    public static DigitalObjectModel getDigitalObjectModel(String uuid) throws IOException {
+        return getDigitalObjectModel(getRelsExt(uuid));
+    }
+
+    public static DigitalObjectModel getDigitalObjectModel(Document relsExt) {
+        try {
+            Element foundElement =
+                    XMLUtils.findElement(relsExt.getDocumentElement(),
+                            "hasModel",
+                            FedoraNamespaces.FEDORA_MODELS_URI);
+            if (foundElement != null) {
+                String sform = foundElement.getAttributeNS(FedoraNamespaces.RDF_NAMESPACE_URI, "resource");
+                PIDParser pidParser = new PIDParser(sform);
+                pidParser.disseminationURI();
+                DigitalObjectModel model = DigitalObjectModel.parseString(pidParser.getObjectId());
+                return model;
+            } else
+                throw new IllegalArgumentException("cannot find model of ");
+        } catch (DOMException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
+        } catch (LexerException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Gets the fedora datastreams list.
+     *
+     * @param uuid
+     *        the uuid
+     * @return the fedora datastreams list
+     */
+    public static String getFedoraDatastreamsList(String uuid) {
+        String datastreamsListPath =
+                FEDORA_URL + "/objects/" + uuid + "/datastreams?format=xml";
+        return datastreamsListPath;
+    }
+
+
+    public String getOcr(String uuid) {
+        String ocrUrl = ocr(uuid);
+        LOGGER.debug("Reading OCR +" + ocrUrl);
+        InputStream docStream = null;
+        try {
+            docStream =
+                    RESTHelper.get(ocrUrl,
+                            USER,
+                            PASS,
+                            true);
+            if (docStream == null) return null;
+        } catch (IOException e) {
+            // ocr is not available
+            e.printStackTrace();
+            return null;
+        }
+        BufferedReader br = new BufferedReader(new InputStreamReader(docStream));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            LOGGER.error("Reading ocr +" + ocrUrl, e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    LOGGER.error("Closing stream +" + ocrUrl, e);
+                    e.printStackTrace();
+                } finally {
+                    br = null;
+                }
+            }
+            try {
+                if (docStream != null) docStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                docStream = null;
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Ocr.
+     *
+     * @param uuid
+     *        the uuid
+     * @return the string
+     */
+    public String ocr(String uuid) {
+        String fedoraObject =
+                FEDORA_URL + "/objects/" + uuid + "/datastreams/TEXT_OCR/content";
+        return fedoraObject;
+    }
+
 
 }
