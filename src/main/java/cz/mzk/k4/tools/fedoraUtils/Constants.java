@@ -50,5 +50,55 @@ public class Constants {
      */
     public static final int REST_DELAY = 75;
 
+    /**
+     * Fedora FOXML related constants.
+     */
+    public static enum DATASTREAM_ID {
+
+        /** The DC. */
+        DC("DC"),
+        /** The REL s_ ext. */
+        RELS_EXT("RELS-EXT"),
+        /** The BIBLI o_ mods. */
+        BIBLIO_MODS("BIBLIO_MODS"),
+        /** The POLICY. */
+        POLICY("POLICY"),
+        /** The IM g_ full. */
+        IMG_FULL("IMG_FULL"),
+
+        /** The IM g_ thumb. */
+        IMG_THUMB("IMG_THUMB"),
+        /** The IM g_ preview. */
+        IMG_PREVIEW("IMG_PREVIEW"),
+        /** The TEI. */
+        TEI("TEI"),
+        /** The TEX t_ ocr. */
+        TEXT_OCR("TEXT_OCR"), WAV("WAV"), OGG("OGG"), MP3("MP3"),
+        /** The ALTO. */
+        ALTO("ALTO");
+
+        /** The value. */
+        private final String value;
+
+        /**
+         * Instantiates a new dATASTREA m_ id.
+         *
+         * @param value
+         *        the value
+         */
+        private DATASTREAM_ID(String value) {
+            this.value = value;
+        }
+
+        /**
+         * Gets the value.
+         *
+         * @return the value
+         */
+        public String getValue() {
+            return value;
+        }
+    }
+
 
 }
