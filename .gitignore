@@ -29,9 +29,11 @@ infinitest.filters
 
 # Logs
 *.log
+/logs
 
 # Openshift
 deployments/
 
 /build
 /zaloha
+*~
