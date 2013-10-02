@@ -24,11 +24,14 @@ public class Tools {
         } else if (args[0].equals("search")) {
             Search.run();
         } else if (args[0].equals("spatneZnakyOCR")) {
-            FindBadCharacterInOcr.run(args[1]);
+            if (args.length > 2 && "opravit".equals(args[1])) {
+                FindBadCharacterInOcr.run(args[1], true);
+            } else {
+                FindBadCharacterInOcr.run(args[1]);
+            }
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
             RepairLinksForReplication.run(args[1]);
         }
-
 
 
     }

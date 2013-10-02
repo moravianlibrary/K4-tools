@@ -3,6 +3,7 @@ package cz.mzk.k4.tools.fedoraUtils;
 import cz.mzk.k4.tools.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.fedoraUtils.domain.FedoraNamespaces;
 import cz.mzk.k4.tools.fedoraUtils.exception.ConnectionException;
+import cz.mzk.k4.tools.fedoraUtils.exception.CreateObjectException;
 import cz.mzk.k4.tools.fedoraUtils.exception.LexerException;
 import cz.mzk.k4.tools.fedoraUtils.util.IOUtils;
 import cz.mzk.k4.tools.fedoraUtils.util.PIDParser;
@@ -19,6 +20,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -286,6 +288,10 @@ public class FedoraUtils {
         return sb.toString();
     }
 
+    public boolean setOcr(String uuid, String ocr) throws CreateObjectException {
+        return insertManagedDatastream(Constants.DATASTREAM_ID.TEXT_OCR, uuid, ocr, false, "text/plain");
+    }
+
     /**
      * Ocr.
      *
@@ -293,10 +299,73 @@ public class FedoraUtils {
      *        the uuid
      * @return the string
      */
-    public String ocr(String uuid) {
+    private String ocr(String uuid) {
         String fedoraObject =
                 FEDORA_URL + "/objects/" + uuid + "/datastreams/TEXT_OCR/content";
         return fedoraObject;
+    }
+
+    /**
+     * Insert managed datastream.
+     *
+     * @param dsId
+     *        the ds id
+     * @param uuid
+     *        the uuid
+     * @param filePathOrContent
+     *        the file path or content
+     * @param isFile
+     *        the is file
+     * @param mimeType
+     *        the mime type
+     * @return true, if successful
+     * @throws CreateObjectException
+     *         the create object exception
+     */
+    private boolean insertManagedDatastream(Constants.DATASTREAM_ID dsId,
+                                            String uuid,
+                                            String filePathOrContent,
+                                            boolean isFile,
+                                            String mimeType) throws CreateObjectException {
+
+        String prepUrl =
+                "/objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/"
+                        + dsId.getValue() + "?controlGroup=M&versionable=true&dsState=A&mimeType=" + mimeType;
+
+        boolean success;
+        String url = FEDORA_URL.concat(prepUrl);
+        try {
+            if (isFile) {
+                success =
+                        RESTHelper.post(url,
+                                new FileInputStream(new File(filePathOrContent)),
+                                USER,
+                                PASS,
+                                false);
+            } else {
+                success = RESTHelper.post(url, filePathOrContent, USER, PASS, false);
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error(e.getMessage());
+            e.printStackTrace();
+            throw new CreateObjectException("Unable to post "
+                    + (isFile ? ("a file: " + filePathOrContent + " as a ") : "")
+                    + "managed datastream to the object: " + uuid);
+        }
+
+        if (success) {
+            LOGGER.info("An " + dsId.getValue() + (isFile ? (" file: " + filePathOrContent) : "")
+                    + " has been inserted to the digital object: " + uuid + " as a " + dsId.getValue()
+                    + " datastream.");
+
+            return true;
+        } else {
+            LOGGER.error("An error occured during inserting an " + dsId.getValue()
+                    + (isFile ? (" file: " + filePathOrContent) : "") + " to the digital object: " + uuid
+                    + " as a " + dsId.getValue() + " datastream.");
+            return false;
+
+        }
     }
 
 
