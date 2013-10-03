@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools;
 
 import cz.mzk.k4.tools.scripts.CheckLogs;
+import cz.mzk.k4.tools.scripts.FindAllDocumentsFromModel;
 import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
 import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
 import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
@@ -38,6 +39,12 @@ public class Tools {
 
         } else if (args[0].equals("spatneZnakyOCR")) {
             /**
+             * Projde u dokumentu všechny rekurzivně OCR u všech stran, v případě nevalidních znaků (XML) se zalogují
+             * uuid těchto stran. V případě parametru "opravit" jsou nevalidní znaky odstraněny.
+             * které mají stav FINISHED a zároveň neprázdný chybový výstup
+             *  @param ~/k4_tools_config.properties
+             *  @param uuid
+             *  @param opravit
              *  @author Martin Rumánek
              */
             if (args.length > 2 && "opravit".equals(args[1])) {
@@ -50,11 +57,16 @@ public class Tools {
 
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
             /**
+             * replikace z NK obsahovala špatné cesty k OCR a obrázkům, tyto cesty jsou zkontrolovány
+             * a pokud jsou v jiné úrovni jsou odkazy upraveny
+             * @param path
              * @author Martin Rumánek
              */
             RepairLinksForReplication.run(args[1]);
 
-        } else {
+        } else if (args[0].equals("vypisVsechnaUUID")) {
+            FindAllDocumentsFromModel.run();
+        }else {
             printUsage();
         }
 
