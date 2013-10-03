@@ -25,59 +25,34 @@
  * 
  */
 
-package cz.mzk.k4.tools.fedoraUtils.exception;
+package cz.mzk.k4.tools.utils.fedoraUtils.exception;
+
+import java.io.IOException;
 
 // TODO: Auto-generated Javadoc
+
 /**
- * The Class LexerException.
- * 
- * @author pavels Window - Preferences - Java - Code Style - Code Templates
+ * The Class ConnectionException.
  */
-public class LexerException
-        extends Exception {
-
-    private static final long serialVersionUID = -193550590037669708L;
+public class ConnectionException
+        extends IOException {
 
     /**
-     * Instantiates a new lexer exception.
+     * 
      */
-    public LexerException() {
-        super();
+    private static final long serialVersionUID = 5932923648539397259L;
 
+    /**
+     * Instantiates a new connection exception.
+     * 
+     * @param msg
+     *        the msg
+     */
+    public ConnectionException(String msg) {
+        super(msg);
     }
 
-    /**
-     * Instantiates a new lexer exception.
-     * 
-     * @param message
-     *        the message
-     */
-    public LexerException(String message) {
-        super(message);
-
-    }
-
-    /**
-     * Instantiates a new lexer exception.
-     * 
-     * @param message
-     *        the message
-     * @param cause
-     *        the cause
-     */
-    public LexerException(String message, Throwable cause) {
-        super(message, cause);
-
-    }
-
-    /**
-     * Instantiates a new lexer exception.
-     * 
-     * @param cause
-     *        the cause
-     */
-    public LexerException(Throwable cause) {
-        super(cause);
-
+    public ConnectionException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

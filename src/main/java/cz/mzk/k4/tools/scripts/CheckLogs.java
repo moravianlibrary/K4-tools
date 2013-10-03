@@ -1,20 +1,16 @@
 package cz.mzk.k4.tools.scripts;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.log4j.Logger;
 import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
+import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 
@@ -49,7 +45,7 @@ public class CheckLogs {
 			LOGGER.fatal("Cannot load properties file");
 		}
 
-		defSize = Integer.parseInt(properties.getProperty("resultSize"));
+		defSize = Integer.parseInt(properties.getProperty("checkLogs.resultSize"));
 		knihovna = Knihovna.valueOf(properties.getProperty("knihovna"));
 		host = properties.getProperty(knihovna + ".host");
 		LOGGER.info("Knihovna: " + knihovna);
@@ -60,7 +56,7 @@ public class CheckLogs {
 		try {
 			// handle URL parameters
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("resultSize", defSize.toString());
+			params.put("checkLogs.resultSize", defSize.toString());
 			params.put("state", "FINISHED");
 			int resultSize = Integer.parseInt(defSize.toString());
 

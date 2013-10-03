@@ -25,13 +25,12 @@
  * 
  */
 
-package cz.mzk.k4.tools.fedoraUtils.util;
+package cz.mzk.k4.tools.utils.fedoraUtils.util;
 
 import com.google.gwt.user.server.Base64Utils;
-import cz.mzk.k4.tools.fedoraUtils.Constants;
-import cz.mzk.k4.tools.fedoraUtils.exception.ConnectionException;
+import cz.mzk.k4.tools.utils.fedoraUtils.Constants;
+import cz.mzk.k4.tools.utils.fedoraUtils.exception.ConnectionException;
 import org.apache.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

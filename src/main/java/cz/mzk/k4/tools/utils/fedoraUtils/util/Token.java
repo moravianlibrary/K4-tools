@@ -25,7 +25,7 @@
  * 
  */
 
-package cz.mzk.k4.tools.fedoraUtils.util;
+package cz.mzk.k4.tools.utils.fedoraUtils.util;
 
 // TODO: Auto-generated Javadoc
 /**
