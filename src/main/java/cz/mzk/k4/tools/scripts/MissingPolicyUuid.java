@@ -2,12 +2,11 @@ package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-
 import javax.ws.rs.core.MediaType;
 
 
 /**
- * @author holmanj
+ * @author Jan Holman
  *         Vypíše uuid svazků s neznámou dostupností
  */
 public class MissingPolicyUuid {
