@@ -16,13 +16,13 @@ public class Tools {
             return;
         }
 
-        if (args[0].equals("checklogs")) {
+        if (args[0].equals("checkLogs")) {
             /**
              * Projde logy procesů v K4 a vypíše ty,
              * které mají stav FINISHED a zároveň neprázdný chybový výstup
              * @param ~/k4_tools_config.properties
-             * @return log v logs/checkK4Logs.txt + sout
-             * @return nalezene chyby v logs/{uuid}.txt
+             * @return log v {projekt}/logs/checkK4Logs.txt + sout
+             * @return nalezene chyby v {projekt}/logs/{uuid}.txt
              * @author Jan Holman
              */
             CheckLogs.run();

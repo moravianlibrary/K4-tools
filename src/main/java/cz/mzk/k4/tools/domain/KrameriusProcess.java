@@ -49,7 +49,7 @@ import java.util.Set;
 
 /**
  * 
- * @author holmanj
+ * @author Jan Holman
  *
  */
 public class KrameriusProcess {

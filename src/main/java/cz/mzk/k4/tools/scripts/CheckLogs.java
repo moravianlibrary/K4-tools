@@ -5,7 +5,6 @@ import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
 import org.apache.log4j.Logger;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,8 @@ import java.util.Properties;
  * Log prohledávání v souboru logs/checkK4Logs + sout
  * Při nalezení FINISHED procesu s neprázdným chybovým výstupem vyrobí soubor 
  * 		logs/{uuid}.txt s chybovým výstupem procesu
+ *
+ * 	@author Jan Holman
  * 
  */
 public class CheckLogs {

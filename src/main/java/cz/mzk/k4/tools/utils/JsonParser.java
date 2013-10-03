@@ -1,20 +1,18 @@
 package cz.mzk.k4.tools.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
-
-import javax.xml.bind.DatatypeConverter;
 import org.apache.log4j.Logger;
+import javax.xml.bind.DatatypeConverter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
- * @author holmanj
+ * @author Jan Holman
  * 
  */
 public class JsonParser {

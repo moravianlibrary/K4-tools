@@ -1,5 +1,10 @@
 package cz.mzk.k4.tools.domain;
 
+/**
+ *
+ * @author Jan Holman
+ *
+ */
 public enum Knihovna {
 
 	MZK("MZK"), 

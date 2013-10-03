@@ -15,7 +15,7 @@ import cz.mzk.k4.tools.domain.ProcessLog;
 
 /**
  * 
- * @author holmanj
+ * @author Jan Holman
  * 
  */
 public class ProcessManager {

@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.domain;
 
 /**
  * 
- * @author holmanj
+ * @author Jan Holman
  *
  */
 public class ProcessLog {
