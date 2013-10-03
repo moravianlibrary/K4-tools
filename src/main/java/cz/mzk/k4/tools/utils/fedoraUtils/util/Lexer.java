@@ -25,9 +25,9 @@
  * 
  */
 
-package cz.mzk.k4.tools.fedoraUtils.util;
+package cz.mzk.k4.tools.utils.fedoraUtils.util;
 
-import cz.mzk.k4.tools.fedoraUtils.exception.LexerException;
+import cz.mzk.k4.tools.utils.fedoraUtils.exception.LexerException;
 
 
 // TODO: Auto-generated Javadoc

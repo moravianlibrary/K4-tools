@@ -1,10 +1,9 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.fedoraUtils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.fedoraUtils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
+import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
+import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
 import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

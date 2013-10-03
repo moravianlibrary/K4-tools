@@ -84,6 +84,11 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>cz.incad.kramerius</groupId>
+            <artifactId>fedora_api</artifactId>
+            <version>4.7.1</version>
+        </dependency>
 
     </dependencies>
     <build>

@@ -22,7 +22,7 @@
  * 
  */
 
-package cz.mzk.k4.tools.fedoraUtils.exception;
+package cz.mzk.k4.tools.utils.fedoraUtils.exception;
 
 /**
  * @author Jiri Kremser

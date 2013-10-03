@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
  * @author holmanj
  *         Vypíše uuid svazků s neznámou dostupností
  */
-public class Search {
+public class MissingPolicyUuid {
 
 
     public static void run() {
