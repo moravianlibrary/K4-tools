@@ -47,12 +47,11 @@ public class Tools {
              *  @param opravit
              *  @author Martin Rumánek
              */
-            if (args.length > 2 && "opravit".equals(args[1])) {
+            if (args.length > 2) {
                 //
-                FindBadCharacterInOcr.run(args[1], true);
-            } else {
-                //
-                FindBadCharacterInOcr.run(args[1]);
+                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
+                findBadCharacterInOcr.setRepair(args[2].equals("opravit"));
+                findBadCharacterInOcr.run(args[1]);
             }
 
         } else if (args[0].equals("opraveniOdkazuProReplikaci")) {
@@ -64,9 +63,9 @@ public class Tools {
              */
             RepairLinksForReplication.run(args[1]);
 
-        } else if (args[0].equals("vypisVsechnaUUID")) {
-            FindAllDocumentsFromModel.run();
-        }else {
+        } else if (args[0].equals("vsechnaUuidZmodelu")) {
+            FindAllDocumentsFromModel.run(args[1]);
+        } else {
             printUsage();
         }
 
