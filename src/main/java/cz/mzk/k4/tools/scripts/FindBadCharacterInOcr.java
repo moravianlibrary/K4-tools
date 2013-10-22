@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
@@ -12,16 +13,18 @@ import java.util.List;
  * @author: Martin Rumanek
  * @version: 9/18/13
  */
-public class FindBadCharacterInOcr {
+public class FindBadCharacterInOcr implements UuidWorker {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
     private static FedoraUtils fu = new FedoraUtils();
 
-    public static void run(String uuid) {
-        run(uuid, false);
+    private boolean repair;
+
+    public void setRepair(boolean repair) {
+        this.repair = repair;
     }
 
-    public static void run(String uuid, boolean repair) {
+    public void run(String uuid) {
 
         List<String> list;
         try {
