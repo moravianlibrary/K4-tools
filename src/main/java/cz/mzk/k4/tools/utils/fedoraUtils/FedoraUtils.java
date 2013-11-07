@@ -132,6 +132,26 @@ public class FedoraUtils {
         return children;
     }
 
+    public static List<String> getChildren(String uuid, DigitalObjectModel model) throws IOException {
+       return getChildren(uuid, new ArrayList<String>(), model);
+    }
+
+    private static List<String> getChildren(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
+        if (model.equals(FedoraUtils.getModel(uuid))) {
+            uuidList.add(uuid);
+        }
+        DigitalObjectModel parentModel = null;
+        ArrayList<ArrayList<String>> children = getAllChildren(uuid);
+
+        if (children != null) {
+            for (ArrayList<String> child : children) {
+                getChildren(child.get(0), uuidList, model);
+            }
+        }
+
+        return uuidList;
+    }
+
     /**
      * Gets the object pids.
      *
