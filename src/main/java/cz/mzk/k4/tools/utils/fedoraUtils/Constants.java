@@ -48,7 +48,7 @@ public class Constants {
      * delay after ingesting the object, fedora may fall down, if there is too
      * much requests.
      */
-    public static final int REST_DELAY = 75;
+    public static final int REST_DELAY = 175;
 
     /**
      * Fedora FOXML related constants.

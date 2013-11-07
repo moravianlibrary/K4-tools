@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.utils.fedoraUtils;
 
+import cz.mzk.k4.tools.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.FedoraNamespaces;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.ConnectionException;
@@ -10,13 +11,29 @@ import cz.mzk.k4.tools.utils.fedoraUtils.util.PIDParser;
 import cz.mzk.k4.tools.utils.fedoraUtils.util.RESTHelper;
 import cz.mzk.k4.tools.utils.fedoraUtils.util.XMLUtils;
 import org.apache.log4j.Logger;
+import org.fedora.api.FedoraAPIA;
+import org.fedora.api.FedoraAPIM;
+import org.fedora.api.FedoraAPIMService;
 import org.fedora.api.RelationshipTuple;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import javax.xml.ws.BindingProvider;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +55,12 @@ public class FedoraUtils {
     private static String USER = "";//fedora user
     private static String PASS = "";//fedora password
 
+    /** The API mport. */
+    private FedoraAPIM APIMport;
+
+    /** The API aport. */
+    private FedoraAPIA APIAport;
+
     public FedoraUtils() {
         String home = System.getProperty("user.home");
         File f = new File(home + "/" + CONF_FILE_NAME);
@@ -58,6 +81,27 @@ public class FedoraUtils {
         FEDORA_URL = properties.getProperty("fedora.url");
 
 
+    }
+
+    @SuppressWarnings("serial")
+    public void applyToAllUuidFromModel(String model, UuidWorker worker) {
+        List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
+
+        if (triplets != null) {
+            for (final RelationshipTuple triplet : triplets) {
+                if (triplet.getSubject().contains("uuid")
+                        && triplet.getSubject().contains(Constants.FEDORA_INFO_PREFIX)) {
+
+                    final String childUuid =
+                            triplet.getSubject().substring((Constants.FEDORA_INFO_PREFIX).length());
+
+                    if (!childUuid.contains("/")) {
+                        LOGGER.info("Worker is running on " + childUuid);
+                        worker.run(childUuid);
+                    }
+                }
+            }
+        }
     }
 
     @SuppressWarnings("serial")
@@ -98,6 +142,10 @@ public class FedoraUtils {
         return getSubjectOrObjectPids("%3Cinfo:fedora/" + subjectPid + "%3E%20*%20*");
     }
 
+    private static List<RelationshipTuple> getObjectPidsFromModel(String model) {
+        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + model + "%3E");
+    }
+
     private static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
 //        String command =
@@ -113,7 +161,7 @@ public class FedoraUtils {
                             USER, PASS,
 //                            configuration.getFedoraLogin(),
 //                            configuration.getFedoraPassword(),
-                            true);
+                            false);
             if (stream == null) return null;
             String result = IOUtils.readAsString(stream, Charset.forName("UTF-8"), true);
             String[] lines = result.split("\n");
@@ -222,8 +270,7 @@ public class FedoraUtils {
     /**
      * Gets the fedora datastreams list.
      *
-     * @param uuid
-     *        the uuid
+     * @param uuid the uuid
      * @return the fedora datastreams list
      */
     public static String getFedoraDatastreamsList(String uuid) {
@@ -231,7 +278,6 @@ public class FedoraUtils {
                 FEDORA_URL + "/objects/" + uuid + "/datastreams?format=xml";
         return datastreamsListPath;
     }
-
 
     public String getOcr(String uuid) {
         String ocrUrl = ocr(uuid);
@@ -288,8 +334,7 @@ public class FedoraUtils {
     /**
      * Ocr.
      *
-     * @param uuid
-     *        the uuid
+     * @param uuid the uuid
      * @return the string
      */
     private String ocr(String uuid) {
@@ -301,19 +346,13 @@ public class FedoraUtils {
     /**
      * Insert managed datastream.
      *
-     * @param dsId
-     *        the ds id
-     * @param uuid
-     *        the uuid
-     * @param filePathOrContent
-     *        the file path or content
-     * @param isFile
-     *        the is file
-     * @param mimeType
-     *        the mime type
+     * @param dsId              the ds id
+     * @param uuid              the uuid
+     * @param filePathOrContent the file path or content
+     * @param isFile            the is file
+     * @param mimeType          the mime type
      * @return true, if successful
-     * @throws CreateObjectException
-     *         the create object exception
+     * @throws CreateObjectException the create object exception
      */
     private boolean insertManagedDatastream(Constants.DATASTREAM_ID dsId,
                                             String uuid,
@@ -360,6 +399,45 @@ public class FedoraUtils {
 
         }
     }
+
+
+    private void initAPIM() {
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(USER, PASS.toCharArray());
+            }
+        });
+
+        FedoraAPIMService APIMservice = null;
+        try {
+            APIMservice =
+                    new FedoraAPIMService(new URL(FEDORA_URL + "/wsdl?api=API-M"),
+                            new QName("http://www.fedora.info/definitions/1/0/api/",
+                                    "Fedora-API-M-Service"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("InvalidURL API-M:" + e);
+            throw new RuntimeException(e);
+        }
+        APIMport = APIMservice.getPort(FedoraAPIM.class);
+        ((BindingProvider) APIMport).getRequestContext().put(BindingProvider.USERNAME_PROPERTY, USER);
+        ((BindingProvider) APIMport).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, PASS);
+
+    }
+
+    public FedoraAPIM getAPIM() {
+        if (APIMport == null) {
+            initAPIM();
+        }
+        return APIMport;
+    }
+
+    public void insertFoxml(String path) {
+        // getAPIM().ingest();
+    }
+
+
 
 
 }
