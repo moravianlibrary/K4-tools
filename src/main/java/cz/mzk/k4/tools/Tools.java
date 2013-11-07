@@ -5,6 +5,7 @@ import cz.mzk.k4.tools.scripts.FindAllDocumentsFromModel;
 import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
 import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
 import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 
 /**
  * @author Martin Rumanek
@@ -37,7 +38,12 @@ public class Tools {
              */
             MissingPolicyUuid.run();
 
-        } else if (args[0].equals("spatneZnakyOCR")) {
+        } else if (args[0].equals("spatneZnakyOCRzModelu")) {
+            FedoraUtils fu = new FedoraUtils();
+            FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
+            fu.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
+        }
+        else if (args[0].equals("spatneZnakyOCR")) {
             /**
              * Projde u dokumentu všechny rekurzivně OCR u všech stran, v případě nevalidních znaků (XML) se zalogují
              * uuid těchto stran. V případě parametru "opravit" jsou nevalidní znaky odstraněny.
