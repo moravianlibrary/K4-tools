@@ -28,7 +28,7 @@ public class FindBadCharacterInOcr implements UuidWorker {
 
         List<String> list;
         try {
-            list = getChildren(uuid, new ArrayList<String>());
+            list = fu.getChildren(uuid, DigitalObjectModel.PAGE);
 
             for (String uuidChild : list) {
                 if (containBadCharacter(fu.getOcr(uuidChild))) {
@@ -49,21 +49,7 @@ public class FindBadCharacterInOcr implements UuidWorker {
 
     }
 
-    private static List<String> getChildren(String uuid, List<String> uuidList) throws IOException {
-        if (DigitalObjectModel.PAGE.equals(FedoraUtils.getModel(uuid))) {
-            uuidList.add(uuid);
-        }
-        DigitalObjectModel parentModel = null;
-        ArrayList<ArrayList<String>> children = fu.getAllChildren(uuid);
 
-        if (children != null) {
-            for (ArrayList<String> child : children) {
-                getChildren(child.get(0), uuidList);
-            }
-        }
-
-        return uuidList;
-    }
 
     // http://blog.mark-mclaren.info/2007/02/invalid-xml-characters-when-valid-utf8_5873.html
     protected static boolean containBadCharacter(String text) {
