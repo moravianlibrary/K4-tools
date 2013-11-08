@@ -2,7 +2,6 @@ package cz.mzk.k4.tools.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class ScriptRunner {
         scripts.put(name, script);
     }
 
-    public void run(@NotNull String name, String[] args) {
+    public void run(@NotNull String name, List<String> args) {
         if (!scripts.containsKey(name)) {
             throw new IllegalArgumentException("Script with this name does not exist.");
         };

@@ -5,6 +5,8 @@ import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 
+import java.util.List;
+
 /**
  * @author: Martin Rumanek
  * @version: 10/3/13
@@ -25,8 +27,8 @@ public class FindAllDocumentsByModel implements Script {
     }
 
     @Override
-    public void run(String[] args) {
-        //run(args[0]);
+    public void run(List<String> args) {
+        //run(args.get(0));
     }
 
     @Override

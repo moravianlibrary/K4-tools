@@ -100,7 +100,7 @@ public class FedoraUtils {
                             triplet.getSubject().substring((Constants.FEDORA_INFO_PREFIX).length());
 
                     if (!childUuid.contains("/")) {
-                        LOGGER.info("Worker is running on " + childUuid);
+                        LOGGER.debug("Worker is running on " + childUuid);
                         worker.run(childUuid);
                     }
                 }
@@ -136,11 +136,11 @@ public class FedoraUtils {
         return children;
     }
 
-    public static List<String> getChildren(String uuid, DigitalObjectModel model) throws IOException {
-       return getChildren(uuid, new ArrayList<String>(), model);
+    public static List<String> getChildrenUuids(String uuid, DigitalObjectModel model) throws IOException {
+       return getChildrenUuids(uuid, new ArrayList<String>(), model);
     }
 
-    private static List<String> getChildren(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
+    private static List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
         if (model.equals(FedoraUtils.getModel(uuid))) {
             uuidList.add(uuid);
         }
@@ -149,10 +149,27 @@ public class FedoraUtils {
 
         if (children != null) {
             for (ArrayList<String> child : children) {
-                getChildren(child.get(0), uuidList, model);
+                getChildrenUuids(child.get(0), uuidList, model);
             }
         }
 
+        return uuidList;
+    }
+
+    public static List<String> getChildrenUuids(String uuid) throws IOException {
+        List<String> list = getChildrenUuids(uuid, new ArrayList<String>());
+        list.remove(uuid);
+        return list;
+    }
+
+    private static List<String> getChildrenUuids(String uuid, List<String> uuidList) throws IOException {
+        uuidList.add(uuid);
+        ArrayList<ArrayList<String>> children = getAllChildren(uuid);
+        if (children != null) {
+            for (ArrayList<String> child : children) {
+                getChildrenUuids(child.get(0), uuidList);
+            }
+        }
         return uuidList;
     }
 
