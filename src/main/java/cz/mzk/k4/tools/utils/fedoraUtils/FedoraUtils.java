@@ -1,6 +1,6 @@
 package cz.mzk.k4.tools.utils.fedoraUtils;
 
-import cz.mzk.k4.tools.UuidWorker;
+import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.FedoraNamespaces;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.ConnectionException;
@@ -84,7 +84,7 @@ public class FedoraUtils {
     }
 
     @SuppressWarnings("serial")
-    public void applyToAllUuidFromModel(String model, UuidWorker worker) {
+    public void applyToAllUuidOfModel(String model, UuidWorker worker) {
         List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
 
         if (triplets != null) {
@@ -164,6 +164,11 @@ public class FedoraUtils {
 
     private static List<RelationshipTuple> getObjectPidsFromModel(String model) {
         return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + model + "%3E");
+    }
+
+    private static List<RelationshipTuple> getPagesOfRootUuid(String uuid) {
+        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + uuid + "%3E");
+        // <info:fedora/uuid:542e41d0-dd86-11e2-9923-005056827e52> <http://www.nsdl.org/ontologies/relationships#hasPage> *
     }
 
     private static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
