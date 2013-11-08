@@ -4,7 +4,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.FedoraNamespaces;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.ConnectionException;
@@ -14,6 +13,7 @@ import cz.mzk.k4.tools.utils.fedoraUtils.util.IOUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.util.PIDParser;
 import cz.mzk.k4.tools.utils.fedoraUtils.util.RESTHelper;
 import cz.mzk.k4.tools.utils.fedoraUtils.util.XMLUtils;
+import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 import org.fedora.api.FedoraAPIA;
 import org.fedora.api.FedoraAPIM;
@@ -60,10 +60,14 @@ public class FedoraUtils {
     private static String USER = "";
     private static String PASS = "";
 
-    /** The API mport. */
+    /**
+     * The API mport.
+     */
     private FedoraAPIM APIMport;
 
-    /** The API aport. */
+    /**
+     * The API aport.
+     */
     private FedoraAPIA APIAport;
 
     public FedoraUtils() {
@@ -89,7 +93,7 @@ public class FedoraUtils {
     }
 
     public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker) {
-        applyToAllUuidOfModel(model, worker, 1);
+        applyToAllUuidOfModel(model, worker, 10);
     }
 
 
@@ -112,15 +116,13 @@ public class FedoraUtils {
                             semaphore.acquire();
                             new Thread() {
                                 public void run() {
-                                    try {
-                                        LOGGER.debug("Worker is running on " + childUuid);
-                                        worker.run(childUuid);
-                                    } finally {
-                                      semaphore.release();
-                                    }
+                                    LOGGER.debug("Worker is running on " + childUuid);
+                                    worker.run(childUuid);
+                                    semaphore.release();
                                 }
                             }.start();
                         } catch (InterruptedException e) {
+                            semaphore.release();
                             LOGGER.error("Worker on " + childUuid + " was interrupted");
                         }
                     }
@@ -158,7 +160,7 @@ public class FedoraUtils {
     }
 
     public static List<String> getChildrenUuids(String uuid, DigitalObjectModel model) throws IOException {
-       return getChildrenUuids(uuid, new ArrayList<String>(), model);
+        return getChildrenUuids(uuid, new ArrayList<String>(), model);
     }
 
     private static List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
@@ -526,8 +528,6 @@ public class FedoraUtils {
     public void insertFoxml(String path) {
         // getAPIM().ingest();
     }
-
-
 
 
 }
