@@ -159,16 +159,18 @@ public class FedoraUtils {
      * @return the object pids
      */
     public static List<RelationshipTuple> getObjectPids(String subjectPid) {
+        // <info:fedora/[uuid:...]> * *
         return getSubjectOrObjectPids("%3Cinfo:fedora/" + subjectPid + "%3E%20*%20*");
     }
 
     private static List<RelationshipTuple> getObjectPidsFromModel(DigitalObjectModel model) {
+        // * * <info:fedora//model:[model]>
         return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/model:" + model.getValue() + "%3E");
     }
 
     private static List<RelationshipTuple> getPagesOfRootUuid(String uuid) {
-        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + uuid + "%3E");
         // <info:fedora/uuid:542e41d0-dd86-11e2-9923-005056827e52> <http://www.nsdl.org/ontologies/relationships#hasPage> *
+        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + uuid + "%3E");
     }
 
     private static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
