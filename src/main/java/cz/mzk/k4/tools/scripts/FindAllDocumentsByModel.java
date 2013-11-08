@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
@@ -8,7 +9,7 @@ import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
  * @author: Martin Rumanek
  * @version: 10/3/13
  */
-public class FindAllDocumentsByModel {
+public class FindAllDocumentsByModel implements Script {
 
     private static FedoraUtils fu = new FedoraUtils();
 
@@ -21,5 +22,15 @@ public class FindAllDocumentsByModel {
         });
 
 
+    }
+
+    @Override
+    public void run(String[] args) {
+        //run(args[0]);
+    }
+
+    @Override
+    public String getUsage() {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
+import cz.mzk.k4.tools.utils.Script;
 import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import java.util.Properties;
  * 	@author Jan Holman
  * 
  */
-public class CheckLogs {
+public class CheckLogs implements Script {
 
 	private static Knihovna knihovna;
 	private static String host;
@@ -31,7 +32,7 @@ public class CheckLogs {
 			.getLogger(CheckLogs.class);
 	static final String CONF_FILE_NAME = "k4_tools_config.properties";
 
-	public static void run() {
+	public void run(String args[]) {
 
 		// get properties file (/home/{user}/properties)
 		String home = System.getProperty("user.home");
@@ -116,4 +117,9 @@ public class CheckLogs {
 			ex.printStackTrace();
 		}
 	}
+
+    @Override
+    public String getUsage() {
+        return null;
+    }
 }
