@@ -2,6 +2,8 @@ package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import cz.mzk.k4.tools.utils.Script;
+
 import javax.ws.rs.core.MediaType;
 
 
@@ -9,10 +11,10 @@ import javax.ws.rs.core.MediaType;
  * @author Jan Holman
  *         Vypíše uuid svazků s neznámou dostupností
  */
-public class MissingPolicyUuid {
+public class MissingPolicyUuid implements Script {
 
 
-    public static void run() {
+    public void run(String[] args) {
         Client client = Client.create();
 
         for (int offset = 0; offset < 1081; offset = offset + 20) {
@@ -30,5 +32,10 @@ public class MissingPolicyUuid {
             }
         }
 
+    }
+
+    @Override
+    public String getUsage() {
+        return null;
     }
 }

@@ -1,5 +1,9 @@
 package cz.mzk.k4.tools.utils.fedoraUtils;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.FedoraNamespaces;
@@ -51,9 +55,9 @@ public class FedoraUtils {
      * The Constant LOGGER.
      */
     private static final Logger LOGGER = Logger.getLogger(FedoraUtils.class);
-    private static String FEDORA_URL = "";//"http://fedora.mzk.cz/fedora/";
-    private static String USER = "";//fedora user
-    private static String PASS = "";//fedora password
+    private static String FEDORA_URL = "";
+    private static String USER = "";
+    private static String PASS = "";
 
     /** The API mport. */
     private FedoraAPIM APIMport;
@@ -175,9 +179,6 @@ public class FedoraUtils {
 
     private static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
-//        String command =
-//                configuration.getFedoraHost() + "/risearch?type=triples&lang=spo&format=N-Triples&query="
-//                        + restOfCommand;
         String command =
                 FEDORA_URL + "/risearch?type=triples&lang=spo&format=N-Triples&query="
                         + restOfCommand;
@@ -186,8 +187,6 @@ public class FedoraUtils {
             stream =
                     RESTHelper.get(command,
                             USER, PASS,
-//                            configuration.getFedoraLogin(),
-//                            configuration.getFedoraPassword(),
                             false);
             if (stream == null) return null;
             String result = IOUtils.readAsString(stream, Charset.forName("UTF-8"), true);
@@ -304,6 +303,32 @@ public class FedoraUtils {
         String datastreamsListPath =
                 FEDORA_URL + "/objects/" + uuid + "/datastreams?format=xml";
         return datastreamsListPath;
+    }
+
+    public static byte[] getPdf(String uuid) throws IOException {
+        String fedoraObject = FEDORA_URL + "/objects/" + uuid + "/datastreams/IMG_FULL/content";
+
+        Client client = Client.create();
+
+        WebResource webResource = client
+                .resource(fedoraObject);
+
+        client.addFilter(new HTTPBasicAuthFilter(USER, PASS));
+
+        ClientResponse response = webResource.accept("application/pdf")
+                .get(ClientResponse.class);
+
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
+
+        InputStream is = response.getEntityInputStream();
+
+
+        byte[] bytes = org.apache.commons.io.IOUtils.toByteArray(is);
+
+        return bytes;
     }
 
     public String getOcr(String uuid) {

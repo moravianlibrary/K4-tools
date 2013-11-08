@@ -1,19 +1,21 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.workers.UuidWorker;
+import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author: Martin Rumanek
  * @version: 9/18/13
  */
-public class FindBadCharacterInOcr implements UuidWorker {
+public class FindBadCharacterInOcr implements UuidWorker, Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
     private static FedoraUtils fu = new FedoraUtils();
@@ -28,7 +30,7 @@ public class FindBadCharacterInOcr implements UuidWorker {
 
         List<String> list;
         try {
-            list = fu.getChildren(uuid, DigitalObjectModel.PAGE);
+            list = fu.getChildren(uuid,     DigitalObjectModel.PAGE);
 
             for (String uuidChild : list) {
                 if (containBadCharacter(fu.getOcr(uuidChild))) {
@@ -49,6 +51,18 @@ public class FindBadCharacterInOcr implements UuidWorker {
 
     }
 
+    public void run(String[] args) {
+        run(args[0]);
+        //fu.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
+        //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
+        //findBadCharacterInOcr.setRepair(args[2].equals("opravit"));
+        //findBadCharacterInOcr.run(args[1]);
+    }
+
+    @Override
+    public String getUsage() {
+        return null;
+    }
 
 
     // http://blog.mark-mclaren.info/2007/02/invalid-xml-characters-when-valid-utf8_5873.html

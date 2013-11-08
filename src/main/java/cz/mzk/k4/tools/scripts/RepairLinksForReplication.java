@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.Script;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -21,15 +22,18 @@ import java.util.List;
  * @version: 8/21/13
  *
  * Prisla nejaka data z jinych knihoven, jsou ve formatu Krameria3, ale maji rozbite odkazy
+ * replikace z NK obsahovala špatné cesty k OCR a obrázkům, tyto cesty jsou zkontrolovány
+ * a pokud jsou v jiné úrovni jsou odkazy upraveny
  */
-public class RepairLinksForReplication {
+public class RepairLinksForReplication implements Script {
 
     private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepairLinksForReplication.class);
 
     public static final String IMAGES_PATH = "jpg" + File.separator;
     public static final String OCR_PATH = "txt" + File.separator;
 
-    public static void run(String path) {
+    public void run(String[] args) {
+        String path = args[0];
         Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
 
         while(iterator.hasNext()) {
@@ -39,7 +43,12 @@ public class RepairLinksForReplication {
 
     }
 
-    protected static void checkAndChangeXML(File file) {
+    @Override
+    public String getUsage() {
+        return null;
+    }
+
+    protected void checkAndChangeXML(File file) {
         SAXReader reader = new SAXReader();
         try {
             Document document = reader.read(file);
