@@ -32,8 +32,8 @@ public class RepairLinksForReplication implements Script {
     public static final String IMAGES_PATH = "jpg" + File.separator;
     public static final String OCR_PATH = "txt" + File.separator;
 
-    public void run(String[] args) {
-        String path = args[0];
+    public void run(List<String> args) {
+        String path = args.get(0);
         Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
 
         while(iterator.hasNext()) {

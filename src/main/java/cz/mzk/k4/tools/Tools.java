@@ -1,13 +1,11 @@
 package cz.mzk.k4.tools;
 
-import cz.mzk.k4.tools.scripts.CheckLogs;
-import cz.mzk.k4.tools.scripts.FindAllDocumentsByModel;
-import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
-import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
-import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.utils.ScriptRunner;
-import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Martin Rumanek
@@ -22,12 +20,17 @@ public class Tools {
         runner.register("spatneZnakyOCR", new FindBadCharacterInOcr());
         runner.register("opraveniOdkazuProReplikaci", new RepairLinksForReplication());
         runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
+        runner.register("vypisBezdetneMonografie", new FindChildlessMonographs());
 
         if (args.length < 1 || args[0] == null) {
             printUsage(runner);
             return;
+        } else {
+            String scriptName = args[0];
+            List<String> params = new ArrayList<String>(Arrays.asList(args));
+            params.remove(scriptName);
+            runner.run(scriptName, params);
         }
-
     }
 
     private static void printUsage(ScriptRunner runner) {
@@ -38,8 +41,6 @@ public class Tools {
         for (String name : runner.getAllScriptsName()) {
             System.out.println(name);
         }
-
-
     }
 
 }

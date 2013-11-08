@@ -5,10 +5,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
-import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +28,7 @@ public class FindBadCharacterInOcr implements UuidWorker, Script {
 
         List<String> list;
         try {
-            list = fu.getChildren(uuid,     DigitalObjectModel.PAGE);
+            list = fu.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
 
             for (String uuidChild : list) {
                 if (containBadCharacter(fu.getOcr(uuidChild))) {
@@ -51,8 +49,8 @@ public class FindBadCharacterInOcr implements UuidWorker, Script {
 
     }
 
-    public void run(String[] args) {
-        run(args[0]);
+    public void run(List<String> args) {
+        run(args.get(0));
         //fu.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
         //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
         //findBadCharacterInOcr.setRepair(args[2].equals("opravit"));

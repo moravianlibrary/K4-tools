@@ -1,7 +1,6 @@
 package cz.mzk.k4.tools.workers.readOnly;
 
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.util.List;
  * Date: 11/7/13
  * Time: 10:13 AM
  */
-public class HasPagesWorker implements UuidWorker {
+public class ChildCounterWorker implements UuidWorker {
 
     private static FedoraUtils fedoraUtils = new FedoraUtils();
 
@@ -24,11 +23,11 @@ public class HasPagesWorker implements UuidWorker {
     @Override
     public void run(String uuid) {
 
-        List<String> listOfPages;
+        List<String> listOfChildren;
         try {
-            // všechny děti typu Page (rekurzivně se zanořuje)
-            listOfPages = fedoraUtils.getChildren(uuid, DigitalObjectModel.PAGE);
-            if (listOfPages.isEmpty()) {
+            // všechny děti (rekurzivně se zanořuje)
+            listOfChildren = fedoraUtils.getChildrenUuids(uuid);
+            if (listOfChildren.isEmpty()) {
                 System.out.println(uuid);
             }
         } catch (IOException e) {

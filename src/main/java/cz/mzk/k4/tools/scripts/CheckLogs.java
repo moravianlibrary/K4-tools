@@ -32,7 +32,7 @@ public class CheckLogs implements Script {
 			.getLogger(CheckLogs.class);
 	static final String CONF_FILE_NAME = "k4_tools_config.properties";
 
-	public void run(String args[]) {
+	public void run(List<String> args) {
 
 		// get properties file (/home/{user}/properties)
 		String home = System.getProperty("user.home");
