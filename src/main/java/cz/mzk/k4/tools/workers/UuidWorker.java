@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools;
+package cz.mzk.k4.tools.workers;
 
 /**
  * @author: Martin Rumanek

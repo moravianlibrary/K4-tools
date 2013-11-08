@@ -1,10 +1,7 @@
 package cz.mzk.k4.tools;
 
-import cz.mzk.k4.tools.scripts.CheckLogs;
-import cz.mzk.k4.tools.scripts.FindAllDocumentsFromModel;
-import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
-import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
-import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.scripts.*;
+import cz.mzk.k4.tools.scripts.FindAllDocumentsByModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 
 /**
@@ -41,7 +38,7 @@ public class Tools {
         } else if (args[0].equals("spatneZnakyOCRzModelu")) {
             FedoraUtils fu = new FedoraUtils();
             FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
-            fu.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
+            fu.applyToAllUuidOfModel(args[1], findBadCharacterInOcr);
         }
         else if (args[0].equals("spatneZnakyOCR")) {
             /**
@@ -70,12 +67,16 @@ public class Tools {
             RepairLinksForReplication.run(args[1]);
 
         } else if (args[0].equals("vsechnaUuidZmodelu")) {
-            FindAllDocumentsFromModel.run(args[1]);
+            FindAllDocumentsByModel.run(args[1]);
+        } else if (args[0].equals("prazdneMonografie")) {
+            /**
+             * Najde a vypíše na stand. výstup uuid monografií, ke kterým ve fedoře (triplety) chybí vazby na stránky
+             * @author Jan Holman
+             */
+            FindPagelessMonographs.run();
         } else {
             printUsage();
         }
-
-
     }
 
     private static void printUsage() {
@@ -84,7 +85,7 @@ public class Tools {
         System.out.println("uuidBezDostupnosti");
         System.out.println("spatneZnakyOCR"); // "opravit"?
         System.out.println("opraveniOdkazuProReplikaci");
-
+        System.out.println("prazdneMonografie");
     }
 
 }
