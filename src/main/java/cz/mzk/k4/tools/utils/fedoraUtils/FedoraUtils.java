@@ -84,7 +84,7 @@ public class FedoraUtils {
     }
 
     @SuppressWarnings("serial")
-    public void applyToAllUuidOfModel(String model, UuidWorker worker) {
+    public void applyToAllUuidOfModel(DigitalObjectModel model, UuidWorker worker) {
         List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
 
         if (triplets != null) {
@@ -162,8 +162,8 @@ public class FedoraUtils {
         return getSubjectOrObjectPids("%3Cinfo:fedora/" + subjectPid + "%3E%20*%20*");
     }
 
-    private static List<RelationshipTuple> getObjectPidsFromModel(String model) {
-        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + model + "%3E");
+    private static List<RelationshipTuple> getObjectPidsFromModel(DigitalObjectModel model) {
+        return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/model:" + model.getValue() + "%3E");
     }
 
     private static List<RelationshipTuple> getPagesOfRootUuid(String uuid) {

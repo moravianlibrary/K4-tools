@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
+import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.readOnly.HasPagesWorker;
 
@@ -14,9 +15,8 @@ public class FindPagelessMonographs {
 
     private static FedoraUtils fu = new FedoraUtils();
     private static UuidWorker worker = new HasPagesWorker();
-    private static String model = "monograph";
 
     public static void run() {
-        fu.applyToAllUuidOfModel(model, worker);
+        fu.applyToAllUuidOfModel(DigitalObjectModel.MONOGRAPH, worker);
     }
 }

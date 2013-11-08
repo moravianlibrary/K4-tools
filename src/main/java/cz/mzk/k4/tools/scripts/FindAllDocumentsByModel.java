@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 
@@ -11,7 +12,7 @@ public class FindAllDocumentsByModel {
 
     private static FedoraUtils fu = new FedoraUtils();
 
-    public static void run(String model) {
+    public static void run(DigitalObjectModel model) {
         fu.applyToAllUuidOfModel(model, new UuidWorker() {
             @Override
             public void run(String uuid) {
