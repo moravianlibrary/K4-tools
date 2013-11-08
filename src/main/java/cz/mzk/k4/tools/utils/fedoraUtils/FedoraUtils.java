@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author: Martin Rumanek, incad
@@ -87,9 +88,16 @@ public class FedoraUtils {
 
     }
 
+    public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker) {
+        applyToAllUuidOfModel(model, worker, 1);
+    }
+
+
     @SuppressWarnings("serial")
-    public void applyToAllUuidOfModel(DigitalObjectModel model, UuidWorker worker) {
+    public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker, Integer maxThreads) {
         List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
+
+        final Semaphore semaphore = new Semaphore(maxThreads);
 
         if (triplets != null) {
             for (final RelationshipTuple triplet : triplets) {
@@ -100,8 +108,21 @@ public class FedoraUtils {
                             triplet.getSubject().substring((Constants.FEDORA_INFO_PREFIX).length());
 
                     if (!childUuid.contains("/")) {
-                        LOGGER.debug("Worker is running on " + childUuid);
-                        worker.run(childUuid);
+                        try {
+                            semaphore.acquire();
+                            new Thread() {
+                                public void run() {
+                                    try {
+                                        LOGGER.debug("Worker is running on " + childUuid);
+                                        worker.run(childUuid);
+                                    } finally {
+                                      semaphore.release();
+                                    }
+                                }
+                            }.start();
+                        } catch (InterruptedException e) {
+                            LOGGER.error("Worker on " + childUuid + " was interrupted");
+                        }
                     }
                 }
             }
