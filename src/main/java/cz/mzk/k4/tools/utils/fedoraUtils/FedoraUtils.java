@@ -34,10 +34,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,13 +95,30 @@ public class FedoraUtils {
     }
 
     public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker) {
-        applyToAllUuidOfModel(model, worker, 10);
+        applyToAllUuidOfModel(model, worker, 1);
+    }
+
+    public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker, Integer maxThreads) {
+        List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
+        applyToAllUuid(triplets, worker, maxThreads);
+    }
+
+    public void applyToAllUuidOfStateDeleted(final UuidWorker worker) {
+        List<RelationshipTuple> triplets = null;
+        try {
+            triplets = FedoraUtils.getObjectsPidsStateDeleted();
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Unsupported encoding");
+        }
+        applyToAllUuid(triplets, worker, 1);
     }
 
 
-    @SuppressWarnings("serial")
-    public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker, Integer maxThreads) {
-        List<RelationshipTuple> triplets = FedoraUtils.getObjectPidsFromModel(model);
+    public void applyToAllUuid(List<RelationshipTuple> triplets, final UuidWorker worker) {
+        applyToAllUuid(triplets, worker, 1);
+    }
+
+    public void applyToAllUuid(List<RelationshipTuple> triplets, final UuidWorker worker, Integer maxThreads) {
 
         final Semaphore semaphore = new Semaphore(maxThreads);
 
@@ -217,7 +236,12 @@ public class FedoraUtils {
         return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + uuid + "%3E");
     }
 
-    private static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
+    private static List<RelationshipTuple> getObjectsPidsStateDeleted() throws UnsupportedEncodingException {
+        return getSubjectOrObjectPids(
+                URLEncoder.encode("* <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Deleted>", "UTF-8"));
+    }
+
+    public static List<RelationshipTuple> getSubjectOrObjectPids(String restOfCommand) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
         String command =
                 FEDORA_URL + "/risearch?type=triples&lang=spo&format=N-Triples&query="
@@ -419,8 +443,16 @@ public class FedoraUtils {
         return sb.toString();
     }
 
-    public boolean setOcr(String uuid, String ocr) throws CreateObjectException {
+    public static boolean  setOcr(String uuid, String ocr) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.TEXT_OCR, uuid, ocr, false, "text/plain");
+    }
+
+    public static boolean setThumbnail(String uuid, String path) throws CreateObjectException {
+        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_THUMB, uuid, path, true, "image/jpg");
+    }
+
+    public static boolean setPreview(String uuid, String path) throws CreateObjectException {
+        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_PREVIEW, uuid, path, true, "image/jpg");
     }
 
     /**
@@ -446,7 +478,7 @@ public class FedoraUtils {
      * @return true, if successful
      * @throws CreateObjectException the create object exception
      */
-    private boolean insertManagedDatastream(Constants.DATASTREAM_ID dsId,
+    private static boolean insertManagedDatastream(Constants.DATASTREAM_ID dsId,
                                             String uuid,
                                             String filePathOrContent,
                                             boolean isFile,
