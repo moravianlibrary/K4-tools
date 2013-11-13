@@ -23,7 +23,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingProvider;
@@ -393,6 +392,23 @@ public class FedoraUtils {
         byte[] bytes = org.apache.commons.io.IOUtils.toByteArray(is);
 
         return bytes;
+    }
+
+    public static void purgeObject(String uuid) {
+        String fedoraObject = FEDORA_URL + "/objects/" + uuid;
+
+        Client client = Client.create();
+
+        WebResource webResource = client.resource(fedoraObject);
+
+        client.addFilter(new HTTPBasicAuthFilter(USER, PASS));
+
+        ClientResponse response = webResource.delete(ClientResponse.class);
+
+        if (response.getStatus() != 204) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
     }
 
     public String getOcr(String uuid) {

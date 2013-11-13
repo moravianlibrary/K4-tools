@@ -17,15 +17,15 @@ import java.util.List;
 public class FindChildlessMonographs implements Script {
 
     private static FedoraUtils fu = new FedoraUtils();
-    private static UuidWorker worker = new ChildCounterWorker();
+    private static UuidWorker worker = new ChildCounterWorker(false);
 
     @Override
     public void run(List<String> args) {
-        fu.applyToAllUuidOfModel(DigitalObjectModel.MONOGRAPH, worker);
+        fu.applyToAllUuidOfModel(DigitalObjectModel.MONOGRAPH, worker, 5);
     }
 
     @Override
     public String getUsage() {
-        return "vražda smrt zabití";
+        return "vypisBezdetneMonografie : Vypíše monografie s rozbitými vazbami v ritriplets";
     }
 }

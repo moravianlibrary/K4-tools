@@ -2,7 +2,6 @@ package cz.mzk.k4.tools.workers.readOnly;
 
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -12,9 +11,15 @@ import java.util.List;
  * Date: 11/7/13
  * Time: 10:13 AM
  */
-public class ChildCounterWorker implements UuidWorker {
+public class ChildCounterWorker extends UuidWorker {
 
     private static FedoraUtils fedoraUtils = new FedoraUtils();
+    private int counter;
+
+    public ChildCounterWorker(boolean writeEnabled) {
+        super(writeEnabled);
+        counter = 0;
+    }
 
     /**
      * @param uuid
@@ -28,7 +33,11 @@ public class ChildCounterWorker implements UuidWorker {
             // všechny děti (rekurzivně se zanořuje)
             listOfChildren = fedoraUtils.getChildrenUuids(uuid);
             if (listOfChildren.isEmpty()) {
+                counter++;
                 System.out.println(uuid);
+                if ((counter % 100) == 1) {
+                    System.out.println("Prohledáno " + counter + " monografií");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

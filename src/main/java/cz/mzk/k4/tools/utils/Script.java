@@ -7,7 +7,9 @@ import java.util.List;
  * @version: 11/8/13
  */
 public interface Script {
+
     public void run(List<String> args);
 
     public String getUsage();
+
 }
