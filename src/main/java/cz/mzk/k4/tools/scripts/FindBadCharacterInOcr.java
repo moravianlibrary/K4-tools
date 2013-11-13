@@ -1,11 +1,12 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
+import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -13,12 +14,16 @@ import java.util.List;
  * @author: Martin Rumanek
  * @version: 9/18/13
  */
-public class FindBadCharacterInOcr implements UuidWorker, Script {
+public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
     private static FedoraUtils fu = new FedoraUtils();
 
     private boolean repair;
+
+    public FindBadCharacterInOcr(boolean writeEnabled) {
+        super(writeEnabled);
+    }
 
     public void setRepair(boolean repair) {
         this.repair = repair;
