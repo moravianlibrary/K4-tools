@@ -1,11 +1,11 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.ProcessManager;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +23,10 @@ import java.util.Properties;
  */
 public class CheckLogs implements Script {
 
-	private static Knihovna knihovna;
-	private static String host;
+	private static String LIBRARY_PREFIX = "";
+	private static String HOST;
 	private static ProcessManager pm;
-	// default number of processes fetched from Kramerius
-	private static Integer defSize;
+	private static Integer defSize; // default number of processes fetched from Kramerius
 	private static org.apache.log4j.Logger LOGGER = Logger
 			.getLogger(CheckLogs.class);
 	static final String CONF_FILE_NAME = "k4_tools_config.properties";
@@ -48,12 +47,12 @@ public class CheckLogs implements Script {
 		}
 
 		defSize = Integer.parseInt(properties.getProperty("checkLogs.resultSize"));
-		knihovna = Knihovna.valueOf(properties.getProperty("knihovna"));
-		host = properties.getProperty(knihovna + ".host");
-		LOGGER.info("Knihovna: " + knihovna);
-		String username = properties.getProperty(knihovna + ".username");
-		String password = properties.getProperty(knihovna + ".password");
-		pm = new ProcessManager(host, username, password);
+        LIBRARY_PREFIX = properties.getProperty("knihovna");
+        HOST = properties.getProperty(LIBRARY_PREFIX + ".host");
+		LOGGER.info("Knihovna: " + LIBRARY_PREFIX);
+		String username = properties.getProperty(LIBRARY_PREFIX + ".username");
+		String password = properties.getProperty(LIBRARY_PREFIX + ".password");
+		pm = new ProcessManager(HOST, username, password);
 
 		try {
 			// handle URL parameters

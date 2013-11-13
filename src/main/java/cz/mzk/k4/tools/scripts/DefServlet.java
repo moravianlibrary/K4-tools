@@ -1,9 +1,9 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.domain.Knihovna;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.utils.ProcessManager;
 import org.apache.log4j.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public class DefServlet extends HttpServlet {
 	private InputStream inputStream;
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(DefServlet.class);
 	static final String CONF_FILE_NAME = "k4_tools_config.properties";
-	private Knihovna knihovna;
+	private String knihovna;
 
 	/**
 	 * Ukazka servletu s nactenim config. souboru
@@ -50,7 +50,7 @@ public class DefServlet extends HttpServlet {
 		}
 
 		defSize = Integer.parseInt(properties.getProperty("resultSize"));
-		knihovna = Knihovna.valueOf(properties.getProperty("knihovna"));
+		knihovna = properties.getProperty("knihovna");
 		host = properties.getProperty(knihovna + ".host");
 		String username = properties.getProperty(knihovna + ".username");
 		String password = properties.getProperty(knihovna + ".password");
@@ -70,8 +70,7 @@ public class DefServlet extends HttpServlet {
 			if (!params.containsKey("resultSize")) {
 				params.put("resultSize", defSize.toString());
 			}
-			int resultSize = Integer.parseInt(params.get("resultSize")
-					.toString());
+			int resultSize = Integer.parseInt(params.get("resultSize").toString());
 
 			// fetch processes
 			List<KrameriusProcess> processes = pm.searchByParams(params);
