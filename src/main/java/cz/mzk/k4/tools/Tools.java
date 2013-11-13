@@ -17,7 +17,7 @@ public class Tools {
         ScriptRunner runner = new ScriptRunner();
         runner.register("checkLogs", new CheckLogs());
         runner.register("uuidBezDostupnosti", new MissingPolicyUuid());
-        runner.register("spatneZnakyOCR", new FindBadCharacterInOcr());
+        runner.register("spatneZnakyOCR", new FindBadCharacterInOcr(false));
         runner.register("opraveniOdkazuProReplikaci", new RepairLinksForReplication());
         runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
         runner.register("vypisBezdetneMonografie", new FindChildlessMonographs());
