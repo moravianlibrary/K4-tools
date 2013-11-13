@@ -60,6 +60,7 @@ public class FedoraUtils {
     private static String FEDORA_URL = "";
     private static String USER = "";
     private static String PASS = "";
+    private static String LIBRARY_PREFIX = "";
 
     /**
      * The API mport.
@@ -86,9 +87,10 @@ public class FedoraUtils {
             LOGGER.log(null, ex);
         }
 
-        USER = properties.getProperty("fedora.username");
-        PASS = properties.getProperty("fedora.password");
-        FEDORA_URL = properties.getProperty("fedora.url");
+        LIBRARY_PREFIX = properties.getProperty("knihovna");
+        USER = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.username");
+        PASS = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.password");
+        FEDORA_URL = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.url");
 
 
     }
@@ -405,7 +407,7 @@ public class FedoraUtils {
 
         ClientResponse response = webResource.delete(ClientResponse.class);
 
-        if (response.getStatus() != 204) {
+        if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
                     + response.getStatus());
         }

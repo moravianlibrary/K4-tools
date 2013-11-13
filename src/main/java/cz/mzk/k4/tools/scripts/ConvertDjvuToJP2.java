@@ -39,6 +39,7 @@ public class ConvertDjvuToJP2 {
     private static final String DECOMPRESS_TIFF_PARAM = " +compress ";
     private static final String TIFF_TO_JP2 = "src/main/resources/djatoka/bin/compress.sh djatoka ";
 
+    private static String LIBRARY_PREFIX = "MZK";
     private static String USER = "";//fedora user
     private static String PASS = "";//fedora password
     
@@ -60,9 +61,8 @@ public class ConvertDjvuToJP2 {
             Logger.getLogger(ConvertDjvuToJP2.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        USER = properties.getProperty("fedora.username");
-        PASS = properties.getProperty("fedora.password");
-
+        USER = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.username");
+        PASS = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.password");
 
         //download and convert djvu images of given periodical uuid
         try {
