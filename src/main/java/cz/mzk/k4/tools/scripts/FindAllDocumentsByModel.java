@@ -16,7 +16,7 @@ public class FindAllDocumentsByModel implements Script {
     private static FedoraUtils fu = new FedoraUtils();
 
     public static void run(DigitalObjectModel model) {
-        fu.applyToAllUuidOfModel(model, new UuidWorker() {
+        fu.applyToAllUuidOfModel(model, new UuidWorker(false) {
             @Override
             public void run(String uuid) {
                 System.out.println(uuid);
