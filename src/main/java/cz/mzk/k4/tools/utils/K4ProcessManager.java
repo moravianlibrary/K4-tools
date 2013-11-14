@@ -1,65 +1,51 @@
 package cz.mzk.k4.tools.utils;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang.NullArgumentException;
-import org.apache.log4j.Logger;
 import com.google.gson.JsonSyntaxException;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
+import org.apache.commons.lang.NullArgumentException;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.List;
 
 /**
  * 
  * @author Jan Holman
  * 
  */
-public class ProcessManager {
+public class K4ProcessManager {
 
-	private BasicAuthenticationFilter credentials;
-	private String host;
-	private JsonParser parser;
-	private Client client;
+	private AccessProvider accessProvider;
+    private JsonParser parser;
 
-	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(ProcessManager.class);
+	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(K4ProcessManager.class);
 
-	public ProcessManager(String host, String username, String password) {
-		this.credentials = new BasicAuthenticationFilter(username, password);
-		this.client = Client.create();
+	public K4ProcessManager(AccessProvider accessProvider) {
+        this.accessProvider = accessProvider;
 		this.parser = new JsonParser();
-		this.host = host;
 	}
 
 	/**
 	 * Returns list of process descriptions
 	 * 
-	 * @param map of parameters
+	 * @param queryParams - map of parameters
 	 * @return List of Process objects
 	 */
-	public List<KrameriusProcess> searchByParams(Map<String, String> params)
+	public List<KrameriusProcess> searchByParams(MultivaluedMap queryParams)
 			throws NullArgumentException {
 
-		if (params == null) {
-			throw new NullArgumentException("params");
+		if (queryParams == null) {
+			throw new NullArgumentException("queryParams");
 		}
 
 		// get JSON string
-		String url = "http://" + host + "/search/api/v4.6/processes";
-		url += "?";
-		Iterator<String> iterator = params.keySet().iterator();
-		String key = "";
-		while (iterator.hasNext()) {
-			key = iterator.next();
-			url += key + "=" + params.get(key) + "&";
-		}
-		WebResource resource = client.resource(url);
-		resource.addFilter(credentials);
-		String strJson = resource.accept(MediaType.APPLICATION_JSON).get(
-				String.class);
+		String query = "/search/api/v4.6/processes";
+		WebResource resource = accessProvider.getKrameriusWebResource(query);
+		String strJson = resource.queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(String.class);
 
 		// parse JSON string
 		List<KrameriusProcess> list = null;
@@ -82,11 +68,8 @@ public class ProcessManager {
 
 		// get JSON string
 		try {
-			WebResource resourse = client.resource("http://" + host
-					+ "/search/api/v4.6/processes/" + uuid);
-			resourse.addFilter(credentials);
-			strJson = resourse.accept(MediaType.APPLICATION_JSON).get(
-					String.class);
+			WebResource resource = accessProvider.getKrameriusWebResource("/search/api/v4.6/processes/" + uuid);
+			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
 		} catch (UniformInterfaceException e) {
 			int status = e.getResponse().getStatus();
 			if (status == 404) {
@@ -116,12 +99,9 @@ public class ProcessManager {
 
 		// get JSON string
 		try {
-			String url = "http://" + host + "/search/api/v4.6/processes/"
-					+ uuid + "/logs";
-			WebResource resource = client.resource(url);
-			resource.addFilter(credentials);
-			strJson = resource.accept(MediaType.APPLICATION_JSON).get(
-					String.class);
+			String query = "/search/api/v4.6/processes/" + uuid + "/logs";
+            WebResource resource = accessProvider.getKrameriusWebResource(query);
+			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
 		} catch (UniformInterfaceException e) {
 			int status = e.getResponse().getStatus();
 			if (status == 404) {

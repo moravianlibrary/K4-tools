@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.workers.readOnly;
 
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class ChildCounterWorker extends UuidWorker {
 
-    private static FedoraUtils fedoraUtils = new FedoraUtils();
+    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
     private int counter;
 
     public ChildCounterWorker(boolean writeEnabled) {

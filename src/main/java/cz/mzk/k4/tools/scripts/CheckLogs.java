@@ -1,16 +1,19 @@
 package cz.mzk.k4.tools.scripts;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
-import cz.mzk.k4.tools.utils.ProcessManager;
+import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.K4ProcessManager;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.HashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * 
@@ -23,46 +26,26 @@ import java.util.Properties;
  */
 public class CheckLogs implements Script {
 
-	private static String LIBRARY_PREFIX = "";
-	private static String HOST;
-	private static ProcessManager pm;
+	private static K4ProcessManager pm;
 	private static Integer defSize; // default number of processes fetched from Kramerius
-	private static org.apache.log4j.Logger LOGGER = Logger
-			.getLogger(CheckLogs.class);
-	static final String CONF_FILE_NAME = "k4_tools_config.properties";
+	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(CheckLogs.class);
+    private AccessProvider accessProvider;
 
 	public void run(List<String> args) {
 
-		// get properties file (/home/{user}/properties)
-		String home = System.getProperty("user.home");
-		File f = new File(home + "/" + CONF_FILE_NAME);
-
-		Properties properties = new Properties();
-		InputStream inputStream;
-		try {
-			inputStream = new FileInputStream(f);
-			properties.load(inputStream);
-		} catch (IOException e) {
-			LOGGER.fatal("Cannot load properties file");
-		}
-
-		defSize = Integer.parseInt(properties.getProperty("checkLogs.resultSize"));
-        LIBRARY_PREFIX = properties.getProperty("knihovna");
-        HOST = properties.getProperty(LIBRARY_PREFIX + ".host");
-		LOGGER.info("Knihovna: " + LIBRARY_PREFIX);
-		String username = properties.getProperty(LIBRARY_PREFIX + ".username");
-		String password = properties.getProperty(LIBRARY_PREFIX + ".password");
-		pm = new ProcessManager(HOST, username, password);
+        accessProvider = new AccessProvider();
+		defSize = Integer.parseInt(accessProvider.getProperties().getProperty("checkLogs.resultSize"));
+		pm = new K4ProcessManager(accessProvider);
 
 		try {
 			// handle URL parameters
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("checkLogs.resultSize", defSize.toString());
-			params.put("state", "FINISHED");
+            MultivaluedMap queryParams = new MultivaluedMapImpl();
+            queryParams.add("checkLogs.resultSize", defSize.toString());
+            queryParams.add("state", "FINISHED");
 			int resultSize = Integer.parseInt(defSize.toString());
 
 			// fetch processes
-			List<KrameriusProcess> processes = pm.searchByParams(params);
+			List<KrameriusProcess> processes = pm.searchByParams(queryParams);
 
 			// specified resultSize can be bigger than the actual number of
 			// processes fetched from Kramerius

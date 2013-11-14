@@ -5,10 +5,12 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.google.gwt.user.server.Base64Utils;
+import cz.mzk.k4.tools.utils.AccessProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,9 +29,7 @@ import java.util.logging.Logger;
  * @author Filip Volner
  */
 public class ConvertDjvuToJP2 {
-    
-    static final String CONF_FILE_NAME = "k4_tools_config.properties";
-    
+
     private static final String FEDORA_URL = "http://krameriustest.mzk.cz/fedora/get/";//"http://fedora.mzk.cz/fedora/get/";
     private static final String RELS_EXT = "/RELS-EXT/";
     private static final String IMG_FULL = "/IMG_FULL/";    
@@ -39,30 +38,19 @@ public class ConvertDjvuToJP2 {
     private static final String DECOMPRESS_TIFF_PARAM = " +compress ";
     private static final String TIFF_TO_JP2 = "src/main/resources/djatoka/bin/compress.sh djatoka ";
 
-    private static String LIBRARY_PREFIX = "MZK";
     private static String USER = "";//fedora user
     private static String PASS = "";//fedora password
+
+    private AccessProvider accessProvider;
     
-    public static void run(String[] args) {
+    public void run(String[] args) {
         String uuid = args[0];//"uuid:bdc405b0-e5f9-11dc-bfb2-000d606f5dc6";
 
-        String home = System.getProperty("user.home");
-        File f = new File(home + "/" + CONF_FILE_NAME);
+        this.accessProvider = new AccessProvider();
 
-
-
-        Properties properties = new Properties();
-
-        InputStream inputStream;
-        try {
-            inputStream = new FileInputStream(f);
-            properties.load(inputStream);
-        } catch (IOException ex) {
-            Logger.getLogger(ConvertDjvuToJP2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        USER = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.username");
-        PASS = properties.getProperty(LIBRARY_PREFIX + "." + "fedora.password");
+        USER = accessProvider.getFedoraUser();
+        PASS = accessProvider.getFedoraPassword();
+//        FEDORA_URL = accessProvider.getFedoraHost() + "/get/";
 
         //download and convert djvu images of given periodical uuid
         try {

@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
@@ -16,12 +17,12 @@ import java.util.List;
  */
 public class FindChildlessMonographs implements Script {
 
-    private static FedoraUtils fu = new FedoraUtils();
+    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
     private static UuidWorker worker = new ChildCounterWorker(false);
 
     @Override
     public void run(List<String> args) {
-        fu.applyToAllUuidOfModel(DigitalObjectModel.MONOGRAPH, worker, 5);
+        fedoraUtils.applyToAllUuidOfModel(DigitalObjectModel.MONOGRAPH, worker, 5);
     }
 
     @Override
