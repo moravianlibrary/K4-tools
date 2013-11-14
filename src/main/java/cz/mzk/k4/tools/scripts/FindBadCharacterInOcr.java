@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
@@ -17,7 +18,7 @@ import java.util.List;
 public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
-    private static FedoraUtils fu = new FedoraUtils();
+    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
 
     private boolean repair;
 
@@ -33,14 +34,14 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
         List<String> list;
         try {
-            list = fu.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
+            list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
 
             for (String uuidChild : list) {
-                if (containBadCharacter(fu.getOcr(uuidChild))) {
+                if (containBadCharacter(fedoraUtils.getOcr(uuidChild))) {
                     LOGGER.info(uuidChild + " contain some bad characters");
                     if (repair) {
                         try {
-                            fu.setOcr(uuidChild, removeBadCharacters(fu.getOcr(uuidChild)));
+                            fedoraUtils.setOcr(uuidChild, removeBadCharacters(fedoraUtils.getOcr(uuidChild)));
                         } catch (CreateObjectException e) {
                             e.printStackTrace();
                         }
@@ -56,7 +57,7 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     public void run(List<String> args) {
         run(args.get(0));
-        //fu.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
+        //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
         //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
         //findBadCharacterInOcr.setRepair(args[2].equals("opravit"));
         //findBadCharacterInOcr.run(args[1]);

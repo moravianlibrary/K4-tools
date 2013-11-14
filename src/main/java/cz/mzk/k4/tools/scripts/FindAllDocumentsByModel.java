@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
@@ -13,10 +14,10 @@ import java.util.List;
  */
 public class FindAllDocumentsByModel implements Script {
 
-    private static FedoraUtils fu = new FedoraUtils();
+    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
 
     public static void run(DigitalObjectModel model) {
-        fu.applyToAllUuidOfModel(model, new UuidWorker(false) {
+        fedoraUtils.applyToAllUuidOfModel(model, new UuidWorker(false) {
             @Override
             public void run(String uuid) {
                 System.out.println(uuid);
