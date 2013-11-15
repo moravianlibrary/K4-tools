@@ -22,6 +22,7 @@ public class Tools {
         runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
         runner.register("vypisBezdetneMonografie", new FindChildlessMonographs());
         runner.register("stavDeleted", new DeletedDocuments());
+        runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
 
         if (args.length < 1 || args[0] == null) {
             printUsage(runner);

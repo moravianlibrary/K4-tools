@@ -19,6 +19,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -325,30 +326,17 @@ public class FedoraUtils {
         return datastreamsListPath;
     }
 
-    public byte[] getPdf(String uuid) throws IOException {
-//        String fedoraObject = FEDORA_URL + "/objects/" + uuid + "/datastreams/IMG_FULL/content";
-//
-//        Client client = Client.create();
-//
-//        WebResource webResource = client
-//                .resource(fedoraObject);
-//
-//        client.addFilter(new HTTPBasicAuthFilter(USER, PASS));
-
-        ClientResponse response = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams?format=xml")
-                .accept("application/pdf").get(ClientResponse.class);
+    public InputStream getPdf(String uuid) throws IOException {
+        ClientResponse response =
+                accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
+                    .accept("application/pdf").get(ClientResponse.class);
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
                     + response.getStatus());
         }
-
         InputStream is = response.getEntityInputStream();
-
-
-        byte[] bytes = org.apache.commons.io.IOUtils.toByteArray(is);
-
-        return bytes;
+        return is;
     }
 
     public void purgeObject(String uuid) {
@@ -492,7 +480,7 @@ public class FedoraUtils {
                     + "managed datastream to the object: " + uuid);
         }
 
-        if (response.getStatus() == 200) {
+        if (response.getStatus() == 201) {
             LOGGER.info("An " + dsId.getValue() + (isFile ? (" file: " + filePathOrContent) : "")
                     + " has been inserted to the digital object: " + uuid + " as a " + dsId.getValue()
                     + " datastream.");
