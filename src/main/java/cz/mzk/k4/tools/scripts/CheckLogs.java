@@ -16,13 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 
- * Log prohledávání v souboru logs/checkK4Logs + sout
- * Při nalezení FINISHED procesu s neprázdným chybovým výstupem vyrobí soubor 
- * 		logs/{uuid}.txt s chybovým výstupem procesu
- *
  * 	@author Jan Holman
- * 
  */
 public class CheckLogs implements Script {
 
@@ -31,6 +25,12 @@ public class CheckLogs implements Script {
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(CheckLogs.class);
     private AccessProvider accessProvider;
 
+    /**
+     * Log prohledávání v souboru logs/checkK4Logs + sout
+     * Při nalezení FINISHED procesu s neprázdným chybovým výstupem vyrobí soubor
+     * 		logs/{uuid}.txt s chybovým výstupem procesu
+     * @param args - nebere parametry
+     */
 	public void run(List<String> args) {
 
         accessProvider = new AccessProvider();
@@ -102,6 +102,8 @@ public class CheckLogs implements Script {
 
     @Override
     public String getUsage() {
-        return null;
+        return "checkLogs - Kontroluje, jestli se v K4 nevyskytují procesy ve stavu FINISHED s neprázdným chybovým výstupem." +
+                " Přístup ke K4 z konfig. souboru, nebere parametry." +
+                " Výstup (logy problémových procesů) v souborech logs/{uuid procesu}.txt";
     }
 }

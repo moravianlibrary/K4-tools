@@ -46,15 +46,30 @@ public class FedoraUtils {
         this.accessProvider = accessProvider;
     }
 
+    /**
+     *
+     * @param model - např. DigitalObjectModel.MONOGRAPH
+     * @param worker
+     */
     public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker) {
         applyToAllUuidOfModel(model, worker, 1);
     }
 
+    /**
+     *
+     * @param model
+     * @param worker
+     * @param maxThreads
+     */
     public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker, Integer maxThreads) {
         List<RelationshipTuple> triplets = getObjectPidsFromModel(model);
         applyToAllUuid(triplets, worker, maxThreads);
     }
 
+    /**
+     *
+     * @param worker
+     */
     public void applyToAllUuidOfStateDeleted(final UuidWorker worker) {
         List<RelationshipTuple> triplets = null;
         try {
@@ -65,10 +80,21 @@ public class FedoraUtils {
         applyToAllUuid(triplets, worker, 1);
     }
 
+    /**
+     *
+     * @param triplets
+     * @param worker
+     */
     public void applyToAllUuid(List<RelationshipTuple> triplets, final UuidWorker worker) {
         applyToAllUuid(triplets, worker, 1);
     }
 
+    /**
+     *
+     * @param triplets
+     * @param worker
+     * @param maxThreads
+     */
     public void applyToAllUuid(List<RelationshipTuple> triplets, final UuidWorker worker, Integer maxThreads) {
 
         final Semaphore semaphore = new Semaphore(maxThreads);
@@ -101,6 +127,11 @@ public class FedoraUtils {
         }
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     */
     @SuppressWarnings("serial")
     public ArrayList<ArrayList<String>> getAllChildren(String uuid) {
         List<RelationshipTuple> triplets = getObjectPids(uuid);
@@ -129,10 +160,25 @@ public class FedoraUtils {
         return children;
     }
 
+    /**
+     *
+     * @param uuid
+     * @param model
+     * @return
+     * @throws IOException
+     */
     public List<String> getChildrenUuids(String uuid, DigitalObjectModel model) throws IOException {
         return getChildrenUuids(uuid, new ArrayList<String>(), model);
     }
 
+    /**
+     *
+     * @param uuid
+     * @param uuidList
+     * @param model
+     * @return
+     * @throws IOException
+     */
     private List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
         if (model.equals(getModel(uuid))) {
             uuidList.add(uuid);
@@ -149,12 +195,25 @@ public class FedoraUtils {
         return uuidList;
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
     public List<String> getChildrenUuids(String uuid) throws IOException {
         List<String> list = getChildrenUuids(uuid, new ArrayList<String>());
         list.remove(uuid);
         return list;
     }
 
+    /**
+     *
+     * @param uuid
+     * @param uuidList
+     * @return
+     * @throws IOException
+     */
     private List<String> getChildrenUuids(String uuid, List<String> uuidList) throws IOException {
         uuidList.add(uuid);
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
@@ -177,34 +236,44 @@ public class FedoraUtils {
         return getSubjectOrObjectPids("%3Cinfo:fedora/" + subjectPid + "%3E%20*%20*");
     }
 
+    /**
+     *
+     * @param model
+     * @return
+     */
     private List<RelationshipTuple> getObjectPidsFromModel(DigitalObjectModel model) {
         // * * <info:fedora//model:[model]>
         return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/model:" + model.getValue() + "%3E");
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     */
     private List<RelationshipTuple> getPagesOfRootUuid(String uuid) {
         // <info:fedora/uuid:542e41d0-dd86-11e2-9923-005056827e52> <http://www.nsdl.org/ontologies/relationships#hasPage> *
         return getSubjectOrObjectPids("%20*%20*%20%3Cinfo:fedora/" + uuid + "%3E");
     }
 
+    /**
+     *
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     private List<RelationshipTuple> getObjectsPidsStateDeleted() throws UnsupportedEncodingException {
         return getSubjectOrObjectPids(
                 URLEncoder.encode("* <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Deleted>", "UTF-8"));
     }
 
+    /**
+     *
+     * @param query
+     * @return
+     */
     public List<RelationshipTuple> getSubjectOrObjectPids(String query) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
-//        String command =
-//                accessProvider.getFedoraHost() + "/risearch?type=triples&lang=spo&format=N-Triples&query=" + query;
 
-//        InputStream stream = null;
-//        try {
-//            stream =
-//                    RESTHelper.get(command,
-//                            USER, PASS,
-//                            false);
-//            if (stream == null) return null;
-//            String result = IOUtils.readAsString(stream, Charset.forName("UTF-8"), true);
         WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         String result = resource.get(String.class);
@@ -223,18 +292,16 @@ public class FedoraUtils {
                 LOGGER.info("Problem parsing RDF, skipping line:" + Arrays.toString(tokens) + " : " + ex);
             }
         }
-//        } catch (Exception e) {
-//            LOGGER.error(e.getMessage(), e);
-//        } finally {
-//            if (stream != null) try {
-//                stream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+
         return retval;
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
     public DigitalObjectModel getModel(String uuid) throws IOException {
         DigitalObjectModel model = null;
         try {
@@ -249,22 +316,17 @@ public class FedoraUtils {
         return model;
     }
 
-    /*
- * (non-Javadoc)
- * @see cz.mzk.editor.server.fedora.FedoraAccess#getKrameriusModel
- * (java.lang.String)
- */
-
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
     public Document getRelsExt(String uuid) throws IOException {
-//        String relsExtUrl = relsExtUrl(uuid);
         LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + "/get/" + uuid + "/RELS-EXT");
         WebResource resource = accessProvider.getFedoraWebResource("/get/" + uuid + "/RELS-EXT");
         String docString = resource.accept(MediaType.APPLICATION_XML).get(String.class);
-//        InputStream docStream =
-//                RESTHelper.get(relsExtUrl,
-//                        USER,
-//                        PASS,
-//                        true);
+
         if (docString == null) {
             throw new ConnectionException("Cannot get RELS EXT data.");
         }
@@ -277,20 +339,23 @@ public class FedoraUtils {
             LOGGER.error(e.getMessage(), e);
             throw new IOException(e);
         }
-//        finally {
-//            docStream.close();
-//        }
     }
 
-//    public String relsExtUrl(String uuid) {
-//        String url = accessProvider.getFedoraHost() + "/get/" + uuid + "/RELS-EXT";
-//        return url;
-//    }
-
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
     public DigitalObjectModel getDigitalObjectModel(String uuid) throws IOException {
         return getDigitalObjectModel(getRelsExt(uuid));
     }
 
+    /**
+     *
+     * @param relsExt
+     * @return
+     */
     public DigitalObjectModel getDigitalObjectModel(Document relsExt) {
         try {
             Element foundElement =
@@ -326,6 +391,12 @@ public class FedoraUtils {
         return datastreamsListPath;
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
     public InputStream getPdf(String uuid) throws IOException {
         ClientResponse response =
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
@@ -339,14 +410,11 @@ public class FedoraUtils {
         return is;
     }
 
+    /**
+     *
+     * @param uuid
+     */
     public void purgeObject(String uuid) {
-//        String fedoraObject = FEDORA_URL + "/objects/" + uuid;
-//
-//        Client client = Client.create();
-//
-//        WebResource webResource = client.resource(fedoraObject);
-//
-//        client.addFilter(new HTTPBasicAuthFilter(USER, PASS));
 
         ClientResponse response = accessProvider.getFedoraWebResource("/objects/" + uuid).delete(ClientResponse.class);
 
@@ -356,64 +424,47 @@ public class FedoraUtils {
         }
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     */
     public String getOcr(String uuid) {
         String ocrUrl = ocr(uuid);
         LOGGER.debug("Reading OCR +" + ocrUrl);
         String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
-//        InputStream docStream = null;
-//        try {
-//            docStream =
-//                    RESTHelper.get(ocrUrl,
-//                            USER,
-//                            PASS,
-//                            true);
-//            if (docStream == null) return null;
-//        } catch (IOException e) {
-//            // ocr is not available
-//            e.printStackTrace();
-//            return null;
-//        }
-//        BufferedReader br = new BufferedReader(new InputStreamReader(docStream));
-//        StringBuilder sb = new StringBuilder();
-//        String line = null;
-//        try {
-//            while ((line = br.readLine()) != null) {
-//                sb.append(line).append('\n');
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            LOGGER.error("Reading ocr +" + ocrUrl, e);
-//        } finally {
-//            if (br != null) {
-//                try {
-//                    br.close();
-//                } catch (IOException e) {
-//                    LOGGER.error("Closing stream +" + ocrUrl, e);
-//                    e.printStackTrace();
-//                } finally {
-//                    br = null;
-//                }
-//            }
-//            try {
-//                if (docStream != null) docStream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } finally {
-//                docStream = null;
-//            }
-//        }
-//        return sb.toString();
         return ocrOutput;
     }
 
+    /**
+     *
+     * @param uuid
+     * @param ocr
+     * @return
+     * @throws CreateObjectException
+     */
     public boolean setOcr(String uuid, String ocr) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.TEXT_OCR, uuid, ocr, false, "text/plain");
     }
 
+    /**
+     *
+     * @param uuid
+     * @param path
+     * @return
+     * @throws CreateObjectException
+     */
     public boolean setThumbnail(String uuid, String path) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_THUMB, uuid, path, true, "image/jpg");
     }
 
+    /**
+     *
+     * @param uuid
+     * @param path
+     * @return
+     * @throws CreateObjectException
+     */
     public boolean setPreview(String uuid, String path) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_PREVIEW, uuid, path, true, "image/jpg");
     }
@@ -456,8 +507,6 @@ public class FedoraUtils {
         queryParams.add("dsState", "A");
         queryParams.add("mimeType", mimeType);
 
-//        boolean success;
-//        String url = FEDORA_URL.concat(prepUrl);
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = null;
         try {

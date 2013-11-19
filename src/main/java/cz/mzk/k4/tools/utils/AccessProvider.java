@@ -31,7 +31,6 @@ public class AccessProvider {
     private static Logger LOGGER = Logger.getLogger(AccessProvider.class);
 
     public AccessProvider() {
-
         // get properties file (/home/{user}/{confFileName})
         String home = System.getProperty("user.home");
         File f = new File(home + "/" + confFileName);
@@ -55,6 +54,11 @@ public class AccessProvider {
         fedoraPassword = properties.getProperty(libraryPrefix + ".fedora.password");
     }
 
+    /**
+     *
+     * @param query
+     * @return
+     */
     public WebResource getKrameriusWebResource(String query) {
         Client client = Client.create();
         String url = "http://" + krameriusHost + query;  // např. "/search/api/v4.6/processes/" + uuid + "/logs"
@@ -65,6 +69,11 @@ public class AccessProvider {
         return resource;
     }
 
+    /**
+     *
+     * @param query
+     * @return
+     */
     public WebResource getFedoraWebResource(String query) {
         Client client = Client.create();
         String url = "http://" + fedoraHost + query;

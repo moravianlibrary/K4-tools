@@ -6,7 +6,7 @@ package cz.mzk.k4.tools.workers;
  */
 public abstract class UuidWorker {
 
-    // worker má právo na zápis
+    // povolení k zápisu
     private boolean writeEnabled;
 
     public UuidWorker(boolean writeEnabled) {
