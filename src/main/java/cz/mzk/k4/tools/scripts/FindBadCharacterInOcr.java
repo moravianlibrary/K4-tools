@@ -30,6 +30,10 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
         this.repair = repair;
     }
 
+    /**
+     *
+     * @param uuid
+     */
     public void run(String uuid) {
 
         List<String> list;
@@ -55,6 +59,10 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     }
 
+    /**
+     *
+     * @param args
+     */
     public void run(List<String> args) {
         run(args.get(0));
         //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
@@ -63,12 +71,17 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
         //findBadCharacterInOcr.run(args[1]);
     }
 
+    // TODO: getUsage FindBadCharacterInOcr
     @Override
     public String getUsage() {
         return null;
     }
 
-
+    /**
+     *
+     * @param text
+     * @return
+     */
     // http://blog.mark-mclaren.info/2007/02/invalid-xml-characters-when-valid-utf8_5873.html
     protected static boolean containBadCharacter(String text) {
         if (text == null) return false;
@@ -86,6 +99,11 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
         return false;
     }
 
+    /**
+     *
+     * @param codePoint
+     * @return
+     */
     private static boolean isBadCharacter(int codePoint) {
         return (!((codePoint == 0x9) ||
                 (codePoint == 0xA) ||
@@ -95,6 +113,11 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
                 ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))));
     }
 
+    /**
+     *
+     * @param text
+     * @return
+     */
     protected static String removeBadCharacters(String text) {
         StringBuffer out = new StringBuffer(); // Used to hold the output.
         char current;

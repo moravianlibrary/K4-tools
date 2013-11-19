@@ -16,6 +16,10 @@ public class FindAllDocumentsByModel implements Script {
 
     private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
 
+    /**
+     *
+     * @param model
+     */
     public static void run(DigitalObjectModel model) {
         fedoraUtils.applyToAllUuidOfModel(model, new UuidWorker(false) {
             @Override
@@ -27,11 +31,13 @@ public class FindAllDocumentsByModel implements Script {
 
     }
 
+    //TODO: run FindAllDocumentsByModel
     @Override
     public void run(List<String> args) {
         //run(args.get(0));
     }
 
+    // TODO: getUsage FindAllDocumentsByModel
     @Override
     public String getUsage() {
         return null;

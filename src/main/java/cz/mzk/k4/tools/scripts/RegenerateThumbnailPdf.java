@@ -6,7 +6,6 @@ import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
 import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +20,10 @@ public class RegenerateThumbnailPdf implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(RegenerateThumbnailPdf.class);
 
+    /**
+     * Znovu vygeneruje náhled (thumbnail) PDF dokumentu a vloží ho do fedory.
+     * @param args - uuid PDF dokumentu (1. argument)
+     */
     @Override
     public void run(List<String> args) {
 
@@ -73,6 +76,6 @@ public class RegenerateThumbnailPdf implements Script {
 
     @Override
     public String getUsage() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "opraveniOdkazuProReplikaci - znovu vygeneruje náhled (thumbnail) PDF dokumentu a vloží ho do fedory";
     }
 }
