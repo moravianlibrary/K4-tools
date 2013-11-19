@@ -1,8 +1,8 @@
-package cz.mzk.k4.tools.workers.readOnly;
+package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.workers.UuidWorker;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -23,6 +23,7 @@ public class ChildCounterWorker extends UuidWorker {
     }
 
     /**
+     * Prohledá monografie a vypíše ty, u kterých ve fedoře (ritriplets) chybí vazby
      * @param uuid
      * @return list of uuids w/o pages
      */
