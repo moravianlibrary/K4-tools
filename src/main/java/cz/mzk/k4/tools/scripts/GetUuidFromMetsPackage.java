@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.dom4j.Document;
@@ -19,7 +20,8 @@ public class GetUuidFromMetsPackage implements Script {
 	@Override
 	public void run(List<String> args) {
 		String path = args.get(0);
-        Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
+        //Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new SuffixFileFilter(".xml"), TrueFileFilter.INSTANCE);
+		Iterator<File> iterator =  FileUtils.iterateFiles(new File(path), new RegexFileFilter("^METS\\S*.xml$"), TrueFileFilter.INSTANCE);
         
         while(iterator.hasNext()) {
             File file = iterator.next();
@@ -33,8 +35,8 @@ public class GetUuidFromMetsPackage implements Script {
 		try{
 			Document document = reader.read(file);
 			
-			List listNodes = document.selectNodes( "//PageImage/@href" );
-			System.out.println(listNodes);
+			List listNodes = document.selectNodes( "//*[local-name()='identifier' and namespace-uri()='http://www.loc.gov/mods/v3'][@type='uuid']" );
+			System.out.println(listNodes.get(0));
 			
 		}catch(DocumentException e){
 			e.printStackTrace();
