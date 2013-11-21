@@ -1,17 +1,16 @@
-package cz.mzk.k4.tools.utils.fedoraUtils;
+package cz.mzk.k4.tools.utils;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.FedoraNamespaces;
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.ConnectionException;
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.LexerException;
-import cz.mzk.k4.tools.utils.fedoraUtils.util.PIDParser;
-import cz.mzk.k4.tools.utils.fedoraUtils.util.XMLUtils;
+import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
+import cz.mzk.k4.tools.utils.domain.FedoraNamespaces;
+import cz.mzk.k4.tools.utils.exception.ConnectionException;
+import cz.mzk.k4.tools.utils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.exception.LexerException;
+import cz.mzk.k4.tools.utils.util.PIDParser;
+import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 import org.fedora.api.RelationshipTuple;

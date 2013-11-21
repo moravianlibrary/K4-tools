@@ -1,7 +1,7 @@
 package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
+import cz.mzk.k4.tools.utils.FedoraUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,11 +35,11 @@ public class ChildCounterWorker extends UuidWorker {
             // všechny děti (rekurzivně se zanořuje)
             listOfChildren = fedoraUtils.getChildrenUuids(uuid);
             if (listOfChildren.isEmpty()) {
-                counter++;
                 System.out.println(uuid);
-                if ((counter % 100) == 1) {
-                    System.out.println("Prohledáno " + counter + " monografií");
-                }
+            }
+            counter++;
+            if ((counter % 100) == 0 && counter > 1) {
+                System.out.println("Prohledáno " + counter + " monografií");
             }
         } catch (IOException e) {
             e.printStackTrace();

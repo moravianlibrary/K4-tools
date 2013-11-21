@@ -25,7 +25,7 @@
  * 
  */
 
-package cz.mzk.k4.tools.utils.fedoraUtils;
+package cz.mzk.k4.tools.utils;
 
 import com.google.gwt.event.shared.GwtEvent.Type;
 

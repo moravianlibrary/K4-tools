@@ -25,7 +25,7 @@
  * 
  */
 
-package cz.mzk.k4.tools.utils.fedoraUtils.util;
+package cz.mzk.k4.tools.utils.util;
 
 import org.apache.log4j.Logger;
 import java.io.ByteArrayOutputStream;

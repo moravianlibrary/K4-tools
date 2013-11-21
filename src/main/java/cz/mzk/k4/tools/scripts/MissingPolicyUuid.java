@@ -32,6 +32,8 @@ public class MissingPolicyUuid implements Script {
                 String[] uuids = uuid_lines[i].split("\"");
                 System.out.println(uuids[0]);
             }
+
+            // TODO: změna viditelnosti podle roku
         }
 
     }

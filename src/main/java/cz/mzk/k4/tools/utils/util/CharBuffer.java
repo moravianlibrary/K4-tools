@@ -25,9 +25,9 @@
  * 
  */
 
-package cz.mzk.k4.tools.utils.fedoraUtils.util;
+package cz.mzk.k4.tools.utils.util;
 
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.LexerException;
+import cz.mzk.k4.tools.utils.exception.LexerException;
 import java.io.IOException;
 import java.io.StringReader;
 
