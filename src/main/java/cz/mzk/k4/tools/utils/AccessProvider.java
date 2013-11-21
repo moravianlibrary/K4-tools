@@ -29,6 +29,7 @@ public class AccessProvider {
     private String confFileName = "k4_tools_config.properties";
     private Properties properties;
     private static Logger LOGGER = Logger.getLogger(AccessProvider.class);
+    public static String K4_REMOTE_API_PATH = "/search/api/v4.6/processes";
 
     public AccessProvider() {
         // get properties file (/home/{user}/{confFileName})
@@ -55,13 +56,13 @@ public class AccessProvider {
     }
 
     /**
-     *
+     * Vrací webresource s cestou ke K4 RemoteAPI
      * @param query
      * @return
      */
     public WebResource getKrameriusWebResource(String query) {
         Client client = Client.create();
-        String url = "http://" + krameriusHost + query;  // např. "/search/api/v4.6/processes/" + uuid + "/logs"
+        String url = "http://" + krameriusHost + K4_REMOTE_API_PATH + query;  // např. "/" + uuid + "/logs"
         LOGGER.debug("Kramerius url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);

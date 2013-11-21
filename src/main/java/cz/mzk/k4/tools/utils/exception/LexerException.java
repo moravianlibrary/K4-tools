@@ -25,7 +25,7 @@
  * 
  */
 
-package cz.mzk.k4.tools.utils.fedoraUtils.exception;
+package cz.mzk.k4.tools.utils.exception;
 
 // TODO: Auto-generated Javadoc
 /**

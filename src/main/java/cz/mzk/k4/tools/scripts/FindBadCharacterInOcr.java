@@ -2,9 +2,9 @@ package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.FedoraUtils;
+import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
+import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
