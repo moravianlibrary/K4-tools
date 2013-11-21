@@ -34,12 +34,15 @@ public class AccessProvider {
     public AccessProvider() {
         // get properties file (/home/{user}/{confFileName})
         String home = System.getProperty("user.home");
-        File f = new File(home + "/" + confFileName);
+        File f = new File(home + File.separatorChar + confFileName);
         properties = new Properties();
         InputStream inputStream;
         try {
             inputStream = new FileInputStream(f);
             properties.load(inputStream);
+
+        
+        
         } catch (IOException e) {
             LOGGER.fatal("Cannot load properties file");
         }
