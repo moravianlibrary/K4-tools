@@ -20,7 +20,7 @@ public class Tools {
         runner.register("spatneZnakyOCR", new FindBadCharacterInOcr(false));
         runner.register("opraveniOdkazuProReplikaci", new RepairLinksForReplication());
         runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
-        runner.register("vypisBezdetneMonografie", new FindChildlessMonographs());
+        runner.register("vypisSmutneMonografie", new FindLonelyMonographs());
         runner.register("stavDeleted", new DeletedDocuments());
         runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
         runner.register("uuidMetsBalik", new GetUuidFromMetsPackage());
