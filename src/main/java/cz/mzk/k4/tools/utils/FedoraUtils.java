@@ -18,7 +18,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -542,5 +541,24 @@ public class FedoraUtils {
             return false;
 
         }
+    }
+
+    public Document getDCStream(String pid) throws IOException {
+        pid = checkPid(pid);
+        try {
+            WebResource resource = accessProvider.getFedoraWebResource("/objects/" + pid + "/datastreams/DC/content");
+            Document result = resource.accept(MediaType.APPLICATION_XML_TYPE).get(Document.class);
+            return result;
+        } catch (UniformInterfaceException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IOException(e);
+        }
+    }
+
+    private String checkPid(String pid) {
+        if (!pid.contains("uuid")) {
+            pid = "uuid:" + pid;
+        }
+        return pid;
     }
 }

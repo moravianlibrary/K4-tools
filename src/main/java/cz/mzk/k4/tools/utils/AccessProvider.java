@@ -63,7 +63,7 @@ public class AccessProvider {
      * @param query
      * @return
      */
-    public WebResource getKrameriusWebResource(String query) {
+    public WebResource getKrameriusWebResource(String query) {     // přejmenovat - REST
         Client client = Client.create();
         String url = "http://" + krameriusHost + K4_REMOTE_API_PATH + query;  // např. "/" + uuid + "/logs"
         LOGGER.debug("Kramerius url: " + url);
