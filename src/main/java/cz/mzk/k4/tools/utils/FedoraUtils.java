@@ -453,7 +453,7 @@ public class FedoraUtils {
      * @throws CreateObjectException
      */
     public boolean setThumbnail(String uuid, String path) throws CreateObjectException {
-        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_THUMB, uuid, path, true, "image/jpg");
+        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_THUMB, uuid, path, true, "image/jpeg");
     }
 
     /**
@@ -464,7 +464,7 @@ public class FedoraUtils {
      * @throws CreateObjectException
      */
     public boolean setPreview(String uuid, String path) throws CreateObjectException {
-        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_PREVIEW, uuid, path, true, "image/jpg");
+        return insertManagedDatastream(Constants.DATASTREAM_ID.IMG_PREVIEW, uuid, path, true, "image/jpeg");
     }
 
     /**
