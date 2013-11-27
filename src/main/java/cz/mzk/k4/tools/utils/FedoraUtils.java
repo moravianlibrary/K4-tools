@@ -408,6 +408,26 @@ public class FedoraUtils {
         return is;
     }
 
+
+    /**
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    //TODO dopsat mimetypy jako enum
+    public InputStream getImgFull(String uuid, String mimetype) throws IOException {
+        ClientResponse response =
+                accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
+                    .accept(mimetype).get(ClientResponse.class);
+        if (response.getStatus() != 200) {
+            throw new RuntimeException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
+        InputStream is = response.getEntityInputStream();
+        return is;
+    }
+
     /**
      *
      * @param uuid
@@ -443,6 +463,11 @@ public class FedoraUtils {
      */
     public boolean setOcr(String uuid, String ocr) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.TEXT_OCR, uuid, ocr, false, "text/plain");
+    }
+
+
+    public boolean setAltoOcr(String uuid, String ocr) throws CreateObjectException {
+        return insertManagedDatastream(Constants.DATASTREAM_ID.ALTO, uuid, ocr, false, "text/plain");
     }
 
     /**
@@ -511,7 +536,7 @@ public class FedoraUtils {
             if (isFile) {
                 response = resource.queryParams(queryParams).post(ClientResponse.class, new File(filePathOrContent));
             } else {
-                resource.queryParams(queryParams).post(ClientResponse.class, filePathOrContent);
+                response = resource.queryParams(queryParams).post(ClientResponse.class, filePathOrContent);
             }
 
         } catch (UniformInterfaceException e) {
