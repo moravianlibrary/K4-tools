@@ -67,6 +67,7 @@ public class RegenerateThumbnailPdf implements Script {
             Process process = processBuilder.start();
             try {
                 process.waitFor();
+                process.getErrorStream();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

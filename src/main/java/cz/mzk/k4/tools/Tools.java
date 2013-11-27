@@ -24,7 +24,8 @@ public class Tools {
         runner.register("stavDeleted", new DeletedDocuments());
         runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
         runner.register("uuidMetsBalik", new GetUuidFromMetsPackage());
-        
+        runner.register("pridatOCR", new AddOcr());
+
         if (args.length < 1 || args[0] == null) {
             printUsage(runner);
             return;
