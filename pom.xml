@@ -99,7 +99,7 @@
 			<artifactId>jaxen</artifactId>
 			<version>1.1.4</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
@@ -150,6 +150,24 @@
 						</configuration>
 						<phase>generate-sources</phase>
 					</execution>
+                    <execution>
+                        <id>RSSoapService</id>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>${basedir}/src/wsdl/RSSoapService.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <staleFile>
+                                ${project.build.directory}/jaxws/stale/RSSoapService.stale
+                            </staleFile>
+                            <packageName>com.abby.recognitionserver3</packageName>
+                            <sourceDestDir>${generatedSources}</sourceDestDir>
+                            <target>2.1</target>
+                        </configuration>
+                        <phase>generate-sources</phase>
+                    </execution>
 				</executions>
 			</plugin>
 

@@ -1,12 +1,13 @@
 package cz.mzk.k4.tools.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.core.util.Base64;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author pavels
