@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import org.apache.log4j.Logger;
+
 import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
 import java.util.List;

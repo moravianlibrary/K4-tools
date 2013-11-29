@@ -18,6 +18,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,8 +46,7 @@ public class FedoraUtils {
     }
 
     /**
-     *
-     * @param model - např. DigitalObjectModel.MONOGRAPH
+     * @param model  - např. DigitalObjectModel.MONOGRAPH
      * @param worker
      */
     public void applyToAllUuidOfModel(DigitalObjectModel model, final UuidWorker worker) {
@@ -54,7 +54,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param model
      * @param worker
      * @param maxThreads
@@ -65,7 +64,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param worker
      */
     public void applyToAllUuidOfStateDeleted(final UuidWorker worker) {
@@ -79,7 +77,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param triplets
      * @param worker
      */
@@ -88,7 +85,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param triplets
      * @param worker
      * @param maxThreads
@@ -126,7 +122,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      */
@@ -159,7 +154,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @param model
      * @return
@@ -170,7 +164,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @param uuidList
      * @param model
@@ -194,7 +187,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -206,7 +198,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @param uuidList
      * @return
@@ -235,7 +226,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param model
      * @return
      */
@@ -245,7 +235,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      */
@@ -255,7 +244,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @return
      * @throws UnsupportedEncodingException
      */
@@ -265,7 +253,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param query
      * @return
      */
@@ -295,7 +282,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -315,7 +301,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -340,7 +325,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -350,7 +334,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param relsExt
      * @return
      */
@@ -390,7 +373,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -398,7 +380,7 @@ public class FedoraUtils {
     public InputStream getPdf(String uuid) throws IOException {
         ClientResponse response =
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
-                    .accept("application/pdf").get(ClientResponse.class);
+                        .accept("application/pdf").get(ClientResponse.class);
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
@@ -408,9 +390,7 @@ public class FedoraUtils {
         return is;
     }
 
-
     /**
-     *
      * @param uuid
      * @return
      * @throws IOException
@@ -419,7 +399,7 @@ public class FedoraUtils {
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
         ClientResponse response =
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
-                    .accept(mimetype).get(ClientResponse.class);
+                        .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
                     + response.getStatus());
@@ -429,7 +409,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      */
     public void purgeObject(String uuid) {
@@ -443,19 +422,25 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @return
      */
     public String getOcr(String uuid) {
         String ocrUrl = ocr(uuid);
         LOGGER.debug("Reading OCR +" + ocrUrl);
-        String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
-        return ocrOutput;
+        try {
+            String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
+            return ocrOutput;
+        } catch (UniformInterfaceException e) {
+            if (e.getResponse().getStatus() == 404) {
+                return null;
+            } else {
+                throw new UniformInterfaceException(e.getResponse());
+            }
+        }
     }
 
     /**
-     *
      * @param uuid
      * @param ocr
      * @return
@@ -465,13 +450,11 @@ public class FedoraUtils {
         return insertManagedDatastream(Constants.DATASTREAM_ID.TEXT_OCR, uuid, ocr, false, "text/plain");
     }
 
-
     public boolean setAltoOcr(String uuid, String ocr) throws CreateObjectException {
         return insertManagedDatastream(Constants.DATASTREAM_ID.ALTO, uuid, ocr, false, "text/plain");
     }
 
     /**
-     *
      * @param uuid
      * @param path
      * @return
@@ -482,7 +465,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param uuid
      * @param path
      * @return

@@ -27,11 +27,6 @@
 
 package cz.mzk.k4.tools.utils;
 
-import com.google.gwt.event.shared.GwtEvent.Type;
-
-import java.util.HashMap;
-import java.util.Map;
-
 // TODO: Auto-generated Javadoc
 
 /**

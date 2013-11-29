@@ -1,18 +1,16 @@
 package cz.mzk.k4.tools.scripts;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
+import cz.mzk.k4.tools.utils.Script;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 
-import cz.mzk.k4.tools.utils.Script;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 public class GetUuidFromMetsPackage implements Script {
 

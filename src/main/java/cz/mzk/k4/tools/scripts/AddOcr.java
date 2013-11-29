@@ -1,12 +1,12 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.FedoraUtils;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.fedoraUtils.FedoraUtils;
-import cz.mzk.k4.tools.utils.fedoraUtils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.utils.fedoraUtils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.AddOcrWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +17,8 @@ import java.util.List;
  */
 public class AddOcr implements Script {
     private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+    private static final Logger LOGGER = Logger.getLogger(AddOcr.class);
+
 
     @Override
     public void run(List<String> args) {

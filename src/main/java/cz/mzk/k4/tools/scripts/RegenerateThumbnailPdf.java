@@ -1,8 +1,8 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.FedoraUtils;
+import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
