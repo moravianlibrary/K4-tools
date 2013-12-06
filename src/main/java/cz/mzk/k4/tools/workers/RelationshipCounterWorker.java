@@ -1,10 +1,8 @@
 package cz.mzk.k4.tools.workers;
 
+import com.sun.jersey.api.client.WebResource;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
-import org.fedora.api.RelationshipTuple;
-
-import java.util.List;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,7 +20,7 @@ public class RelationshipCounterWorker extends UuidWorker {
         counter = 0;
     }
 
-    /**
+    /**                                                                       git add
      * Prohledá monografie a vypíše ty, u kterých ve fedoře (ritriplets) chybí vazby
      *
      * @param uuid
@@ -31,10 +29,13 @@ public class RelationshipCounterWorker extends UuidWorker {
     @Override
     public void run(String uuid) {
 
-        List<RelationshipTuple> triplets;
-        // všechny děti (rekurzivně se zanořuje)
-        triplets = fedoraUtils.getObjectPids(uuid);
-        if (triplets.isEmpty()) {
+        AccessProvider accessProvider = new AccessProvider();
+        String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+                + query);
+        String result = resource.get(String.class);
+
+        if (result.equals("")) {
             System.out.println(uuid);
         }
         counter++;

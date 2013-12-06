@@ -28,7 +28,7 @@
 package cz.mzk.k4.tools.utils.util;
 
 import com.google.gwt.user.server.Base64Utils;
-import cz.mzk.k4.tools.utils.Constants;
+import cz.mzk.k4.tools.utils.fedora.Constants;
 import cz.mzk.k4.tools.utils.exception.ConnectionException;
 import org.apache.log4j.Logger;
 

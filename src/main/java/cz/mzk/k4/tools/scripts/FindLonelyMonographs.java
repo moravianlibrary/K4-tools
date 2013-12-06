@@ -1,11 +1,11 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import org.apache.log4j.Logger;
 
 import java.util.List;

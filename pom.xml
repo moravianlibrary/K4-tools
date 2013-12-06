@@ -99,7 +99,7 @@
 			<artifactId>jaxen</artifactId>
 			<version>1.1.4</version>
 		</dependency>
-    </dependencies>
+	</dependencies>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
@@ -126,7 +126,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.jvnet.jax-ws-commons</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
@@ -170,8 +169,8 @@
                     </execution>
 				</executions>
 			</plugin>
-
 		</plugins>
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -180,6 +179,7 @@
 					<configuration>
 						<source>1.6</source>
 						<target>1.6</target>
+                        <encoding>UTF-8</encoding>
 						<compilerArgument></compilerArgument>
 					</configuration>
 				</plugin>

@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.domain.DCConent;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.util.DCContentUtils;
 import org.apache.log4j.Logger;
@@ -51,19 +51,19 @@ public class SetPolicyWorker extends UuidWorker {
 
             // periodical, more than 70 years old
             if (type.equals("periodical") && (year < (currentYear - 70))) {
-                LOGGER.info("Setting object " + uuid + " to PUBLIC");
-//                krameriusUtils.setPublic(uuid);
+                LOGGER.info("Setting object " + uuid + " to PUBLIC (mladý periodikum)");
+                krameriusUtils.setPublic(uuid);
                 return;
 
                 // periodical, less than 70 years old
             } else if (type.equals("periodical")) {
-//                krameriusUtils.setPrivate(uuid);
-//                LOGGER.info("Setting object " + uuid + " to PRIVATE");
-//                return;
+                krameriusUtils.setPrivate(uuid);
+                LOGGER.info("Setting object " + uuid + " to PRIVATE (starý periodikum)");
+                return;
 
                 // monograph
             } else if (type.equals("monograph")) {
-                // seynam autorů
+                // seznam autorů
                 List<String> creators = Arrays.asList(dcConent.getCreators());
 
                 for (String creator : creators) {
@@ -76,6 +76,7 @@ public class SetPolicyWorker extends UuidWorker {
                         if (umrti > currentYear - 70) {
                             // private
                             LOGGER.info("Setting object " + uuid + " to PRIVATE, kvuli umrti " + umrti);
+                            krameriusUtils.setPrivate(uuid);
                             return;
                         }
                     } else {
@@ -92,15 +93,18 @@ public class SetPolicyWorker extends UuidWorker {
                     // nebo nejsou uvedeni autoři
                     if (year < (currentYear - 110)) {
                         LOGGER.info("Chybí info, ale " + uuid + " bude PUBLIC (vydání: " + year + ")");
+                        krameriusUtils.setPublic(uuid);
                         return;
                     } else {
                         LOGGER.info("Chybí info, ale " + uuid + " bude PRIVATE (vydání: " + year + ")");
+                        krameriusUtils.setPrivate(uuid);
                         return;
                     }
 
                 } else {
                     // všichni dávno mrtví
                     LOGGER.info("Setting object " + uuid + " to PUBLIC, všichni jsou dávno mrtví");
+                    krameriusUtils.setPublic(uuid);
                     return;
                 }
 
@@ -114,13 +118,6 @@ public class SetPolicyWorker extends UuidWorker {
         } catch (NullPointerException e) {
             LOGGER.error(e.getMessage() + " on " + uuid);
         }
-
-     /*
-    periodikum - 70 let po vydání
-    monografie - aspoň 70 stará, všichni autoři aspoň umřeli aspoň před 70 lety
-                - když nejsou autoři, tak před rokem teď-110 let
-
-     */
 
     }
 }
