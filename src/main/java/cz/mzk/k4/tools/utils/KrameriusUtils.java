@@ -55,7 +55,7 @@ public class KrameriusUtils {
     public void setPrivate(String pid_path) {
         pid_path = checkPid(pid_path);
         // {"parameters":["uuid:..."]}
-        String json = "{\"parameters\":[\"" + pid_path + "\"}";
+        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setprivate");
         WebResource resource = accessProvider.getKrameriusWebResource("");
@@ -75,7 +75,7 @@ public class KrameriusUtils {
     public void setPublic(String pid_path) {
         pid_path = checkPid(pid_path);
         // {"parameters":["uuid:..."]}
-        String json = "{\"parameters\":[\"" + pid_path + "\"}";
+        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setpublic");
         WebResource resource = accessProvider.getKrameriusWebResource("");
