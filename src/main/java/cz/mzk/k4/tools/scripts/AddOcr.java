@@ -1,7 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.AddOcrWorker;

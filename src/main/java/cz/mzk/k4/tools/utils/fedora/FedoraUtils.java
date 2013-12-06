@@ -1,9 +1,10 @@
-package cz.mzk.k4.tools.utils;
+package cz.mzk.k4.tools.utils.fedora;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.domain.FedoraNamespaces;
 import cz.mzk.k4.tools.utils.exception.ConnectionException;
@@ -13,6 +14,7 @@ import cz.mzk.k4.tools.utils.util.PIDParser;
 import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
+import org.fedora.api.DatastreamDef;
 import org.fedora.api.RelationshipTuple;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -550,6 +552,12 @@ public class FedoraUtils {
         }
     }
 
+    /**
+     *
+     * @param pid
+     * @return
+     * @throws IOException
+     */
     public Document getDCStream(String pid) throws IOException {
         pid = checkPid(pid);
         try {
@@ -562,6 +570,25 @@ public class FedoraUtils {
         }
     }
 
+    /**
+     *
+     * @param pid - pid objektu ve fedoře
+     * @param datastreamName název datastreamu (cz.mzk.k4.tools.utils.fedora.Constants.java)
+     * @return
+     * @throws IOException
+     */
+    public String getMimeTypeForStream(String pid, String datastreamName) throws IOException {
+        List<DatastreamDef> datastreams = accessProvider.getFedoraAPIA().listDatastreams(pid, null);
+        for (DatastreamDef datastream : datastreams) {
+            if (datastream.getID().equals(datastreamName)) {
+                return datastream.getMIMEType();
+            }
+        }
+        // neobsahuje daný datastream
+        throw new IOException("Objekt neobsahuje datastream " + datastreamName);
+    }
+
+    // TODO: isPidValid
     private String checkPid(String pid) {
         if (!pid.contains("uuid")) {
             pid = "uuid:" + pid;

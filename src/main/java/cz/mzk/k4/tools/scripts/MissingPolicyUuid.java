@@ -3,8 +3,6 @@ package cz.mzk.k4.tools.scripts;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.SetPolicyWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
@@ -30,8 +28,6 @@ public class MissingPolicyUuid implements Script {
     public void run(List<String> args) {
         LOGGER.info("Searching for uuids");
         AccessProvider accessProvider = new AccessProvider();
-        FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-        KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
         Client client = new Client();
         List<String> uuidList = new ArrayList<String>();
 
@@ -62,14 +58,6 @@ public class MissingPolicyUuid implements Script {
                 worker.run(uuid);
             }
         }
-
-         /*
-    monografie - aspoň 70 stará, všichni autoři aspoň umřeli aspoň před 70 lety
-                - když nejsou autoři, tak před rokem teď-110 let
-
-     */
-
-
     }
 
     @Override

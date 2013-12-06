@@ -76,7 +76,7 @@ public class ConvertDjvuToJP2 {
 
  //       try {
 //            FedoraClient fc = new FedoraClient(FEDORA_URL, USER, PASS);
-//            FedoraAPIA apia = fc.getAPIA(); //not really needed
+//            FedoraAPIA apia = fc.getFedoraAPIA(); //not really needed
 //            FedoraAPIM apim = fc.getAPIM();                       
 //           
 //            /*******FIRST APPROACH*******/

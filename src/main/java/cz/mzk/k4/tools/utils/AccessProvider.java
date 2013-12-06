@@ -3,11 +3,19 @@ package cz.mzk.k4.tools.utils;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import org.apache.log4j.Logger;
+import org.fedora.api.FedoraAPIA;
+import org.fedora.api.FedoraAPIAService;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -19,6 +27,7 @@ import java.util.Properties;
  */
 public class AccessProvider {
 
+    private FedoraAPIA fedoraAPIA;
     private String fedoraHost;
     private String fedoraUser;
     private String fedoraPassword;
@@ -41,9 +50,6 @@ public class AccessProvider {
         try {
             inputStream = new FileInputStream(f);
             properties.load(inputStream);
-
-        
-        
         } catch (IOException e) {
             LOGGER.fatal("Cannot load properties file");
         }
@@ -87,6 +93,45 @@ public class AccessProvider {
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
         resource.addFilter(credentials);
         return resource;
+    }
+
+    /*
+     * @see https://wiki.duraspace.org/display/FEDORA35/API-A
+     */
+    public FedoraAPIA getFedoraAPIA() {
+        if (fedoraAPIA == null) {
+            initAPIA();
+        }
+        return fedoraAPIA;
+    }
+    /**
+     * Inits the apia.
+     */
+    private void initAPIA() {
+        final String user = getFedoraUser();
+        final String pwd = getFedoraPassword();
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, pwd.toCharArray());
+            }
+        });
+
+        FedoraAPIAService APIAservice = null;
+        try {
+            APIAservice =
+                    new FedoraAPIAService(
+                            new URL("http://" + getFedoraHost() + "/wsdl?api=API-A"),
+                            new QName("http://www.fedora.info/definitions/1/0/api/",
+                                    "Fedora-API-A-Service"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("InvalidURL API-A:" + e);
+            throw new RuntimeException(e);
+        }
+        fedoraAPIA = APIAservice.getPort(FedoraAPIA.class);
+        ((BindingProvider) fedoraAPIA).getRequestContext().put(BindingProvider.USERNAME_PROPERTY, user);
+        ((BindingProvider) fedoraAPIA).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, pwd);
     }
 
     public String getFedoraHost() {

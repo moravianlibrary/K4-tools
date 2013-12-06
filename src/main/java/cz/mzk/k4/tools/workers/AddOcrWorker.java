@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AbbyUtils;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.FedoraUtils;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import org.apache.log4j.Logger;
