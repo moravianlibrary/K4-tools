@@ -1,15 +1,6 @@
 package cz.mzk.k4.tools;
 
-import cz.mzk.k4.tools.scripts.AddOcr;
-import cz.mzk.k4.tools.scripts.CheckLogs;
-import cz.mzk.k4.tools.scripts.DeletedDocuments;
-import cz.mzk.k4.tools.scripts.FindAllDocumentsByModel;
-import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
-import cz.mzk.k4.tools.scripts.FindLonelyMonographs;
-import cz.mzk.k4.tools.scripts.GetUuidFromMetsPackage;
-import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
-import cz.mzk.k4.tools.scripts.RegenerateThumbnailPdf;
-import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 
 import java.util.ArrayList;
@@ -32,7 +23,7 @@ public class Tools {
         runner.register("vypisSmutneMonografie", new FindLonelyMonographs());
         runner.register("stavDeleted", new DeletedDocuments());
         runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
-        runner.register("uuidMetsBalik", new GetUuidFromMetsPackage());
+        runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
         runner.register("pridatOCR", new AddOcr());
 
         runner.register("test", new TestScript());
