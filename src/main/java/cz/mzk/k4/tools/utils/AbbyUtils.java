@@ -9,9 +9,9 @@ import com.abby.recognitionserver3.XmlResult;
 import java.io.UnsupportedEncodingException;
 
 /**
- * @author: Martin Rumanek
- * @version: 11/26/13
- */
+* @author: Martin Rumanek
+* @version: 11/26/13
+*/
 public class AbbyUtils {
     public String[] getOcr(byte[] file) {
         String ocrAlto = null;

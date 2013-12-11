@@ -32,7 +32,8 @@ public class MissingPolicyUuid implements Script {
         List<String> uuidList = new ArrayList<String>();
 
         // get object with no policy
-        for (int offset = 0; offset < 1081; offset = offset + 20) {
+//        for (int offset = 0; offset < 1081; offset = offset + 20) {
+        int offset = 0;
             String url = "http://" + accessProvider.getKrameriusHost()
                     + "/search/r.jsp?fq=dostupnost:%22%22&offset="
                     + offset;
@@ -42,14 +43,15 @@ public class MissingPolicyUuid implements Script {
             String html = resource.accept(MediaType.APPLICATION_XML).get(String.class);
 
             // parse response html
-            String[] uuid_lines = html.split("id=\"res_monograph_uuid:");
+            // String[] uuid_lines = html.split("id=\"res_monograph_uuid:");
+            String[] uuid_lines = html.split("id=\"res_periodical_uuid:");
             LOGGER.debug("počet: " + uuid_lines.length);
             for (int i = 1; i < uuid_lines.length; i++) {
                 String[] uuids = uuid_lines[i].split("\"");
-//                System.out.println(uuids[0]);
+                System.out.println(uuids[0]);
                 uuidList.add(uuids[0]);
             }
-        }
+//        }
 
         // SetPolicyWorker
         if (args.contains("writeEnabled")) {

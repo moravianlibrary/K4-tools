@@ -54,7 +54,7 @@ public class KrameriusUtils {
 
     public void setPrivate(String pid_path) {
         pid_path = checkPid(pid_path);
-        // {"parameters":["uuid:..."]}
+        // {"parameters":["uuid:...","uuid:..."]}
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setprivate");
@@ -74,7 +74,7 @@ public class KrameriusUtils {
 
     public void setPublic(String pid_path) {
         pid_path = checkPid(pid_path);
-        // {"parameters":["uuid:..."]}
+        // {"parameters":["uuid:...","uuid:..."]}
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setpublic");
