@@ -23,7 +23,7 @@ public class Tools {
         runner.register("vypisSmutneMonografie", new FindLonelyMonographs());
         runner.register("stavDeleted", new DeletedDocuments());
         runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
-        runner.register("uuidMetsBalik", new GetUuidFromMetsPackage());
+        runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
         runner.register("pridatOCR", new AddOcr());
 
         runner.register("test", new TestScript());

@@ -158,6 +158,7 @@
                             <wsdlFiles>
                                 <wsdlFile>${basedir}/src/wsdl/RSSoapService.wsdl</wsdlFile>
                             </wsdlFiles>
+                            <wsdlLocation>/META-INF/RSSoapService.wsdl</wsdlLocation>
                             <staleFile>
                                 ${project.build.directory}/jaxws/stale/RSSoapService.stale
                             </staleFile>
