@@ -40,7 +40,6 @@ public class SetPolicyWorker extends UuidWorker {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         Pattern ROZSAH = Pattern.compile("\\d\\d\\d\\d\\-\\d\\d\\d\\d");
 
-        boolean zpracovavat_dal = true;
         boolean missingInfo = false;
         try {
             // get DC data
@@ -51,14 +50,14 @@ public class SetPolicyWorker extends UuidWorker {
 
             // periodical, more than 70 years old
             if (type.equals("periodical") && (year < (currentYear - 70))) {
-                LOGGER.info("Setting object " + uuid + " to PUBLIC (mladý periodikum)");
+                LOGGER.info("Setting object " + uuid + " to PUBLIC (starý periodikum - " + year + ")");
                 krameriusUtils.setPublic(uuid);
                 return;
 
                 // periodical, less than 70 years old
             } else if (type.equals("periodical")) {
                 krameriusUtils.setPrivate(uuid);
-                LOGGER.info("Setting object " + uuid + " to PRIVATE (starý periodikum)");
+                LOGGER.info("Setting object " + uuid + " to PRIVATE (mladý periodikum - " + year + ")");
                 return;
 
                 // monograph

@@ -19,66 +19,13 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
     private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-
     private boolean repair;
 
     public FindBadCharacterInOcr(boolean writeEnabled) {
         super(writeEnabled);
     }
 
-    public void setRepair(boolean repair) {
-        this.repair = repair;
-    }
-
     /**
-     *
-     * @param uuid
-     */
-    public void run(String uuid) {
-
-        List<String> list;
-        try {
-            list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
-
-            for (String uuidChild : list) {
-                if (containBadCharacter(fedoraUtils.getOcr(uuidChild))) {
-                    LOGGER.info(uuidChild + " contain some bad characters");
-                    if (repair) {
-                        try {
-                            fedoraUtils.setOcr(uuidChild, removeBadCharacters(fedoraUtils.getOcr(uuidChild)));
-                        } catch (CreateObjectException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    /**
-     *
-     * @param args
-     */
-    public void run(List<String> args) {
-        run(args.get(0));
-        //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
-        //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
-        //findBadCharacterInOcr.setRepair(args[2].equals("opravit"));
-        //findBadCharacterInOcr.run(args[1]);
-    }
-
-    // TODO: getUsage FindBadCharacterInOcr
-    @Override
-    public String getUsage() {
-        return null;
-    }
-
-    /**
-     *
      * @param text
      * @return
      */
@@ -100,7 +47,6 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     }
 
     /**
-     *
      * @param codePoint
      * @return
      */
@@ -114,7 +60,6 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     }
 
     /**
-     *
      * @param text
      * @return
      */
@@ -130,6 +75,57 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
             }
         }
         return out.toString();
+    }
+
+    public void setRepair(boolean repair) {
+        this.repair = repair;
+    }
+
+    /**
+     * @param uuid
+     */
+    public void run(String uuid) {
+
+        List<String> list;
+        try {
+            list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
+
+            for (String uuidChild : list) {
+                if (containBadCharacter(fedoraUtils.getOcr(uuidChild))) {
+                    LOGGER.warn(uuidChild + " contain some bad characters");
+                    if (repair) {
+                        try {
+                            fedoraUtils.setOcr(uuidChild, removeBadCharacters(fedoraUtils.getOcr(uuidChild)));
+                        } catch (CreateObjectException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    LOGGER.debug(uuidChild + " is just fine");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * @param args
+     */
+    public void run(List<String> args) {
+        run(args.get(0));
+        //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
+        //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();
+        //findBadCharacterInOcr.setRepair(args[2].equals("opravit"));
+        //findBadCharacterInOcr.run(args[1]);
+    }
+
+    // TODO: getUsage FindBadCharacterInOcr
+    @Override
+    public String getUsage() {
+        return null;
     }
 
 }

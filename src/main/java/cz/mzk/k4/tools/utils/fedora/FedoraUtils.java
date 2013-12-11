@@ -173,8 +173,14 @@ public class FedoraUtils {
      * @throws IOException
      */
     private List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
-        if (model.equals(getModel(uuid))) {
-            uuidList.add(uuid);
+        try {
+            if (model.equals(getModel(uuid))) {
+                uuidList.add(uuid);
+                LOGGER.debug("Adding " + uuid);
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return uuidList;
         }
         DigitalObjectModel parentModel = null;
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
@@ -310,19 +316,24 @@ public class FedoraUtils {
     public Document getRelsExt(String uuid) throws IOException {
         LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + "/get/" + uuid + "/RELS-EXT");
         WebResource resource = accessProvider.getFedoraWebResource("/get/" + uuid + "/RELS-EXT");
-        String docString = resource.accept(MediaType.APPLICATION_XML).get(String.class);
-
-        if (docString == null) {
-            throw new ConnectionException("Cannot get RELS EXT data.");
-        }
-        try {
-            return XMLUtils.parseDocument(docString, true);
-        } catch (ParserConfigurationException e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new IOException(e);
-        } catch (SAXException e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new IOException(e);
+//        String docString = resource.accept(MediaType.APPLICATION_XML).get(String.class);
+        ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        if (response.getStatus() == 200) {
+            String docString = response.getEntity(String.class);
+            if (docString == null) {
+                throw new ConnectionException("Cannot get RELS EXT data.");
+            }
+            try {
+                return XMLUtils.parseDocument(docString, true);
+            } catch (ParserConfigurationException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new IOException(e);
+            } catch (SAXException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new IOException(e);
+            }
+        } else {
+            throw new IOException("Could not get RELS-EXT for object " + uuid + "\nResponse status:" + response.getStatus());
         }
     }
 
@@ -553,7 +564,6 @@ public class FedoraUtils {
     }
 
     /**
-     *
      * @param pid
      * @return
      * @throws IOException
@@ -571,8 +581,7 @@ public class FedoraUtils {
     }
 
     /**
-     *
-     * @param pid - pid objektu ve fedoře
+     * @param pid            - pid objektu ve fedoře
      * @param datastreamName název datastreamu (cz.mzk.k4.tools.utils.fedora.Constants.java)
      * @return
      * @throws IOException
