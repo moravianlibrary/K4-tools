@@ -2,6 +2,7 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AbbyUtils;
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.fedora.Constants;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
@@ -24,15 +25,21 @@ public class AddOcrWorker extends UuidWorker {
         super(writeEnabled);
     }
 
-    //TODO funguje jenom pro DJVU!
     @Override
     public void run(String uuid) {
         try {
-            InputStream rawInputStream = fedoraUtils.getImgFull(uuid, "image/vnd.djvu");
-
+            String mimetype = fedoraUtils.getMimeTypeForStream(uuid, Constants.DATASTREAM_ID.IMG_FULL.getValue());
+            InputStream rawInputStream = fedoraUtils.getImgFull(uuid, mimetype);
+            LOGGER.info("Page " + uuid + " is sending to OCR server");
             if (fedoraUtils.getOcr(uuid) == null) {
-                InputStream tiffInputStream = FormatConvertor.convertDjvuToJpg(rawInputStream);
-                byte[] img = org.apache.commons.io.IOUtils.toByteArray(tiffInputStream);
+                InputStream jpgInputStream;
+                if ("image/vnd.djvu".equals(mimetype)) {
+                    jpgInputStream = FormatConvertor.convertDjvuToJpg(rawInputStream);
+                } else {
+                    jpgInputStream = rawInputStream;
+                }
+
+                byte[] img = org.apache.commons.io.IOUtils.toByteArray(jpgInputStream);
                 String[] ocr = abbyUtils.getOcr(img);
                 try {
                     fedoraUtils.setOcr(uuid, ocr[0]);
@@ -46,7 +53,7 @@ public class AddOcrWorker extends UuidWorker {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("IO error " + uuid);
         }
     }
 }
