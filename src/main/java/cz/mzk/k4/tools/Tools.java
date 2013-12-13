@@ -25,6 +25,7 @@ public class Tools {
         runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
         runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
         runner.register("pridatOCR", new AddOcr());
+        runner.register("hledaniHaluzi", new WtfSearch());
 
         runner.register("test", new TestScript());
 

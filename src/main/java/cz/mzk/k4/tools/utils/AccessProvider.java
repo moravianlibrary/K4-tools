@@ -65,14 +65,32 @@ public class AccessProvider {
         fedoraPassword = properties.getProperty(libraryPrefix + ".fedora.password");
     }
 
+    //TODO: static getAccessOrovider
+
+
     /**
      * Vrací webresource s cestou ke K4 RemoteAPI
      * @param query
      * @return
      */
-    public WebResource getKrameriusWebResource(String query) {     // přejmenovat - REST
+    public WebResource getKrameriusRESTWebResource(String query) {
         Client client = Client.create();
         String url = "http://" + krameriusHost + K4_REMOTE_API_PATH + query;  // např. "/" + uuid + "/logs"
+        LOGGER.debug("Kramerius remote api url: " + url);
+        WebResource resource = client.resource(url);
+        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
+        resource.addFilter(credentials);
+        return resource;
+    }
+
+    /**
+     * Vrací webresource s cestou ke K4
+     * @param query
+     * @return
+     */
+    public WebResource getKrameriusWebResource(String query) {
+        Client client = Client.create();
+        String url = "http://" + krameriusHost + query;  // např. "/" + uuid + "/logs"
         LOGGER.debug("Kramerius url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);

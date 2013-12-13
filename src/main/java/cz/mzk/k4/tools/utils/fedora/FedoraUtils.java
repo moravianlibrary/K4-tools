@@ -161,7 +161,7 @@ public class FedoraUtils {
      * @return
      * @throws IOException
      */
-    public List<String> getChildrenUuids(String uuid, DigitalObjectModel model) throws IOException {
+    public List<String> getChildrenUuids(String uuid, DigitalObjectModel model) {
         return getChildrenUuids(uuid, new ArrayList<String>(), model);
     }
 
@@ -172,17 +172,16 @@ public class FedoraUtils {
      * @return
      * @throws IOException
      */
-    private List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) throws IOException {
+    private List<String> getChildrenUuids(String uuid, List<String> uuidList, DigitalObjectModel model) {
         try {
             if (model.equals(getModel(uuid))) {
                 uuidList.add(uuid);
                 LOGGER.debug("Adding " + uuid);
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());  // zapsat i nadřazené uuid?   - dá se najít přes risearch
             return uuidList;
         }
-        DigitalObjectModel parentModel = null;
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
 
         if (children != null) {
@@ -192,6 +191,30 @@ public class FedoraUtils {
         }
 
         return uuidList;
+    }
+
+    /**
+     * Projde celý foxml strom a vypíše chyby (vazby, ke kterým chybí objekt)
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    public void checkChildrenExistance(String uuid) {
+        try {
+            getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
+            LOGGER.debug(uuid + " existuje");
+        } catch (IOException e) {
+            // objekt není ve fedoře, ale už je zalogování z nižší úrovně
+            // zapsat i nadřazené uuid?   - dá se najít přes risearch
+        }
+
+        ArrayList<ArrayList<String>> children = getAllChildren(uuid);
+        if (children != null) {
+            for (ArrayList<String> child : children) {
+                checkChildrenExistance(child.get(0));
+            }
+        }
     }
 
     /**
@@ -260,6 +283,14 @@ public class FedoraUtils {
                 URLEncoder.encode("* <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Deleted>", "UTF-8"));
     }
 
+    public String getAllRelationships(String uuid) {  // plain string returned from risearch
+        String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+                + query);
+        String result = resource.get(String.class);
+        return result;
+    }
+
     /**
      * @param query
      * @return
@@ -295,14 +326,11 @@ public class FedoraUtils {
      * @throws IOException
      */
     public DigitalObjectModel getModel(String uuid) throws IOException {
-        DigitalObjectModel model = null;
+        DigitalObjectModel model;
         try {
             model = getDigitalObjectModel(uuid);
-        } catch (ConnectionException e) {
-            LOGGER.error("Digital object " + uuid + " is not in the repository. " + e.getMessage());
-            throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not get model of object " + uuid + ". Using generic model handler.", e);
+            LOGGER.error("Digital object " + uuid + " is not in the repository.\n" + e.getMessage());
             throw e;
         }
         return model;
@@ -314,9 +342,9 @@ public class FedoraUtils {
      * @throws IOException
      */
     public Document getRelsExt(String uuid) throws IOException {
-        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + "/get/" + uuid + "/RELS-EXT");
-        WebResource resource = accessProvider.getFedoraWebResource("/get/" + uuid + "/RELS-EXT");
-//        String docString = resource.accept(MediaType.APPLICATION_XML).get(String.class);
+        String query =  "/get/" + uuid + "/RELS-EXT";
+        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
+        WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         if (response.getStatus() == 200) {
             String docString = response.getEntity(String.class);

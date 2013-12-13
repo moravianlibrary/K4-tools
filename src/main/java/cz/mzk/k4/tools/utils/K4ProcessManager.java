@@ -44,7 +44,7 @@ public class K4ProcessManager {
 
 		// get JSON string
 		String query = "/search/api/v4.6/processes";
-		WebResource resource = accessProvider.getKrameriusWebResource(query);
+		WebResource resource = accessProvider.getKrameriusRESTWebResource(query);
 		String strJson = resource.queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(String.class);
 
 		// parse JSON string
@@ -68,7 +68,7 @@ public class K4ProcessManager {
 
 		// get JSON string
 		try {
-			WebResource resource = accessProvider.getKrameriusWebResource("/search/api/v4.6/processes/" + uuid);
+			WebResource resource = accessProvider.getKrameriusRESTWebResource("/search/api/v4.6/processes/" + uuid);
 			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
 		} catch (UniformInterfaceException e) {
 			int status = e.getResponse().getStatus();
@@ -100,7 +100,7 @@ public class K4ProcessManager {
 		// get JSON string
 		try {
 			String query = "/search/api/v4.6/processes/" + uuid + "/logs";
-            WebResource resource = accessProvider.getKrameriusWebResource(query);
+            WebResource resource = accessProvider.getKrameriusRESTWebResource(query);
 			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
 		} catch (UniformInterfaceException e) {
 			int status = e.getResponse().getStatus();

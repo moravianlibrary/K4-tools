@@ -4,9 +4,19 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +47,7 @@ public class KrameriusUtils {
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "delete");
-        WebResource resource = accessProvider.getKrameriusWebResource("");
+        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
         ClientResponse response = resource.queryParams(queryParams)
                 .accept(MediaType.APPLICATION_JSON)
                 .type(MediaType.APPLICATION_JSON)
@@ -58,7 +68,7 @@ public class KrameriusUtils {
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setprivate");
-        WebResource resource = accessProvider.getKrameriusWebResource("");
+        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
         ClientResponse response = resource.queryParams(queryParams)
                 .accept(MediaType.APPLICATION_JSON)
                 .type(MediaType.APPLICATION_JSON)
@@ -78,7 +88,7 @@ public class KrameriusUtils {
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("def", "setpublic");
-        WebResource resource = accessProvider.getKrameriusWebResource("");
+        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
         ClientResponse response = resource.queryParams(queryParams)
                 .accept(MediaType.APPLICATION_JSON)
                 .type(MediaType.APPLICATION_JSON)
@@ -97,5 +107,46 @@ public class KrameriusUtils {
             pid = "uuid:" + pid;
         }
         return pid;
+    }
+
+    public List<String> getUuidsByModelSolr(String model) {
+        List<String> uuidList = new ArrayList<String>();
+
+        int offset = 0;
+        int numFound = 1;
+
+        LOGGER.debug("Hledání uuid modelu " + model);
+        while (offset < numFound) {
+            WebResource resource = accessProvider.getKrameriusWebResource("/solr/select?indent=on&version=2.2&q=document_type%3A" + model + "&fq=&start=" + offset + "&rows=1000&fl=PID");
+            Document xml = resource.accept(MediaType.APPLICATION_XML).get(Document.class);
+
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            NodeList nodes = null;
+            try {
+                nodes = (NodeList) xPath.evaluate("/response/result/doc/str",
+                        xml.getDocumentElement(), XPathConstants.NODESET);
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            }
+
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                Element element = (Element) nodes.item(i);
+                uuidList.add(element.getTextContent());
+            }
+
+            offset += 1000;
+            try {
+                Node result = (Node) xPath.evaluate("/response/result",
+                        xml.getDocumentElement(), XPathConstants.NODE);
+                String numString = result.getAttributes().getNamedItem("numFound").getTextContent();
+                numFound = Integer.parseInt(numString);
+            } catch (XPathExpressionException e) {
+                e.printStackTrace();
+            }
+            LOGGER.debug("Offset = " + offset + " z " + numFound);
+
+        }
+        LOGGER.info("Nalezeno celkem " + uuidList.size() + " objektů typu " + model + ".");
+        return uuidList;
     }
 }
