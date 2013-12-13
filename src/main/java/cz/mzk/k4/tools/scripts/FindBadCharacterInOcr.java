@@ -1,14 +1,13 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -87,25 +86,21 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     public void run(String uuid) {
 
         List<String> list;
-        try {
-            list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
+        list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
 
-            for (String uuidChild : list) {
-                if (containBadCharacter(fedoraUtils.getOcr(uuidChild))) {
-                    LOGGER.warn(uuidChild + " contain some bad characters");
-                    if (repair) {
-                        try {
-                            fedoraUtils.setOcr(uuidChild, removeBadCharacters(fedoraUtils.getOcr(uuidChild)));
-                        } catch (CreateObjectException e) {
-                            e.printStackTrace();
-                        }
+        for (String uuidChild : list) {
+            if (containBadCharacter(fedoraUtils.getOcr(uuidChild))) {
+                LOGGER.warn(uuidChild + " contain some bad characters");
+                if (repair) {
+                    try {
+                        fedoraUtils.setOcr(uuidChild, removeBadCharacters(fedoraUtils.getOcr(uuidChild)));
+                    } catch (CreateObjectException e) {
+                        e.printStackTrace();
                     }
-                } else {
-                    LOGGER.debug(uuidChild + " is just fine");
                 }
+            } else {
+                LOGGER.info(uuidChild + " is just fine");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
 
