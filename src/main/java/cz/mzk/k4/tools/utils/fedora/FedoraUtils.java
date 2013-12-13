@@ -87,13 +87,16 @@ public class FedoraUtils {
         applyToAllUuid(triplets, worker, 1);
     }
 
-    //TODO
-    public void applyToAllUuid(final Provider queue) {
+    /**
+     * @param queue Uuid provider
+     * @param worker Uuid worker
+     */
+    public void applyToAllUuid(final Provider queue, final UuidWorker worker) {
         while (true) {
             try {
-                System.out.println(queue.take());
+                worker.run(queue.take());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("K4 tools was interrupted");
             }
         }
     }

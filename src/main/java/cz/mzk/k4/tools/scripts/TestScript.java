@@ -26,7 +26,7 @@ public class TestScript implements Script {
 
         String uuid = args.get(0);
 
-        fedoraUtils.applyToAllUuid(new ChildrenUuid(uuid, DigitalObjectModel.PAGE));
+        //fedoraUtils.applyToAllUuid(new ChildrenUuid(uuid, DigitalObjectModel.PAGE));
 
         //krameriusUtils.setPublic(uuid);
     }
