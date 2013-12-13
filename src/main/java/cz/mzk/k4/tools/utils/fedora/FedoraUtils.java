@@ -4,6 +4,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import cz.mzk.k4.tools.providers.Provider;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.domain.FedoraNamespaces;
@@ -84,6 +85,20 @@ public class FedoraUtils {
      */
     public void applyToAllUuid(List<RelationshipTuple> triplets, final UuidWorker worker) {
         applyToAllUuid(triplets, worker, 1);
+    }
+
+    /**
+     * @param queue Uuid provider
+     * @param worker Uuid worker
+     */
+    public void applyToAllUuid(final Provider queue, final UuidWorker worker) {
+        while (true) {
+            try {
+                worker.run(queue.take());
+            } catch (InterruptedException e) {
+                LOGGER.error("K4 tools was interrupted");
+            }
+        }
     }
 
     /**
@@ -610,7 +625,8 @@ public class FedoraUtils {
 
     /**
      * @param pid            - pid objektu ve fedoře
-     * @param datastreamName název datastreamu (cz.mzk.k4.tools.utils.fedora.Constants.java)
+     * @param datastreamName název datastreamu
+     * @see cz.mzk.k4.tools.utils.fedora.Constants
      * @return
      * @throws IOException
      */
