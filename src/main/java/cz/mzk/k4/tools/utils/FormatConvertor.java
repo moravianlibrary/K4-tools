@@ -24,7 +24,7 @@ public class FormatConvertor {
         List<String> commandParams = new ArrayList<String>();
         commandParams.add("convert");
         commandParams.add("-quality");
-        commandParams.add("80%");
+        commandParams.add("90%");
         commandParams.add(djvuFile.getAbsolutePath());
         commandParams.add(jpgFile.getAbsolutePath());
 
