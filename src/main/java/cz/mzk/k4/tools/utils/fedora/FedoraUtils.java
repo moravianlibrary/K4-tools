@@ -102,34 +102,6 @@ public class FedoraUtils {
     }
 
     /**
-     * @param queue Uuid provider
-     * @param worker Uuid worker
-     */
-    public void applyToAllUuid(final Provider queue, final UuidWorker worker) {
-        while (true) {
-            try {
-                worker.run(queue.take());
-            } catch (InterruptedException e) {
-                LOGGER.error("K4 tools was interrupted");
-            }
-        }
-    }
-
-    /**
-     * @param queue Uuid provider
-     * @param worker Uuid worker
-     */
-    public void applyToAllUuid(final Provider queue, final UuidWorker worker) {
-        while (true) {
-            try {
-                worker.run(queue.take());
-            } catch (InterruptedException e) {
-                LOGGER.error("K4 tools was interrupted");
-            }
-        }
-    }
-
-    /**
      * @param triplets
      * @param worker
      * @param maxThreads
