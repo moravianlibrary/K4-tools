@@ -84,7 +84,9 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
      * @param uuid
      */
     public void run(String uuid) {
-
+        if (isWriteEnabled()) {
+            repair = true;
+        }
         List<String> list;
         list = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
 
