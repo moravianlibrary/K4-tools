@@ -33,10 +33,23 @@ public class WtfSearch implements Script {
         krameriusUtils = new KrameriusUtils(accessProvider);
         fedoraUtils = new FedoraUtils(accessProvider);
 
-        // SOLR - porovnat s tripletama (chybějící vazby)
-        List<DigitalObjectModel> modely = new ArrayList<DigitalObjectModel>();
-        modely.add(DigitalObjectModel.MONOGRAPH);
-        modely.add(DigitalObjectModel.PERIODICAL);
+        if (args.size() == 1) {
+            String uuid = args.get(0);
+            LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix() + ", uuid: " + uuid);
+
+            // porovnání s triplety
+            // není rekurzivní (každý model zvlášť)
+            worker.run(uuid);
+
+            // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
+            // + kontrola konzistence ORC
+            fedoraUtils.checkChildrenAndOcrExistance(uuid);
+        } else {
+
+            // SOLR - porovnat s tripletama (chybějící vazby)
+            List<DigitalObjectModel> modely = new ArrayList<DigitalObjectModel>();
+            modely.add(DigitalObjectModel.MONOGRAPH);
+            modely.add(DigitalObjectModel.PERIODICAL);
 //        modely.add(DigitalObjectModel.PAGE);
 //        modely.add(DigitalObjectModel.ARCHIVE);
 //        modely.add(DigitalObjectModel.ARTICLE);
@@ -52,25 +65,35 @@ public class WtfSearch implements Script {
 //        modely.add(DigitalObjectModel.SUPPLEMENT);
 //        modely.add(DigitalObjectModel.TRACK);
 
-        for (DigitalObjectModel model : modely) {
-            List<String> uuidList = krameriusUtils.getUuidsByModelSolr(model.getValue());
-            // všechna uuid ve fedoře? =)
+            for (DigitalObjectModel model : modely) {
+                List<String> uuidList = krameriusUtils.getUuidsByModelSolr(model.getValue());
+                // všechna uuid ve fedoře? =)
 
-            LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix() + ", model: " + model.getValue());      // new thread?
-            for (String uuid : uuidList) {
+                LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix() + ", model: " + model.getValue());      // new thread?
 
-                // porovnání s triplety
-                // není rekurzivní (každý model zvlášť)
-                worker.run(uuid);
+                for (int i = 0; i < uuidList.size(); i++) {
+                    String uuid = uuidList.get(i);
 
-                // kontrola závislostí ve fedoře (prohledání stromu)
-                fedoraUtils.checkChildrenExistance(uuid);
+                    // porovnání s triplety
+                    // není rekurzivní (každý model zvlášť)
+                    // časem spustit na stránkách
+                    worker.run(uuid);
+
+                    // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
+                    fedoraUtils.checkChildrenExistance(uuid);
+
+                    if ((i % 1000) == 0 && i > 1) {
+                        LOGGER.info("Prohledáno " + i + " objektů");
+                    }
+                }
             }
         }
     }
 
     @Override
     public String getUsage() {
-        return "Projde solr, triplety foxml stromy ve fedoře a vypíše haluze.\n Bez argumentů.";
+        return "hledaniHaluzi\n" +
+                "Projde solr, triplety a foxml stromy ve fedoře a vypíše wtf objekty.\n" +
+                "Bez argumentů.";
     }
 }

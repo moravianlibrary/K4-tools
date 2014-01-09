@@ -63,6 +63,8 @@ public class AccessProvider {
         fedoraHost = properties.getProperty(libraryPrefix + ".fedora.host");
         fedoraUser = properties.getProperty(libraryPrefix + ".fedora.username");
         fedoraPassword = properties.getProperty(libraryPrefix + ".fedora.password");
+
+        client = Client.create();
     }
 
     //TODO: static getAccessOrovider
@@ -74,9 +76,8 @@ public class AccessProvider {
      * @return
      */
     public WebResource getKrameriusRESTWebResource(String query) {
-        Client client = Client.create();
         String url = "http://" + krameriusHost + K4_REMOTE_API_PATH + query;  // např. "/" + uuid + "/logs"
-        LOGGER.debug("Kramerius remote api url: " + url);
+//        LOGGER.debug("Kramerius remote api url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
         resource.addFilter(credentials);
@@ -89,9 +90,8 @@ public class AccessProvider {
      * @return
      */
     public WebResource getKrameriusWebResource(String query) {
-        Client client = Client.create();
         String url = "http://" + krameriusHost + query;  // např. "/" + uuid + "/logs"
-        LOGGER.debug("Kramerius url: " + url);
+//        LOGGER.debug("Kramerius url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
         resource.addFilter(credentials);
@@ -104,12 +104,25 @@ public class AccessProvider {
      * @return
      */
     public WebResource getFedoraWebResource(String query) {
-        Client client = Client.create();
         String url = "http://" + fedoraHost + query;
-        LOGGER.debug("Fedora url: " + url);
+//        LOGGER.debug("Fedora url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
         resource.addFilter(credentials);
+        return resource;
+    }
+
+    /**
+     *
+     * @param query
+     * @return
+     */
+    public WebResource getSolrWebResource(String query) {
+        String url = "http://" + krameriusHost + "/solr" + query;
+//        LOGGER.debug("Fedora url: " + url);
+        WebResource resource = client.resource(url);
+//        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
+//        resource.addFilter(credentials);
         return resource;
     }
 
