@@ -1,7 +1,6 @@
 package cz.mzk.k4.tools.utils;
 
 import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

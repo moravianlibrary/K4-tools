@@ -88,7 +88,7 @@ public class FedoraUtils {
     }
 
     /**
-     * @param queue Uuid provider
+     * @param queue  Uuid provider
      * @param worker Uuid worker
      */
     public void applyToAllUuid(final Provider queue, final UuidWorker worker) {
@@ -220,6 +220,7 @@ public class FedoraUtils {
             getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
             LOGGER.debug(uuid + " existuje");
         } catch (IOException e) {
+            // TODO: ?
             // objekt není ve fedoře, ale už je zalogování z nižší úrovně
             // zapsat i nadřazené uuid?   - dá se najít přes risearch
         }
@@ -230,6 +231,52 @@ public class FedoraUtils {
                 checkChildrenExistance(child.get(0));
             }
         }
+    }
+
+    /**
+     * Projde celý foxml strom a vypíše chyby (vazby, ke kterým chybí objekt)
+     *
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    public Boolean checkChildrenAndOcrExistance(String uuid) {
+        Boolean containsOcr = null;
+        DigitalObjectModel model = null;
+        try {
+            model = getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
+            LOGGER.debug(uuid + " existuje");
+        } catch (IOException e) {
+            // TODO: ?
+            // objekt není ve fedoře, ale už je zalogování z nižší úrovně
+            // zapsat i nadřazené uuid?   - dá se najít přes risearch
+        }
+
+        if (model.equals(DigitalObjectModel.PAGE)) {
+            containsOcr = (getOcr(uuid) != null);
+        } else {
+            // TODO: může mít OCR jen model PAGE?
+        }
+
+        ArrayList<ArrayList<String>> children = getAllChildren(uuid);
+        if (children != null) {
+            for (ArrayList<String> child : children) {
+                Boolean childResult = checkChildrenAndOcrExistance(child.get(0));
+                if (childResult != null && containsOcr != null) {
+                    if (!containsOcr.equals(childResult)) {
+                        LOGGER.error("OCR problém " + uuid);
+                    }
+                } else {
+                    containsOcr = childResult;
+                }
+            }
+            if (model.equals(DigitalObjectModel.PERIODICALVOLUME)) {
+                LOGGER.info("Prohledán ročník " + accessProvider.getFedoraAPIA().getObjectProfile(uuid, null).getObjLabel());
+            }
+            return containsOcr;
+        }
+        // pro vyšší úrovně bez dětí (return false)
+        return null;
     }
 
     /**
@@ -357,8 +404,8 @@ public class FedoraUtils {
      * @throws IOException
      */
     public Document getRelsExt(String uuid) throws IOException {
-        String query =  "/get/" + uuid + "/RELS-EXT";
-        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
+        String query = "/get/" + uuid + "/RELS-EXT";
+//        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
         if (response.getStatus() == 200) {
@@ -626,9 +673,9 @@ public class FedoraUtils {
     /**
      * @param pid            - pid objektu ve fedoře
      * @param datastreamName název datastreamu
-     * @see cz.mzk.k4.tools.utils.fedora.Constants
      * @return
      * @throws IOException
+     * @see cz.mzk.k4.tools.utils.fedora.Constants
      */
     public String getMimeTypeForStream(String pid, String datastreamName) throws IOException {
         List<DatastreamDef> datastreams = accessProvider.getFedoraAPIA().listDatastreams(pid, null);
