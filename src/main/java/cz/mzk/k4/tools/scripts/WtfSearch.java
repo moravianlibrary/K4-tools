@@ -9,6 +9,7 @@ import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,16 +42,31 @@ public class WtfSearch implements Script {
             // není rekurzivní (každý model zvlášť)
             worker.run(uuid);
 
+            // kontrola existence obrázků u stránek
+            try {
+                List<String> uuidList = fedoraUtils.getChildrenUuids(uuid);
+
+                for (String childUuid : uuidList) {
+                    DigitalObjectModel model = fedoraUtils.getModel(uuid);
+   //                 if (fedoraUtils.getModel(uuid).equals(DigitalObjectModel.PAGE)) {
+                        checkImageExistence(childUuid);
+     //               }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
             // + kontrola konzistence ORC
             fedoraUtils.checkChildrenAndOcrExistance(uuid);
+
         } else {
 
             // SOLR - porovnat s tripletama (chybějící vazby)
             List<DigitalObjectModel> modely = new ArrayList<DigitalObjectModel>();
-            modely.add(DigitalObjectModel.MONOGRAPH);
+           modely.add(DigitalObjectModel.MONOGRAPH);
             modely.add(DigitalObjectModel.PERIODICAL);
-//        modely.add(DigitalObjectModel.PAGE);
+//            modely.add(DigitalObjectModel.PAGE);
 //        modely.add(DigitalObjectModel.ARCHIVE);
 //        modely.add(DigitalObjectModel.ARTICLE);
 //        modely.add(DigitalObjectModel.GRAPHIC);
@@ -82,11 +98,29 @@ public class WtfSearch implements Script {
                     // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
                     fedoraUtils.checkChildrenExistance(uuid);
 
+                    try {
+                        if (fedoraUtils.getModel(uuid).equals(DigitalObjectModel.PAGE)) {
+                            checkImageExistence(uuid);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     if ((i % 1000) == 0 && i > 1) {
                         LOGGER.info("Prohledáno " + i + " objektů");
                     }
+
                 }
             }
+        }
+    }
+
+    private void checkImageExistence(String uuid) {
+        try {
+            fedoraUtils.getImgFull(uuid, "image/jpeg");
+   //         LOGGER.info("V pořádku: " + uuid);
+        } catch (IOException e) {
+            LOGGER.info("Chybí obrázek u strany " + uuid);
         }
     }
 
