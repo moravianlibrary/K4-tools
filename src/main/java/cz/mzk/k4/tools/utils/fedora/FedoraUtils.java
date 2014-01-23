@@ -25,10 +25,7 @@ import org.xml.sax.SAXException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -504,7 +501,7 @@ public class FedoraUtils {
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
                         .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
+            throw new FileNotFoundException("Failed : HTTP error code : "
                     + response.getStatus());
         }
         InputStream is = response.getEntityInputStream();
