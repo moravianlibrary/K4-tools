@@ -26,6 +26,7 @@ public class Tools {
         runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
         runner.register("pridatOCR", new AddOcr());
         runner.register("hledaniHaluzi", new WtfSearch());
+        runner.register("kontrolaRajhradu", new RajhradValidate());
 
         runner.register("test", new TestScript());
 
