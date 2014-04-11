@@ -575,6 +575,39 @@ public class FedoraUtils {
     }
 
     /**
+     * Method sets IMG_FULL datastream value to external source
+     * @param uuid Uuid of file to be changed
+     * @param path Path to external source
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setImgFullFromExternal(String uuid, String path) throws CreateObjectException {
+        return insertExternalDatastream(Constants.DATASTREAM_ID.IMG_FULL, uuid, path, false, "image/jpeg");
+    }
+
+    /**
+     * Method sets IMG_THUMB datastream value to external source
+     * @param uuid Uuid of file to be changed
+     * @param path Path to external source
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setImgThumbnailFromExternal(String uuid, String path) throws CreateObjectException {
+        return insertExternalDatastream(Constants.DATASTREAM_ID.IMG_THUMB, uuid, path, false, "image/jpeg");
+    }
+
+    /**
+     * Methods replaces RELS-EXT file
+     * @param uuid Uuid of file to be changed
+     * @param path Path to new RELS-EXT file
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setRelsExt(String uuid, String path) throws CreateObjectException {
+        return insertXDataStream(Constants.DATASTREAM_ID.RELS_EXT, uuid, path, true, "application/rdf+xml");
+    }
+
+    /**
      * Ocr.
      *
      * @param uuid the uuid
@@ -602,18 +635,65 @@ public class FedoraUtils {
                                             String filePathOrContent,
                                             boolean isFile,
                                             String mimeType) throws CreateObjectException {
+        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "M", "true", "A");
+    }
+
+    //Inserts datastream with controulGroup="R"
+    private boolean insertExternalDatastream(Constants.DATASTREAM_ID dsId,
+                                            String uuid,
+                                            String filePathOrContent,
+                                            boolean isFile,
+                                            String mimeType) throws CreateObjectException {
+        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "R", "true", "A");
+    }
+
+    //Inserts datastream with controulGroup="X"
+    private boolean insertXDataStream(Constants.DATASTREAM_ID dsId,
+                                        String uuid,
+                                        String filePathOrContent,
+                                        boolean isFile,
+                                        String mimeType) throws CreateObjectException {
+        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "X", "true", "A");
+    }
+
+    /**
+     * Inserts any stream
+     * @param dsId
+     * @param uuid
+     * @param filePathOrContent
+     * @param isFile
+     * @param mimeType
+     * @param controlGroup control group - M or R
+     * @param versionable
+     * @param dsState
+     * @return
+     * @throws CreateObjectException
+     */
+    private boolean insertDataStream(Constants.DATASTREAM_ID dsId,
+                                               String uuid,
+                                               String filePathOrContent,
+                                               boolean isFile,
+                                               String mimeType,
+                                               String controlGroup,
+                                               String versionable,
+                                               String dsState) throws CreateObjectException {
 
         String query =
                 "/objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
 
         MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("controlGroup", "M");
-        queryParams.add("versionable", "true");
-        queryParams.add("dsState", "A");
+        queryParams.add("controlGroup", controlGroup);
+        queryParams.add("versionable", versionable);
+        queryParams.add("dsState", dsState);
         queryParams.add("mimeType", mimeType);
 
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = null;
+        if(controlGroup == "R") {
+            queryParams.add("dsLocation", filePathOrContent);
+            resource.delete();
+        }
+
         try {
             if (isFile) {
                 response = resource.queryParams(queryParams).post(ClientResponse.class, new File(filePathOrContent));

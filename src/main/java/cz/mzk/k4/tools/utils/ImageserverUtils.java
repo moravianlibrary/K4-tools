@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,8 @@ import java.util.List;
 public class ImageserverUtils {
 
     private Configuration configuration = new Configuration();
+    public static final String IMAGE_SERVER_URL = "http://medit.mzk.cz/imageserver/";
+    private static final String IMAGE_SERVER_PATH = "/imageserver-data/";
 
     /**
      * List filenames from workspace (mzk sysifos)
@@ -79,6 +82,33 @@ public class ImageserverUtils {
 
     }
 
+    /**
+     * Method uploading image input stream to image server. Name of uploaded image on image
+     * server is its uuid without the "uuid:" part
+     * Connection settings are stored in rajhard.properties file
+     * Path on imageserver is stored in constant IMAGE_SERVER_PATH
+     *
+     * @param jp2InputStream Image stream to be uploaded
+     * @param uuid           Uuid of image
+     * @throws JSchException If the connection to image server was unsuccessful
+     * @throws SftpException If the upload to image server was unsuccessful
+     */
+    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws JSchException, SftpException {
+        try {
+            //Connect to image server
+            ChannelSftp imgServerChannel = getSftpConnection(configuration.getImageServerUserWorkspace(),
+                    configuration.getImageServerHostWorkspace(), configuration.getPrivateKeypassphrase());
+            //Upload File
+            imgServerChannel.put(jp2InputStream, IMAGE_SERVER_PATH + uuid.substring("uuid:".length()) + ".jp2");
+            //Disconnect from server
+            imgServerChannel.disconnect();
+        } catch (JSchException e) {
+            throw new JSchException("Chyba připojení se k imageserveru: " + e.getMessage());
+        } catch (SftpException e) {
+            throw new SftpException(e.id, "Chyba uploadu na imageserver: " + e.getMessage());
+        }
+    }
+
     private ChannelSftp getSftpConnection(String user, String host, String password) throws JSchException {
         JSch jsch = new JSch();
 
@@ -94,7 +124,7 @@ public class ImageserverUtils {
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
         Channel channel = session.openChannel("sftp");
-            channel.connect();
+        channel.connect();
         ChannelSftp channelSftp = (ChannelSftp) channel;
         return channelSftp;
     }

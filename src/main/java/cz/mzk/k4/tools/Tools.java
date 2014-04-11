@@ -27,6 +27,7 @@ public class Tools {
         runner.register("pridatOCR", new AddOcr());
         runner.register("hledaniHaluzi", new WtfSearch());
         runner.register("kontrolaRajhradu", new RajhradValidate());
+        runner.register("djvuNaJp2", new ConvertDJvuToJp2());
 
         runner.register("test", new TestScript());
 
