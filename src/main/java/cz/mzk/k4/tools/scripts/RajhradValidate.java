@@ -2,6 +2,7 @@ package cz.mzk.k4.tools.scripts;
 
 import com.jcraft.jsch.*;
 import cz.mzk.k4.tools.Configuration;
+import cz.mzk.k4.tools.domain.LsItem;
 import cz.mzk.k4.tools.domain.aleph.RecordHolder;
 import cz.mzk.k4.tools.scripts.rajhradValidate.Validation;
 import cz.mzk.k4.tools.utils.ImageserverUtils;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,10 +36,14 @@ public class RajhradValidate implements Script {
     @Override
     public void run(List<String> args) {
         String path = args.get(0);
-        List<String> list = null;
+        run(path);
+    }
+
+    protected void run (String path) {
+        List<LsItem> lsList = null;
 
         try {
-            list = imageserverUtils.getFilenames(path);
+            lsList = imageserverUtils.getFilenames(path);
         } catch (JSchException e) {
             e.printStackTrace();
         } catch (SftpException e) {
@@ -46,6 +52,15 @@ public class RajhradValidate implements Script {
             e.printStackTrace();
         }
 
+        List<String> list = new ArrayList<String>();
+        for (LsItem item : lsList) {
+            if (item.isDirectory()) {
+                run(path + "/" + item.getFilename());
+            } else {
+               list.add(item.getFilename());
+            }
+        }
+        System.out.println("Kontrola " + path);
         RecordHolder holder = new RecordHolder(list);
 
         try {
@@ -65,18 +80,16 @@ public class RajhradValidate implements Script {
         System.out.println("------------------------------");
         holder.writeAlephScript();
 
-        Client client = ClientBuilder.newClient();
-        for (String url : holder.getImageserverLinkList()) {
-            WebTarget webTarget = client.target(url + "/preview.jpg");
-            Response response = webTarget.request().get();
-            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
-                System.err.println(url + " returned status code " + response.getStatus());
-            } else {
-                System.out.println(url + " is ok");
-            }
-        }
-
-
+//        Client client = ClientBuilder.newClient();
+//        for (String url : holder.getImageserverLinkList()) {
+//            WebTarget webTarget = client.target(url + "/preview.jpg");
+//            Response response = webTarget.request().get();
+//            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+//                System.err.println(url + " returned status code " + response.getStatus());
+//            } else {
+//                System.out.println(url + " is ok");
+//            }
+//        }
     }
 
     //ensure that base is updated

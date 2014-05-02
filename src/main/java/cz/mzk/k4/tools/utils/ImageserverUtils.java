@@ -2,6 +2,7 @@ package cz.mzk.k4.tools.utils;
 
 import com.jcraft.jsch.*;
 import cz.mzk.k4.tools.Configuration;
+import cz.mzk.k4.tools.domain.LsItem;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -30,7 +31,7 @@ public class ImageserverUtils {
      * @throws SftpException
      * @throws java.io.IOException
      */
-    public List<String> getFilenames(String path) throws JSchException, SftpException, IOException {
+    public List<LsItem> getFilenames(String path) throws JSchException, SftpException, IOException {
 
         ChannelSftp channelWorkspace = getSftpConnection(configuration.getSshUserWorkspace(),
                 configuration.getSshHostWorkspace(), configuration.getPasswordWorkspace());
@@ -40,25 +41,24 @@ public class ImageserverUtils {
         channelWorkspace.disconnect();
 
 
-        List<String> filenames = new ArrayList<String>();
+        List<LsItem> filenames = new ArrayList<LsItem>();
 
         for (ChannelSftp.LsEntry entry : list) {
-            filenames.add(entry.getFilename());
+            if (!".".equals(entry.getFilename()) && !"..".equals(entry.getFilename()))
+            filenames.add(new LsItem(entry.getFilename(),entry.getAttrs().isDir()));
         }
-        filenames.remove(".");
-        filenames.remove("..");
 
         return filenames;
 
     }
 
     public void uploadToImageserver(String path) throws JSchException, SftpException, IOException {
-        List<String> list = getFilenames(path);
+        List<LsItem> list = getFilenames(path);
 
         ChannelSftp workspaceChannel = getSftpConnection(configuration.getSshUserWorkspace(),
                 configuration.getSshHostWorkspace(), null);
 
-        for (String item : list) {
+        for (LsItem item : list) {
             BufferedWriter writer = null;
             File originalImage = File.createTempFile("rajhrad_tool", "image");
             File convertedImage = File.createTempFile("rajhrad_tool", ".jp2");
