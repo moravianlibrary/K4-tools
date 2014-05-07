@@ -28,6 +28,7 @@ public class Tools {
         runner.register("hledaniHaluzi", new WtfSearch());
         runner.register("kontrolaRajhradu", new RajhradValidate());
         runner.register("djvuNaJp2", new ConvertDJvuToJp2());
+        runner.register("regenerateAudioServer", new RegenerateAudioServer());
 
         runner.register("test", new TestScript());
 
