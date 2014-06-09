@@ -158,8 +158,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>1.12</version>
 				<executions>
 					<execution>
 						<id>FedoraAPI</id>
@@ -168,8 +169,8 @@
 						</goals>
 						<configuration>
 							<wsdlFiles>
-								<wsdlFile>${basedir}/src/wsdl/FedoraAPI-A.wsdl</wsdlFile>
-								<wsdlFile>${basedir}/src/wsdl/FedoraAPI-M.wsdl</wsdlFile>
+								<wsdlFile>/FedoraAPI-A.wsdl</wsdlFile>
+								<wsdlFile>/FedoraAPI-M.wsdl</wsdlFile>
 							</wsdlFiles>
 							<staleFile>
 								${project.build.directory}/jaxws/stale/FedoraAPI.stale
@@ -187,7 +188,7 @@
                         </goals>
                         <configuration>
                             <wsdlFiles>
-                                <wsdlFile>${basedir}/src/wsdl/RSSoapService.wsdl</wsdlFile>
+                                <wsdlFile>RSSoapService.wsdl</wsdlFile>
                             </wsdlFiles>
                             <wsdlLocation>/META-INF/RSSoapService.wsdl</wsdlLocation>
                             <staleFile>
