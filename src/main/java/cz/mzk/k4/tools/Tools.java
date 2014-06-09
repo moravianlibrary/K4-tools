@@ -29,6 +29,7 @@ public class Tools {
         runner.register("kontrolaRajhradu", new RajhradValidate());
         runner.register("djvuNaJp2", new ConvertDJvuToJp2());
         runner.register("regenerateAudioServer", new RegenerateAudioServer());
+        runner.register("grafikyUpload", new GraphicsUpload());
 
         runner.register("test", new TestScript());
 
