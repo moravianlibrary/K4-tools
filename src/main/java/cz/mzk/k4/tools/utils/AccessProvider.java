@@ -27,6 +27,8 @@ import java.util.Properties;
  */
 public class AccessProvider {
 
+    private static AccessProvider accessProvider;
+
     private FedoraAPIA fedoraAPIA;
     private String fedoraHost;
     private String fedoraUser;
@@ -34,6 +36,11 @@ public class AccessProvider {
     private String krameriusHost;
     private String krameriusUser;
     private String krameriusPassword;
+    private String imageserverUser;
+    private String imageserverHost;
+    private String imageserverPassword;
+    private String imageserverPath;
+    private String imageserverUrlPath;
     private String libraryPrefix;
     private Client client;
     private String confFileName = "k4_tools_config.properties";
@@ -64,10 +71,21 @@ public class AccessProvider {
         fedoraUser = properties.getProperty(libraryPrefix + ".fedora.username");
         fedoraPassword = properties.getProperty(libraryPrefix + ".fedora.password");
 
+        imageserverHost = properties.getProperty(libraryPrefix + ".imageserver.host");
+        imageserverUser = properties.getProperty(libraryPrefix + ".imageserver.username");
+        imageserverPassword = properties.getProperty(libraryPrefix + ".imageserver.password");
+        imageserverPath = properties.getProperty(libraryPrefix + ".imageserver.path");
+        imageserverUrlPath = properties.getProperty(libraryPrefix + ".imageserver.urlPath");
+
         client = Client.create();
     }
 
-    //TODO: static getAccessOrovider
+    public static AccessProvider getInstance() {
+        if(accessProvider == null) {
+            accessProvider = new AccessProvider();
+        }
+        return accessProvider;
+    }
 
 
     /**
@@ -154,7 +172,7 @@ public class AccessProvider {
             APIAservice =
                     new FedoraAPIAService(
                             new URL("http://" + getFedoraHost() + "/wsdl?api=API-A"),
-                            new QName("http://www.fedora.info/definitions/1/0/api/",
+                            new QName("http://www.fedora.info/definitions/1/0/types/",
                                     "Fedora-API-A-Service"));
         } catch (MalformedURLException e) {
             LOGGER.error("InvalidURL API-A:" + e);
@@ -243,5 +261,44 @@ public class AccessProvider {
 
     public void setProperties(Properties properties) {
         this.properties = properties;
+    }
+
+    public String getImageserverUser() { return imageserverUser;
+    }
+
+    public void setImageserverUser(String imageserverUser) {
+        this.imageserverUser = imageserverUser;
+    }
+
+    public String getImageserverHost() {
+        return imageserverHost;
+    }
+
+    public void setImageserverHost(String imageserverHost) {
+        this.imageserverHost = imageserverHost;
+    }
+
+    public String getImageserverPassword() {
+        return imageserverPassword;
+    }
+
+    public void setImageserverPassword(String imageserverPassword) {
+        this.imageserverPassword = imageserverPassword;
+    }
+
+    public String getImageserverPath() {
+        return imageserverPath;
+    }
+
+    public void setImageserverPath(String imageserverPath) {
+        this.imageserverPath = imageserverPath;
+    }
+
+    public String getImageserverUrlPath() {
+        return imageserverUrlPath;
+    }
+
+    public void setImageserverUrlPath(String imageserverUrlPath) {
+        this.imageserverUrlPath = imageserverUrlPath;
     }
 }

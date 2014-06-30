@@ -1,7 +1,5 @@
 package cz.mzk.k4.tools.workers;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.ImageserverUtils;
@@ -62,14 +60,15 @@ public class ConvertDjvuWorker extends UuidWorker {
                 imageServer.uploadJp2ToImageserver(jp2Stream, uuid);
                 LOGGER.info("Proběhl upload na imageserver.");
 
-                //Change datastream references for uuif to new image, for reference to imageserver uses constant IMAGE_SERVER_URL
-                String path = ImageserverUtils.IMAGE_SERVER_URL + uuid.substring("uuid:".length()) + "/";
+                //Change datastream references for uuid to new image, for reference to imageserver uses constant IMAGE_SERVER_URL
+                String imageServerUrl = imageServer.getImageserverUrl() == null ? AccessProvider.getInstance().getImageserverUrlPath() : imageServer.getImageserverUrl();
+                String path = imageServerUrl + uuid.substring("uuid:".length()) + "/";
                 fedoraUtils.setImgFullFromExternal(uuid, path + "big.jpg");
-                fedoraUtils.setImgThumbnailFromExternal(uuid, path + "preview.jpg");
+                fedoraUtils.setImgThumbnailFromExternal(uuid, path + "thumb.jpg");
                 LOGGER.info("Nastaveny datastreamy.");
 
                 //Change RELS-EXT document to refer to imageserver url, for reference to imageserver uses constant IMAGE_SERVER_URL
-                changeRelsExt(uuid);
+                changeRelsExt(uuid, imageServerUrl);
                 LOGGER.info("Změněno RELS-EXT.");
             }
             LOGGER.info("Konec zpracování dokumentu.");
@@ -82,7 +81,7 @@ public class ConvertDjvuWorker extends UuidWorker {
     }
 
 
-    private void changeRelsExt(String uuid) throws CreateObjectException, TransformerException, IOException {
+    private void changeRelsExt(String uuid, String imageServerUrl) throws CreateObjectException, TransformerException, IOException {
         try {
             Document dom = fedoraUtils.getRelsExt(uuid);
             if (dom.getChildNodes().getLength() == 0) {
@@ -94,7 +93,7 @@ public class ConvertDjvuWorker extends UuidWorker {
 
                 //Add element kramerius:tiles-url
                 Element tiles = dom.createElement("kramerius:tiles-url");
-                tiles.setTextContent(ImageserverUtils.IMAGE_SERVER_URL + uuid.substring("uuid:".length()));
+                tiles.setTextContent(imageServerUrl + uuid.substring("uuid:".length()));
                 currentElement.appendChild(tiles);
 
                 //save XML file temporary

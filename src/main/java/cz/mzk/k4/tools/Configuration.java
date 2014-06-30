@@ -68,4 +68,8 @@ public class Configuration {
         return configuration.getString("imageserverHost");
     }
 
+    public String getImageserverUrl() { return configuration.getString("imageserverUrl"); }
+
+    public String getImageServerPath() { return configuration.getString("imageserverPath"); }
+
 }

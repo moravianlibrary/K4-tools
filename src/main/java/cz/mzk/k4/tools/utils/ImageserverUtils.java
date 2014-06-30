@@ -19,8 +19,8 @@ import java.util.List;
 public class ImageserverUtils {
 
     private Configuration configuration = new Configuration();
-    public static final String IMAGE_SERVER_URL = "http://medit.mzk.cz/imageserver/";
-    private static final String IMAGE_SERVER_PATH = "/imageserver-data/";
+    private  String imageserverUrl = configuration.getImageserverUrl();
+    private String imageServerPath = configuration.getImageServerPath();
 
     /**
      * List filenames from workspace (mzk sysifos)
@@ -96,10 +96,18 @@ public class ImageserverUtils {
     public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws JSchException, SftpException {
         try {
             //Connect to image server
-            ChannelSftp imgServerChannel = getSftpConnection(configuration.getImageServerUserWorkspace(),
-                    configuration.getImageServerHostWorkspace(), configuration.getPrivateKeypassphrase());
+            ChannelSftp imgServerChannel;
+            if(configuration.getImageServerHostWorkspace() != null) {
+                imgServerChannel=getSftpConnection(configuration.getImageServerUserWorkspace(),
+                        configuration.getImageServerHostWorkspace(), configuration.getPrivateKeypassphrase());
+            } else {
+                AccessProvider accessProvider = AccessProvider.getInstance();
+                imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
+                        accessProvider.getImageserverHost(), accessProvider.getImageserverPassword());
+            }
             //Upload File
-            imgServerChannel.put(jp2InputStream, IMAGE_SERVER_PATH + uuid.substring("uuid:".length()) + ".jp2");
+            String imgServerUrl = getImageServerPath() == null ? AccessProvider.getInstance().getImageserverPath() : getImageServerPath();
+            imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
             //Disconnect from server
             imgServerChannel.disconnect();
         } catch (JSchException e) {
@@ -113,7 +121,7 @@ public class ImageserverUtils {
         JSch jsch = new JSch();
 
         Session session;
-        if (configuration.getPasswordWorkspace() == null) {
+        if (configuration.getPasswordWorkspace() == null & AccessProvider.getInstance().getImageserverPassword() == null) {
             jsch.addIdentity(configuration.getPathPrivateKey(), configuration.getPrivateKeypassphrase());
             session = jsch.getSession(user, host, 22);
         } else {
@@ -122,10 +130,18 @@ public class ImageserverUtils {
         }
 
         session.setConfig("StrictHostKeyChecking", "no");
-        session.connect();
+        if(!session.isConnected()) session.connect();
         Channel channel = session.openChannel("sftp");
         channel.connect();
         ChannelSftp channelSftp = (ChannelSftp) channel;
         return channelSftp;
+    }
+
+    public String getImageserverUrl() {
+        return imageserverUrl;
+    }
+
+    public String getImageServerPath() {
+        return imageServerPath;
     }
 }
