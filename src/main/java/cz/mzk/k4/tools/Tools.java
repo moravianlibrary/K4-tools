@@ -30,6 +30,8 @@ public class Tools {
         runner.register("djvuNaJp2", new ConvertDJvuToJp2());
         runner.register("regenerateAudioServer", new RegenerateAudioServer());
         runner.register("grafikyUpload", new GraphicsUpload());
+        runner.register("exportZeSouboru", new ExportFromFile());
+        runner.register("stazeniObrazku", new DownloadImages());
 
         runner.register("test", new TestScript());
 

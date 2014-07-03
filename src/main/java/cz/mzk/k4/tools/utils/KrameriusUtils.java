@@ -149,4 +149,22 @@ public class KrameriusUtils {
         LOGGER.info("Nalezeno celkem " + uuidList.size() + " objektů typu " + model + ".");
         return uuidList;
     }
+
+    public void export(String pid) {
+        String json = "{ \"parameters\":[ \"" + pid + "\" ]}";
+        MultivaluedMap queryParams = new MultivaluedMapImpl();
+        queryParams.add("def","export");
+        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
+        ClientResponse response = resource.queryParams(queryParams)
+                .accept(MediaType.APPLICATION_JSON)
+                .type(MediaType.APPLICATION_JSON)
+                .entity(json,MediaType.APPLICATION_JSON)
+                .post(ClientResponse.class);
+        if(response.getStatus() == 201) {
+            LOGGER.info("Exportováno: " + pid);
+        } else {
+            LOGGER.error("Export " + pid + "se nepodaril. CHYBA: " + response.getStatus());
+        }
+    }
+
 }
