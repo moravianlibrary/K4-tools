@@ -38,57 +38,59 @@ public class DownloadImages implements Script{
             System.out.println("Součástí příkazu musí být i cesta k cílovému adresáři. (A nic dalšího)");
             return;
         }
-
-        File imagesPathFile = new File(args.get(0) + "/images");
-        if(!imagesPathFile.exists()) {
-            imagesPathFile.mkdir();
-        }
-        LOGGER.info("Vytvořen adresář images.");
-
         File homeFile = new File(args.get(0));
+        File[] homeDirs = homeFile.listFiles((java.io.FileFilter) DirectoryFileFilter.DIRECTORY);
+        for (File dir : homeDirs) {
 
-        Collection<File> foxmlFiles = FileUtils.listFiles(homeFile, new SuffixFileFilter(".xml"), DirectoryFileFilter.DIRECTORY);
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            if(!foxmlFiles.isEmpty()) {
-                for (File foxml : foxmlFiles) {
-                    Document document = builder.parse(foxml);
-
-                    XPathFactory xPathFactory = XPathFactory.newInstance();
-                    XPath xpath = xPathFactory.newXPath();
-                    Element datastream = (Element) xpath.evaluate("//*[@ID='"+DATASTREAM_NAME+"']", document, XPathConstants.NODE);
-                    if(datastream !=null) {
-                        Element urlElement = (Element) datastream.getElementsByTagName(DATASTREAM_LOCATION_TAG).item(0);
-                        String imgLocaion = urlElement.getAttribute("REF");
-                        imgLocaion = imgLocaion.substring(imgLocaion.indexOf("NDK/"), imgLocaion.length() - DATASTREAM_SUFFIX.length());
-                        imgLocaion += ".jp2";
-
-                        File inputImgLocation = new File(INPUT_ADRESS + imgLocaion);
-                        File outputImgLocation = new File(args.get(0) + "/images/"+inputImgLocation.getName());
-                        FileUtils.copyFile(inputImgLocation, outputImgLocation);
-                    }
-
-
-                }
+            File imagesPathFile = new File(dir.getAbsolutePath() + "/images");
+            if(!imagesPathFile.exists()) {
+                imagesPathFile.mkdir();
             }
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("Chyba ve zpracování XML: ");
-            e.printStackTrace();
-        } catch (SAXException e) {
-            LOGGER.error("Chyba ve zpracování XML: ");
-            e.printStackTrace();
-        } catch (IOException e) {
-            LOGGER.error("Chyba při otvírání XML souboru: ");
-            e.printStackTrace();
-        } catch (XPathExpressionException e) {
-            LOGGER.error("Chyba v XPath: ");
-            e.printStackTrace();
+            LOGGER.info("Vytvořen adresář images.");
+
+            File homeDir = new File(dir.getAbsolutePath());
+
+            Collection<File> foxmlFiles = FileUtils.listFiles(homeDir, new SuffixFileFilter(".xml"), DirectoryFileFilter.DIRECTORY);
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                if(!foxmlFiles.isEmpty()) {
+                    for (File foxml : foxmlFiles) {
+                        Document document = builder.parse(foxml);
+
+                        XPathFactory xPathFactory = XPathFactory.newInstance();
+                        XPath xpath = xPathFactory.newXPath();
+                        Element datastream = (Element) xpath.evaluate("//*[@ID='"+DATASTREAM_NAME+"']", document, XPathConstants.NODE);
+                        if(datastream !=null) {
+                            Element urlElement = (Element) datastream.getElementsByTagName(DATASTREAM_LOCATION_TAG).item(0);
+                            String imgLocaion = urlElement.getAttribute("REF");
+                            imgLocaion = imgLocaion.substring(imgLocaion.indexOf("NDK/"), imgLocaion.length() - DATASTREAM_SUFFIX.length());
+                            imgLocaion += ".jp2";
+
+                            File inputImgLocation = new File(INPUT_ADRESS + imgLocaion);
+                            File outputImgLocation = new File(homeDir.getAbsolutePath() + "/images/"+inputImgLocation.getName());
+                            FileUtils.copyFile(inputImgLocation, outputImgLocation);
+                        }
+
+
+                    }
+                }
+            } catch (ParserConfigurationException e) {
+                LOGGER.error("Chyba ve zpracování XML: ");
+                e.printStackTrace();
+            } catch (SAXException e) {
+                LOGGER.error("Chyba ve zpracování XML: ");
+                e.printStackTrace();
+            } catch (IOException e) {
+                LOGGER.error("Chyba při otvírání XML souboru: ");
+                e.printStackTrace();
+            } catch (XPathExpressionException e) {
+                LOGGER.error("Chyba v XPath: ");
+                e.printStackTrace();
+            }
+
         }
 
-
-        LOGGER.info("Začíná stahování obrázků");
-        LOGGER.info("Konec stahování obrázků");
     }
 
     @Override
