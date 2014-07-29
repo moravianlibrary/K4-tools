@@ -644,7 +644,7 @@ public class FedoraUtils {
                                             String filePathOrContent,
                                             boolean isFile,
                                             String mimeType) throws CreateObjectException {
-        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "R", "true", "A");
+        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "R", "false", "A");
     }
 
     //Inserts datastream with controulGroup="X"

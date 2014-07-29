@@ -32,6 +32,7 @@ public class Tools {
         runner.register("grafikyUpload", new GraphicsUpload());
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
+        runner.register("indexaceZeSeznamu", new IndexList());
 
         runner.register("test", new TestScript());
 

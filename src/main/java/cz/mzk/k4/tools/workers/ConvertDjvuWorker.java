@@ -82,8 +82,13 @@ public class ConvertDjvuWorker extends UuidWorker {
 
 
     private void changeRelsExt(String uuid, String imageServerUrl) throws CreateObjectException, TransformerException, IOException {
+        File tempDom = null;
         try {
             Document dom = fedoraUtils.getRelsExt(uuid);
+            Element rdf = (Element) dom.getElementsByTagName("rdf:RDF").item(0);
+            if(!rdf.hasAttribute("xmlns:kramerius")) {
+                rdf.setAttribute("xmlns:kramerius","http://www.nsdl.org/ontologies/relationships#");
+            }
             if (dom.getChildNodes().getLength() == 0) {
                 dom.appendChild(dom.createElement("rdf:Description"));
             }
@@ -97,7 +102,7 @@ public class ConvertDjvuWorker extends UuidWorker {
                 currentElement.appendChild(tiles);
 
                 //save XML file temporary
-                File tempDom = File.createTempFile("relsExt", ".rdf");
+                tempDom = File.createTempFile("relsExt", ".rdf");
                 TransformerFactory.newInstance().newTransformer().transform(new DOMSource(dom), new StreamResult(tempDom));
                 //Copy temporary file to document
                 fedoraUtils.setRelsExt(uuid, tempDom.getAbsolutePath());
@@ -110,6 +115,10 @@ public class ConvertDjvuWorker extends UuidWorker {
             throw new TransformerException("Chyba při změně XML: " + e.getMessage());
         } catch (IOException e) {
             throw new IOException("Chyba při změně XML: " + e.getMessage());
+        } finally {
+            if(tempDom != null) {
+                tempDom.delete();
+            }
         }
     }
 }

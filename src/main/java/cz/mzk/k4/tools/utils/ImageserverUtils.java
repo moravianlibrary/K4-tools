@@ -97,11 +97,11 @@ public class ImageserverUtils {
         try {
             //Connect to image server
             ChannelSftp imgServerChannel;
-            if(configuration.getImageServerHostWorkspace() != null) {
+            AccessProvider accessProvider = AccessProvider.getInstance();
+            if(accessProvider.getImageserverHost() == null) {
                 imgServerChannel=getSftpConnection(configuration.getImageServerUserWorkspace(),
                         configuration.getImageServerHostWorkspace(), configuration.getPrivateKeypassphrase());
             } else {
-                AccessProvider accessProvider = AccessProvider.getInstance();
                 imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
                         accessProvider.getImageserverHost(), accessProvider.getImageserverPassword());
             }
