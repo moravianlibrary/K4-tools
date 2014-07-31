@@ -33,6 +33,7 @@ public class Tools {
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());
+        runner.register("pocetDJVUstran", new CountPagesWithDjvuImage());
 
         runner.register("test", new TestScript());
 
