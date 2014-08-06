@@ -33,7 +33,7 @@ public class Tools {
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());
-
+        runner.register("importKolekce", new ImportCollection());
         runner.register("test", new TestScript());
 
         if (args.length < 1 || args[0] == null) {

@@ -98,15 +98,10 @@ public class ImageserverUtils {
             //Connect to image server
             ChannelSftp imgServerChannel;
             AccessProvider accessProvider = AccessProvider.getInstance();
-            if(accessProvider.getImageserverHost() == null) {
-                imgServerChannel=getSftpConnection(configuration.getImageServerUserWorkspace(),
-                        configuration.getImageServerHostWorkspace(), configuration.getPrivateKeypassphrase());
-            } else {
-                imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
-                        accessProvider.getImageserverHost(), accessProvider.getImageserverPassword());
-            }
+            imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
+                    accessProvider.getImageserverHost(), accessProvider.getImageserverPassword(), true);
             //Upload File
-            String imgServerUrl = getImageServerPath() == null ? AccessProvider.getInstance().getImageserverPath() : getImageServerPath();
+            String imgServerUrl = accessProvider.getImageserverPath();
             imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
             //Disconnect from server
             imgServerChannel.disconnect();
@@ -118,10 +113,14 @@ public class ImageserverUtils {
     }
 
     private ChannelSftp getSftpConnection(String user, String host, String password) throws JSchException {
+        return getSftpConnection(user, host, password, false);
+    }
+
+    private ChannelSftp getSftpConnection(String user, String host, String password, boolean fromImageserver) throws JSchException {
         JSch jsch = new JSch();
 
         Session session;
-        if (configuration.getPasswordWorkspace() == null & AccessProvider.getInstance().getImageserverPassword() == null) {
+        if (!fromImageserver && configuration.getPasswordWorkspace() == null) {
             jsch.addIdentity(configuration.getPathPrivateKey(), configuration.getPrivateKeypassphrase());
             session = jsch.getSession(user, host, 22);
         } else {

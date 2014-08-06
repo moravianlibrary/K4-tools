@@ -172,8 +172,10 @@ public class AccessProvider {
             APIAservice =
                     new FedoraAPIAService(
                             new URL("http://" + getFedoraHost() + "/wsdl?api=API-A"),
-                            new QName("http://www.fedora.info/definitions/1/0/types/",
+                            new QName("http://www.fedora.info/definitions/1/0/api/",
                                     "Fedora-API-A-Service"));
+//                            new QName("http://www.fedora.info/definitions/1/0/types/",
+//                                    "Fedora-API-A-Service"));
         } catch (MalformedURLException e) {
             LOGGER.error("InvalidURL API-A:" + e);
             throw new RuntimeException(e);

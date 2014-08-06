@@ -183,4 +183,23 @@ public class KrameriusUtils {
 
     }
 
+    public void addToCollection(String pid, String collectionPid) {
+        MultivaluedMap queryParams = new MultivaluedMapImpl();
+        queryParams.add("action","start");
+        queryParams.add("def", "aggregate");
+        queryParams.add("out", "text");
+        String nparams = "{virtualcollections;{add;uuid\\:" + pid + ";vc\\:" + collectionPid + "}}}";
+        queryParams.add("nparams", nparams);
+        WebResource resource = accessProvider.getKrameriusWebResource("/search/lr");
+        ClientResponse response = resource.queryParams(queryParams)
+                .type(MediaType.TEXT_PLAIN)
+                .get(ClientResponse.class);
+        if(response.getStatus() == 200){
+            LOGGER.info("Přidáno: " +pid);
+        } else {
+            LOGGER.error("Nepodařilo se přidat soubor " + pid);
+        }
+
+    }
+
 }

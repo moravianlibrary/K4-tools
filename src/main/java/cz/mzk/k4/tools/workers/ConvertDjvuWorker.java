@@ -61,7 +61,7 @@ public class ConvertDjvuWorker extends UuidWorker {
                 LOGGER.info("Proběhl upload na imageserver.");
 
                 //Change datastream references for uuid to new image, for reference to imageserver uses constant IMAGE_SERVER_URL
-                String imageServerUrl = imageServer.getImageserverUrl() == null ? AccessProvider.getInstance().getImageserverUrlPath() : imageServer.getImageserverUrl();
+                String imageServerUrl = AccessProvider.getInstance().getImageserverUrlPath();
                 String path = imageServerUrl + uuid.substring("uuid:".length()) + "/";
                 fedoraUtils.setImgFullFromExternal(uuid, path + "big.jpg");
                 fedoraUtils.setImgThumbnailFromExternal(uuid, path + "thumb.jpg");
