@@ -89,6 +89,11 @@ public class ConvertDjvuWorker extends UuidWorker {
             if(!rdf.hasAttribute("xmlns:kramerius")) {
                 rdf.setAttribute("xmlns:kramerius","http://www.nsdl.org/ontologies/relationships#");
             }
+            Element djvu;
+            if((djvu = (Element) dom.getElementsByTagName("kramerius:file").item(0)) != null) {
+                if(djvu.getTextContent().contains("djvu"))
+                    djvu.getParentNode().removeChild(djvu);
+            }
             if (dom.getChildNodes().getLength() == 0) {
                 dom.appendChild(dom.createElement("rdf:Description"));
             }
