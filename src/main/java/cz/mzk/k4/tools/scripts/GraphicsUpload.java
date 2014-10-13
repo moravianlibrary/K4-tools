@@ -1,8 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
 
-import cz.mzk.editor.server.OAIPMHClient;
-import cz.mzk.editor.server.OAIPMHClientImpl;
 import cz.mzk.editor.server.config.EditorConfiguration;
 import cz.mzk.editor.server.config.EditorConfigurationImpl;
 import cz.mzk.editor.server.newObject.CreateObject;
@@ -29,10 +27,10 @@ public class GraphicsUpload implements Script {
         String sysno = args.get(0);
         String metadataPrefix = "http://oai.mzk.cz/provider?verb=GetRecord&identifier=oai:aleph.mzk.cz:MZK03-"+ sysno +"&metadataPrefix=";
 
-        OAIPMHClient client = new OAIPMHClientImpl(getConfigarion());
-        List<MetadataBundle> metadataBundles = client.search(metadataPrefix, "MZK03");
+        //OAIPMHClient client = new OAIPMHClientImpl(getConfigarion());
+        //List<MetadataBundle> metadataBundles = client.search(metadataPrefix, "MZK03");
 
-        System.out.println(metadataBundles);
+        //System.out.println(metadataBundles);
     }
 
     public EditorConfiguration getConfigarion() {
