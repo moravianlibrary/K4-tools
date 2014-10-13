@@ -33,16 +33,16 @@ public class GraphicsUpload implements Script {
         //System.out.println(metadataBundles);
     }
 
-    public EditorConfiguration getConfigarion() {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("editor.home", System.getProperty("user.home") + File.separatorChar + "k4_tools");
-        Configuration configuration = new MapConfiguration(parameters);
-
-        EditorConfigurationImpl editorConfiguration = new EditorConfigurationImpl();
-        editorConfiguration.setConfiguration(configuration);
-
-        return editorConfiguration;
-    }
+//    public EditorConfiguration getConfigarion() {
+//        Map<String, Object> parameters = new HashMap<String, Object>();
+//        parameters.put("editor.home", System.getProperty("user.home") + File.separatorChar + "k4_tools");
+//        Configuration configuration = new MapConfiguration(parameters);
+//
+//        EditorConfigurationImpl editorConfiguration = new EditorConfigurationImpl();
+//        editorConfiguration.setConfiguration(configuration);
+//
+//        return editorConfiguration;
+//    }
 
 
 
