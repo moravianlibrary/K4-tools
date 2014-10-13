@@ -1,20 +1,11 @@
 package cz.mzk.k4.tools.scripts;
 
 
-import cz.mzk.editor.server.config.EditorConfiguration;
-import cz.mzk.editor.server.config.EditorConfigurationImpl;
-import cz.mzk.editor.server.newObject.CreateObject;
-import cz.mzk.editor.shared.rpc.MetadataBundle;
-import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.Script;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.MapConfiguration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
+import cz.mzk.k4.tools.utils.Script;
+
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by rumanekm on 9.6.14.
