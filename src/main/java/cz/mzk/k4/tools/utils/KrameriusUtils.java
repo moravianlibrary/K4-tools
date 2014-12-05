@@ -1,16 +1,16 @@
 package cz.mzk.k4.tools.utils;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -45,14 +45,14 @@ public class KrameriusUtils {
 
         // {"parameters":["uuid:...","uuid:..."]}
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "delete");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "delete");
+        WebTarget resource = accessProvider.getKrameriusRESTWebResource("");
+        Response response = resource.queryParam("def", "delete")
+//                .type(MediaType.APPLICATION_JSON)
+                .request(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+                .post(Entity.json(json));
 
 
         if (response.getStatus() == 201) {
@@ -66,14 +66,14 @@ public class KrameriusUtils {
         pid_path = checkPid(pid_path);
         // {"parameters":["uuid:...","uuid:..."]}
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "setprivate");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "setprivate");
+        WebTarget resource = accessProvider.getKrameriusRESTWebResource("");
+        Response response = resource.queryParam("def", "setprivate")
+                .request(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+                .post(Entity.json(json));
 
         if (response.getStatus() == 201) {
             LOGGER.info("Setting object " + pid_path + " policy to private");
@@ -86,14 +86,14 @@ public class KrameriusUtils {
         pid_path = checkPid(pid_path);
         // {"parameters":["uuid:...","uuid:..."]}
         String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "setpublic");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "setpublic");
+        WebTarget resource = accessProvider.getKrameriusRESTWebResource("");
+        Response response = resource.queryParam("def", "setpublic")
+                .request(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+                .post(Entity.json(json));
 
         if (response.getStatus() == 201) {
             LOGGER.info("Setting object " + pid_path + " policy to public");
@@ -117,8 +117,8 @@ public class KrameriusUtils {
 
         LOGGER.debug("Hledání uuid modelu " + model);
         while (offset < numFound) {
-            WebResource resource = accessProvider.getKrameriusWebResource("/solr/select?indent=on&version=2.2&q=document_type%3A" + model + "&fq=&start=" + offset + "&rows=1000&fl=PID");
-            Document xml = resource.accept(MediaType.APPLICATION_XML).get(Document.class);
+            WebTarget resource = accessProvider.getKrameriusWebResource("/solr/select?indent=on&version=2.2&q=document_type%3A" + model + "&fq=&start=" + offset + "&rows=1000&fl=PID");
+            Document xml = resource.request(MediaType.APPLICATION_XML).get(Document.class);
 
             XPath xPath = XPathFactory.newInstance().newXPath();
             NodeList nodes = null;
@@ -152,14 +152,14 @@ public class KrameriusUtils {
 
     public void export(String pid) {
         String json = "{ \"parameters\":[ \"" + pid + "\" ]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def","export");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json,MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def","export");
+        WebTarget resource = accessProvider.getKrameriusRESTWebResource("");
+        Response response = resource.queryParam("def","export")
+                .request(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json,MediaType.APPLICATION_JSON)
+                .post(Entity.json(json));
         if(response.getStatus() == 201) {
             LOGGER.info("Exportováno: " + pid);
         } else {
@@ -168,19 +168,61 @@ public class KrameriusUtils {
     }
 
     public void reindex(String pid) {
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("action","start");
-        queryParams.add("def", "reindex");
-        queryParams.add("out", "text");
-        queryParams.add("params", "reindexDoc," + pid);
-        WebResource resource = accessProvider.getKrameriusWebResource("/search//lr");
-        ClientResponse response = resource.queryParams(queryParams).get(ClientResponse.class);
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("action","start");
+//        queryParams.add("def", "reindex");
+//        queryParams.add("out", "text");
+//        queryParams.add("params", "reindexDoc," + pid);
+        WebTarget resource = accessProvider.getKrameriusWebResource("/search//lr");
+        Response response = resource
+                .queryParam("action","start")
+                .queryParam("def", "reindex")
+                .queryParam("out", "text")
+                .queryParam("params", "reindexDoc," + pid)
+                .request()
+                .get();
         if(response.getStatus() == 200){
             LOGGER.info("Reindexováno: " +pid);
         } else {
             LOGGER.error("Nepodařila se reindexace souboru " + pid);
         }
 
+    }
+
+    public void addToCollection(String pid, String collectionPid) {
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("action","start");
+//        queryParams.add("def", "aggregate");
+//        queryParams.add("out", "text");
+        String nparams = "{virtualcollections;{add;uuid\\:" + pid + ";vc\\:" + collectionPid + "}}}";
+//        queryParams.add("nparams", nparams);
+        WebTarget resource = accessProvider.getKrameriusWebResource("/search/lr");
+        Response response = resource
+                .queryParam("action","start")
+                .queryParam("def", "aggregate")
+                .queryParam("out", "text")
+//                .type(MediaType.TEXT_PLAIN)
+                .request(MediaType.TEXT_PLAIN).get();
+        if(response.getStatus() == 200){
+            LOGGER.info("Přidáno: " +pid);
+        } else {
+            LOGGER.error("Nepodařilo se přidat soubor " + pid);
+        }
+
+    }
+
+    public void stopProcessess(String pid) {
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+        WebTarget resource = accessProvider.getKrameriusRESTWebResource("/" + pid + "?stop");
+        Response response = resource
+                .request(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+                .put(Entity.json(null));
+        if(response.getStatus() == 200) {
+            LOGGER.info("Zabito: " + pid);
+        } else {
+            LOGGER.error("Zabiti " + pid + "se nepodarilo. CHYBA: " + response.getStatus());
+        }
     }
 
 }

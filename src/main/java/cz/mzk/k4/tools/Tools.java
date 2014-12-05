@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools;
 
 import cz.mzk.k4.tools.scripts.*;
+import cz.mzk.k4.tools.scripts.rajhradValidate.StopProcesses;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 
 import java.util.ArrayList;
@@ -33,8 +34,8 @@ public class Tools {
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());
-        runner.register("pocetDJVUstran", new CountPagesWithDjvuImage());
-
+        runner.register("importKolekce", new ImportCollection());
+        runner.register("stopProcesses", new StopProcesses());
         runner.register("test", new TestScript());
 
         if (args.length < 1 || args[0] == null) {

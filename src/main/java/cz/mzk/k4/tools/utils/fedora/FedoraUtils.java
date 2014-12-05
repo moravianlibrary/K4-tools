@@ -1,9 +1,5 @@
 package cz.mzk.k4.tools.utils.fedora;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import cz.mzk.k4.tools.providers.Provider;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
@@ -14,6 +10,7 @@ import cz.mzk.k4.tools.utils.exception.LexerException;
 import cz.mzk.k4.tools.utils.util.PIDParser;
 import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.fedora.api.DatastreamDef;
 import org.fedora.api.RelationshipTuple;
@@ -21,9 +18,13 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import scala.util.parsing.combinator.testing.Str;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.URLEncoder;
@@ -344,9 +345,9 @@ public class FedoraUtils {
 
     public String getAllRelationships(String uuid) {  // plain string returned from risearch
         String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
-        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebTarget resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
-        String result = resource.get(String.class);
+        String result = resource.request().get(String.class);
         return result;
     }
 
@@ -357,9 +358,9 @@ public class FedoraUtils {
     public List<RelationshipTuple> getSubjectOrObjectPids(String query) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
 
-        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebTarget resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
-        String result = resource.get(String.class);
+        String result = resource.request().get(String.class);
         String[] lines = result.split("\n");
         for (String line : lines) {
             String[] tokens = line.split(" ");
@@ -403,10 +404,10 @@ public class FedoraUtils {
     public Document getRelsExt(String uuid) throws IOException {
         String query = "/get/" + uuid + "/RELS-EXT";
 //        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
-        WebResource resource = accessProvider.getFedoraWebResource(query);
-        ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        WebTarget resource = accessProvider.getFedoraWebResource(query);
+        Response response = resource.request(MediaType.APPLICATION_XML).get();
         if (response.getStatus() == 200) {
-            String docString = response.getEntity(String.class);
+            String docString = response.readEntity(String.class);
             if (docString == null) {
                 throw new ConnectionException("Cannot get RELS EXT data.");
             }
@@ -478,15 +479,15 @@ public class FedoraUtils {
      * @throws IOException
      */
     public InputStream getPdf(String uuid) throws IOException {
-        ClientResponse response =
+        Response response =
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
-                        .accept("application/pdf").get(ClientResponse.class);
+                        .request("application/pdf").get();
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
                     + response.getStatus());
         }
-        InputStream is = response.getEntityInputStream();
+        InputStream is = response.readEntity(InputStream.class);
         return is;
     }
 
@@ -497,14 +498,14 @@ public class FedoraUtils {
      */
     //TODO dopsat mimetypy jako enum
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
-        ClientResponse response =
-                accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
-                        .accept(mimetype).get(ClientResponse.class);
+        Response response = null;
+        response = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
+                        .request().get();
         if (response.getStatus() != 200) {
             throw new FileNotFoundException("Failed : HTTP error code : "
                     + response.getStatus());
         }
-        InputStream is = response.getEntityInputStream();
+        InputStream is = response.readEntity(InputStream.class);
         return is;
     }
 
@@ -513,7 +514,7 @@ public class FedoraUtils {
      */
     public void purgeObject(String uuid) {
 
-        ClientResponse response = accessProvider.getFedoraWebResource("/objects/" + uuid).delete(ClientResponse.class);
+        Response response = accessProvider.getFedoraWebResource("/objects/" + uuid).request().delete();
 
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : "
@@ -528,16 +529,17 @@ public class FedoraUtils {
     public String getOcr(String uuid) {
         String ocrUrl = ocr(uuid);
         LOGGER.debug("Reading OCR +" + ocrUrl);
-        try {
-            String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
+//        try {
+            String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").request().get(String.class);
             return ocrOutput;
-        } catch (UniformInterfaceException e) {
-            if (e.getResponse().getStatus() == 404) {
-                return null;
-            } else {
-                throw new UniformInterfaceException(e.getResponse());
-            }
-        }
+//        }
+//        catch (UniformInterfaceException e) {
+//            if (e.getResponse().getStatus() == 404) {
+//                return null;
+//            } else {
+//                throw new UniformInterfaceException(e.getResponse());
+//            }
+//        }
     }
 
     /**
@@ -681,38 +683,42 @@ public class FedoraUtils {
         String query =
                 "/objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
 
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("controlGroup", controlGroup);
-        queryParams.add("versionable", versionable);
-        queryParams.add("dsState", dsState);
-        queryParams.add("mimeType", mimeType);
+//        MultivaluedMap queryParams = new Multivalued();
+//        queryParams.add("controlGroup", controlGroup);
+//        queryParams.add("versionable", versionable);
+//        queryParams.add("dsState", dsState);
+//        queryParams.add("mimeType", mimeType);
 
-        WebResource resource = accessProvider.getFedoraWebResource(query);
-        ClientResponse response = null;
+        WebTarget resource = accessProvider.getFedoraWebResource(query)
+                .queryParam("controlGroup", controlGroup)
+                .queryParam("versionable", versionable)
+                .queryParam("dsState", dsState)
+                .queryParam("mimeType", mimeType);
+        Response response = null;
         if(controlGroup == "R") {
-            queryParams.add("dsLocation", filePathOrContent);
-            resource.delete();
+            resource = resource.queryParam("dsLocation", filePathOrContent);
+            resource.request().delete();
         }
 
-        try {
+//        try {
             if (isFile) {
-                response = resource.queryParams(queryParams).post(ClientResponse.class, new File(filePathOrContent));
+                response = resource.request().post(Entity.entity(new File(filePathOrContent), MediaType.TEXT_XML_TYPE));
             } else {
-                response = resource.queryParams(queryParams).post(ClientResponse.class, filePathOrContent);
+                response = resource.request().post(Entity.entity(filePathOrContent, MediaType.TEXT_XML_TYPE));
             }
 
-        } catch (UniformInterfaceException e) {
-            int status = e.getResponse().getStatus();
-            if (status == 404) {
-                LOGGER.fatal("Process not found");
-            }
-
-            LOGGER.error(e.getMessage());
-            e.printStackTrace();
-            throw new CreateObjectException("Unable to post "
-                    + (isFile ? ("a file: " + filePathOrContent + " as a ") : "")
-                    + "managed datastream to the object: " + uuid);
-        }
+//        } catch (UniformInterfaceException e) {
+//            int status = e.getResponse().getStatus();
+//            if (status == 404) {
+//                LOGGER.fatal("Process not found");
+//            }
+//
+//            LOGGER.error(e.getMessage());
+//            e.printStackTrace();
+//            throw new CreateObjectException("Unable to post "
+//                    + (isFile ? ("a file: " + filePathOrContent + " as a ") : "")
+//                    + "managed datastream to the object: " + uuid);
+//        }
 
         if (response.getStatus() == 201) {
             LOGGER.info("An " + dsId.getValue() + (isFile ? (" file: " + filePathOrContent) : "")
@@ -737,14 +743,14 @@ public class FedoraUtils {
      */
     public Document getDCStream(String pid) throws IOException {
         pid = checkPid(pid);
-        try {
-            WebResource resource = accessProvider.getFedoraWebResource("/objects/" + pid + "/datastreams/DC/content");
-            Document result = resource.accept(MediaType.APPLICATION_XML_TYPE).get(Document.class);
+//        try {
+            WebTarget resource = accessProvider.getFedoraWebResource("/objects/" + pid + "/datastreams/DC/content");
+            Document result = resource.request(MediaType.APPLICATION_XML_TYPE).get(Document.class);
             return result;
-        } catch (UniformInterfaceException e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new IOException(e);
-        }
+//        } catch (UniformInterfaceException e) {
+//            LOGGER.error(e.getMessage(), e);
+//            throw new IOException(e);
+//        }
     }
 
     /**

@@ -37,7 +37,7 @@ public interface FedoraNamespaces {
 
     public static final String FOXML_NAMESPACE_URI = "info:fedora/fedora-system:def/foxml#";
 
-    public static final String FEDORA_NAMESPACE_URI = "http://www.fedora.info/definitions/1/0/api/";
+    public static final String FEDORA_NAMESPACE_URI = "http://www.fedora.info/definitions/1/0/types/";
 
     public static final String SCHEMA_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
 

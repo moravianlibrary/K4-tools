@@ -1,13 +1,14 @@
 package cz.mzk.k4.tools.scripts;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.SetPolicyWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class MissingPolicyUuid implements Script {
     public void run(List<String> args) {
         LOGGER.info("Searching for uuids");
         AccessProvider accessProvider = new AccessProvider();
-        Client client = new Client();
+        Client client = ClientBuilder.newClient();
         List<String> uuidList = new ArrayList<String>();
 
         // get object with no policy
@@ -39,8 +40,8 @@ public class MissingPolicyUuid implements Script {
                     + offset;
 
             LOGGER.debug("Getting uuids from " + url);
-            WebResource resource = client.resource(url);
-            String html = resource.accept(MediaType.APPLICATION_XML).get(String.class);
+            WebTarget resource = client.target(url);
+            String html = resource.request(MediaType.APPLICATION_XML).get(String.class);
 
             // parse response html
             // String[] uuid_lines = html.split("id=\"res_monograph_uuid:");

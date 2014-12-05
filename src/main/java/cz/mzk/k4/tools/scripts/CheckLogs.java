@@ -1,6 +1,5 @@
 package cz.mzk.k4.tools.scripts;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.AccessProvider;
@@ -13,7 +12,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 	@author Jan Holman
@@ -39,9 +40,9 @@ public class CheckLogs implements Script {
 
 		try {
 			// handle URL parameters
-            MultivaluedMap queryParams = new MultivaluedMapImpl();
-            queryParams.add("checkLogs.resultSize", defSize.toString());
-            queryParams.add("state", "FINISHED");
+            Map<String, String> queryParams = new HashMap<>();
+            queryParams.put("checkLogs.resultSize", defSize.toString());
+            queryParams.put("state", "FINISHED");
 			int resultSize = Integer.parseInt(defSize.toString());
 
 			// fetch processes

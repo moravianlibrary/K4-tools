@@ -1,11 +1,14 @@
 package cz.mzk.k4.tools.utils;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+
 import org.apache.log4j.Logger;
 import org.fedora.api.FedoraAPIA;
 import org.fedora.api.FedoraAPIAService;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.File;
@@ -41,6 +44,8 @@ public class AccessProvider {
     private String imageserverPassword;
     private String imageserverPath;
     private String imageserverUrlPath;
+    private String imageserverPrivateKey;
+    private String imageserverPrivatePassphrase;
     private String libraryPrefix;
     private Client client;
     private String confFileName = "k4_tools_config.properties";
@@ -76,8 +81,10 @@ public class AccessProvider {
         imageserverPassword = properties.getProperty(libraryPrefix + ".imageserver.password");
         imageserverPath = properties.getProperty(libraryPrefix + ".imageserver.path");
         imageserverUrlPath = properties.getProperty(libraryPrefix + ".imageserver.urlPath");
+        imageserverPrivateKey = properties.getProperty(libraryPrefix + ".imageserver.privateKey");
+        imageserverPrivatePassphrase = properties.getProperty(libraryPrefix + ".imageserver.privateKeyPassphrase");
 
-        client = Client.create();
+        client = ClientBuilder.newClient();
     }
 
     public static AccessProvider getInstance() {
@@ -93,12 +100,13 @@ public class AccessProvider {
      * @param query
      * @return
      */
-    public WebResource getKrameriusRESTWebResource(String query) {
+    public WebTarget getKrameriusRESTWebResource(String query) {
         String url = "http://" + krameriusHost + K4_REMOTE_API_PATH + query;  // např. "/" + uuid + "/logs"
 //        LOGGER.debug("Kramerius remote api url: " + url);
-        WebResource resource = client.resource(url);
-        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
-        resource.addFilter(credentials);
+        WebTarget resource = client.target(url);
+        HttpAuthenticationFeature credentials = HttpAuthenticationFeature.basic(krameriusUser, krameriusPassword);
+//        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
+        resource.register(credentials);
         return resource;
     }
 
@@ -107,12 +115,13 @@ public class AccessProvider {
      * @param query
      * @return
      */
-    public WebResource getKrameriusWebResource(String query) {
+    public WebTarget getKrameriusWebResource(String query) {
         String url = "http://" + krameriusHost + query;  // např. "/" + uuid + "/logs"
 //        LOGGER.debug("Kramerius url: " + url);
-        WebResource resource = client.resource(url);
-        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
-        resource.addFilter(credentials);
+        WebTarget resource = client.target(url);
+        HttpAuthenticationFeature credentials = HttpAuthenticationFeature.basic(krameriusUser, krameriusPassword);
+//        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
+        resource.register(credentials);
         return resource;
     }
 
@@ -121,12 +130,13 @@ public class AccessProvider {
      * @param query
      * @return
      */
-    public WebResource getFedoraWebResource(String query) {
+    public WebTarget getFedoraWebResource(String query) {
         String url = "http://" + fedoraHost + query;
 //        LOGGER.debug("Fedora url: " + url);
-        WebResource resource = client.resource(url);
-        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
-        resource.addFilter(credentials);
+        WebTarget resource = client.target(url);
+        HttpAuthenticationFeature credentials = HttpAuthenticationFeature.basic(krameriusUser, krameriusPassword);
+//        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
+        resource.register(credentials);
         return resource;
     }
 
@@ -135,10 +145,10 @@ public class AccessProvider {
      * @param query
      * @return
      */
-    public WebResource getSolrWebResource(String query) {
+    public WebTarget getSolrWebResource(String query) {
         String url = "http://" + krameriusHost + "/solr" + query;
 //        LOGGER.debug("Fedora url: " + url);
-        WebResource resource = client.resource(url);
+        WebTarget resource = client.target(url);
 //        BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(krameriusUser, krameriusPassword);
 //        resource.addFilter(credentials);
         return resource;
@@ -174,6 +184,8 @@ public class AccessProvider {
                             new URL("http://" + getFedoraHost() + "/wsdl?api=API-A"),
                             new QName("http://www.fedora.info/definitions/1/0/api/",
                                     "Fedora-API-A-Service"));
+//                            new QName("http://www.fedora.info/definitions/1/0/types/",
+//                                    "Fedora-API-A-Service"));
         } catch (MalformedURLException e) {
             LOGGER.error("InvalidURL API-A:" + e);
             throw new RuntimeException(e);
@@ -300,5 +312,21 @@ public class AccessProvider {
 
     public void setImageserverUrlPath(String imageserverUrlPath) {
         this.imageserverUrlPath = imageserverUrlPath;
+    }
+
+    public String getImageserverPrivatePassphrase() {
+        return imageserverPrivatePassphrase;
+    }
+
+    public void setImageserverPrivatePassphrase(String imageserverPrivatePassphrase) {
+        this.imageserverPrivatePassphrase = imageserverPrivatePassphrase;
+    }
+
+    public String getImageserverPrivateKey() {
+        return imageserverPrivateKey;
+    }
+
+    public void setImageserverPrivateKey(String imageserverPrivateKey) {
+        this.imageserverPrivateKey = imageserverPrivateKey;
     }
 }

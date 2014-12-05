@@ -56,9 +56,11 @@ public class FormatConvertor {
         //Create temporary file on disk
         File djvuFile = File.createTempFile("convertdjvu", ".djvu");
         File tiffFile = File.createTempFile("converttiff", ".tiff");
+        System.out.println("Copying stream: ");
         FileUtils.copyInputStreamToFile(djvu, djvuFile);
 
         //Create terminal command
+        System.out.println("Creating command");
         List<String> cmdParams = new ArrayList<String>();
         cmdParams.add("ddjvu");
         cmdParams.add("-format=tiff");
@@ -66,6 +68,7 @@ public class FormatConvertor {
         cmdParams.add(tiffFile.getAbsolutePath());
 
         //Run the command
+        System.out.printf("Starting process");
         Process process = new ProcessBuilder(cmdParams).start();
 
         try {
@@ -160,8 +163,11 @@ public class FormatConvertor {
      */
     public static InputStream convertDjvuToJp2(InputStream inputDjvu) throws IOException {
 
+        System.out.println("Začíná tiff");
         File tiffConversionTempFiles = FormatConvertor.convertDjvuToTiff(inputDjvu);
+        System.out.println("Začíná dekomprese tiffu");
         File decompressedTiffTempFiles = FormatConvertor.decompressTiff(tiffConversionTempFiles);
+        System.out.println("Začíná převod na jpeg2000");
         return FormatConvertor.convertTiffToJpg2(decompressedTiffTempFiles);
     }
 }

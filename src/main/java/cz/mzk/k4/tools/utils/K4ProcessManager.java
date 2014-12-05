@@ -1,16 +1,17 @@
 package cz.mzk.k4.tools.utils;
 
 import com.google.gson.JsonSyntaxException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import cz.mzk.k4.tools.domain.KrameriusProcess;
 import cz.mzk.k4.tools.domain.ProcessLog;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
+import scala.collection.mutable.HashEntry;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -35,7 +36,7 @@ public class K4ProcessManager {
 	 * @param queryParams - map of parameters
 	 * @return List of Process objects
 	 */
-	public List<KrameriusProcess> searchByParams(MultivaluedMap queryParams)
+	public List<KrameriusProcess> searchByParams(Map<String,String> queryParams)
 			throws NullArgumentException {
 
 		if (queryParams == null) {
@@ -44,8 +45,12 @@ public class K4ProcessManager {
 
 		// get JSON string
 		String query = "/search/api/v4.6/processes";
-		WebResource resource = accessProvider.getKrameriusRESTWebResource(query);
-		String strJson = resource.queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(String.class);
+		WebTarget resource = accessProvider.getKrameriusRESTWebResource(query);
+        WebTarget webJson = resource;
+        for (Map.Entry<String, String> param : queryParams.entrySet()) {
+            resource.queryParam(param.getKey(), param.getValue());
+        }
+		String strJson = resource.request(MediaType.APPLICATION_JSON).get(String.class);
 
 		// parse JSON string
 		List<KrameriusProcess> list = null;
@@ -67,16 +72,16 @@ public class K4ProcessManager {
 		String strJson = "";
 
 		// get JSON string
-		try {
-			WebResource resource = accessProvider.getKrameriusRESTWebResource("/search/api/v4.6/processes/" + uuid);
-			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
-		} catch (UniformInterfaceException e) {
-			int status = e.getResponse().getStatus();
-			if (status == 404) {
-				LOGGER.fatal("Process not found");
-			}
-			throw new IllegalStateException(e);
-		}
+//		try {
+			WebTarget resource = accessProvider.getKrameriusRESTWebResource("/search/api/v4.6/processes/" + uuid);
+			strJson = resource.request(MediaType.APPLICATION_JSON).get(String.class);
+//		} catch (UniformInterfaceException e) {
+//			int status = e.getResponse().getStatus();
+//			if (status == 404) {
+//				LOGGER.fatal("Process not found");
+//			}
+//			throw new IllegalStateException(e);
+//		}
 
 		// parse JSON string
 		KrameriusProcess process = null;
@@ -98,17 +103,17 @@ public class K4ProcessManager {
 		String strJson = "";
 
 		// get JSON string
-		try {
+//		try {
 			String query = "/search/api/v4.6/processes/" + uuid + "/logs";
-            WebResource resource = accessProvider.getKrameriusRESTWebResource(query);
-			strJson = resource.accept(MediaType.APPLICATION_JSON).get(String.class);
-		} catch (UniformInterfaceException e) {
-			int status = e.getResponse().getStatus();
-			if (status == 404) {
-				// LOGGER.fatal("Process not found");
-			}
-			throw new IllegalStateException(e);
-		}
+            WebTarget resource = accessProvider.getKrameriusRESTWebResource(query);
+			strJson = resource.request(MediaType.APPLICATION_JSON).get(String.class);
+//		} catch (UniformInterfaceException e) {
+//			int status = e.getResponse().getStatus();
+//			if (status == 404) {
+//				// LOGGER.fatal("Process not found");
+//			}
+//			throw new IllegalStateException(e);
+//		}
 
 		// parse JSON string
 		ProcessLog log = null;

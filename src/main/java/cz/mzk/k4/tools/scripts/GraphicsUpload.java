@@ -5,12 +5,15 @@ import cz.mzk.editor.server.OAIPMHClient;
 import cz.mzk.editor.server.OAIPMHClientImpl;
 import cz.mzk.editor.server.config.EditorConfiguration;
 import cz.mzk.editor.server.config.EditorConfigurationImpl;
+import cz.mzk.editor.server.newObject.CreateObject;
 import cz.mzk.editor.shared.rpc.MetadataBundle;
+import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

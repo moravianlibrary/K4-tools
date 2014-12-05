@@ -18,14 +18,14 @@ import java.util.List;
  */
 public class TestScript implements Script {
 
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-    //private static KrameriusUtils krameriusUtils = new KrameriusUtils(new AccessProvider());
+//    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+    private static KrameriusUtils krameriusUtils = new KrameriusUtils(new AccessProvider());
 
     @Override
     public void run(List<String> args) {
 
-        String uuid = args.get(0);
-
+//        String uuid = args.get(0);
+        krameriusUtils.exterminate("uuid:99664d46-d375-4fe5-bb04-e64f94b55e52");
         //fedoraUtils.applyToAllUuid(new ChildrenUuid(uuid, DigitalObjectModel.PAGE));
 
         //krameriusUtils.setPublic(uuid);
