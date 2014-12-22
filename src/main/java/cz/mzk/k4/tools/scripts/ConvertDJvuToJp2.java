@@ -34,6 +34,7 @@ public class ConvertDJvuToJp2 implements Script {
         for (String id : fedoraList) {
             convertDjvuToJp2.run(id);
         }
+        System.out.println("KONEC");
     }
 
     @Override

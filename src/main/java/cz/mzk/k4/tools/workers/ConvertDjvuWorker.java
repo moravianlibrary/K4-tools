@@ -6,6 +6,7 @@ import cz.mzk.k4.tools.utils.ImageserverUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.Constants;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,24 +53,27 @@ public class ConvertDjvuWorker extends UuidWorker {
             if (djvuInputStream != null) {
 
                 //Convert image to jpeg2000
-                InputStream jp2Stream = FormatConvertor.convertDjvuToJp2(djvuInputStream);
-                LOGGER.info("Proběhla konverze obrázku.");
+                System.out.println("MIMETYPE: " + mimetype);
+                if(mimetype.equals("image/vnd.djvu")) {
+                    InputStream jp2Stream = FormatConvertor.convertDjvuToJp2(djvuInputStream);
+                    LOGGER.info("Proběhla konverze obrázku.");
 
-                //Upload image to image server
-                ImageserverUtils imageServer = new ImageserverUtils();
-                imageServer.uploadJp2ToImageserver(jp2Stream, uuid);
-                LOGGER.info("Proběhl upload na imageserver.");
+                    //Upload image to image server
+                    ImageserverUtils imageServer = new ImageserverUtils();
+                    imageServer.uploadJp2ToImageserver(jp2Stream, uuid);
+                    LOGGER.info("Proběhl upload na imageserver.");
 
-                //Change datastream references for uuid to new image, for reference to imageserver uses constant IMAGE_SERVER_URL
-                String imageServerUrl = AccessProvider.getInstance().getImageserverUrlPath();
-                String path = imageServerUrl + uuid.substring("uuid:".length()) + "/";
-                fedoraUtils.setImgFullFromExternal(uuid, path + "big.jpg");
-                fedoraUtils.setImgThumbnailFromExternal(uuid, path + "thumb.jpg");
-                LOGGER.info("Nastaveny datastreamy.");
+                    //Change datastream references for uuid to new image, for reference to imageserver uses constant IMAGE_SERVER_URL
+                    String imageServerUrl = AccessProvider.getInstance().getImageserverUrlPath();
+                    String path = imageServerUrl + uuid.substring("uuid:".length()) + "/";
+                    fedoraUtils.setImgFullFromExternal(uuid, path + "big.jpg");
+                    fedoraUtils.setImgThumbnailFromExternal(uuid, path + "thumb.jpg");
+                    LOGGER.info("Nastaveny datastreamy.");
 
-                //Change RELS-EXT document to refer to imageserver url, for reference to imageserver uses constant IMAGE_SERVER_URL
-                changeRelsExt(uuid, imageServerUrl);
-                LOGGER.info("Změněno RELS-EXT.");
+                    //Change RELS-EXT document to refer to imageserver url, for reference to imageserver uses constant IMAGE_SERVER_URL
+                    changeRelsExt(uuid, imageServerUrl);
+                    LOGGER.info("Změněno RELS-EXT.");
+                }
             }
             LOGGER.info("Konec zpracování dokumentu.");
 
