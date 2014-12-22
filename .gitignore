@@ -14,6 +14,7 @@ out/
 # Gradle
 .gradle/
 .ivy/
+build/
 
 # Maven
 target/
