@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.domain;
+package cz.mzk.k4.tools.utils.domain;
 
 import java.util.Iterator;
 import java.util.Set;

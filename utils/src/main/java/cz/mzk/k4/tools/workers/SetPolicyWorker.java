@@ -1,6 +1,6 @@
 package cz.mzk.k4.tools.workers;
 
-import cz.mzk.k4.tools.domain.DCConent;
+import cz.mzk.k4.tools.utils.domain.DCConent;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;

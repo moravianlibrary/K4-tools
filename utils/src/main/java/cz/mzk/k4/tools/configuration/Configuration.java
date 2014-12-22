@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools;
+package cz.mzk.k4.tools.configuration;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -39,7 +39,7 @@ public class Configuration {
     }
 
     public String getPathMarcExport() {
-        return configuration.getString("marcExportPath", "/work/aleph/data/aktualizace_zaznamu/mzk03.m21");
+        return configuration.getString("marcExportPath", "/work/cz.mzk.k4.tools.aleph/data/aktualizace_zaznamu/mzk03.m21");
     }
 
     public String getPasswordMarcExport() {

@@ -3,8 +3,8 @@ package cz.mzk.k4.tools.utils;
 import com.google.gson.JsonSyntaxException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import cz.mzk.k4.tools.domain.KrameriusProcess;
-import cz.mzk.k4.tools.domain.ProcessLog;
+import cz.mzk.k4.tools.utils.domain.KrameriusProcess;
+import cz.mzk.k4.tools.utils.domain.ProcessLog;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.log4j.Logger;
 

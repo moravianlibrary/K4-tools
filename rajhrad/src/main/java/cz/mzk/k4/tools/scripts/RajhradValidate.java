@@ -1,10 +1,9 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.jcraft.jsch.*;
-import cz.mzk.k4.tools.Configuration;
-import cz.mzk.k4.tools.domain.LsItem;
+import cz.mzk.k4.tools.configuration.Configuration;
+import cz.mzk.k4.tools.utils.domain.LsItem;
 import cz.mzk.k4.tools.domain.aleph.RecordHolder;
-import cz.mzk.k4.tools.scripts.rajhradValidate.Validation;
 import cz.mzk.k4.tools.utils.ImageserverUtils;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.commons.io.IOUtils;
@@ -22,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by rumanekm on 27.3.14.
- */
+* Created by rumanekm on 27.3.14.
+*/
 public class RajhradValidate implements Script {
 
     private static final String EXPORT_PATH = "/home/rumanekm/mzk03.m21";

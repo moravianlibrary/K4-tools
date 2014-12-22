@@ -1,9 +1,9 @@
-package cz.mzk.k4.tools.scripts.rajhradValidate;
+package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.Configuration;
 import cz.mzk.k4.tools.domain.aleph.RecordHolder;
 import cz.mzk.k4.tools.domain.aleph.RecordRelation;
 import cz.mzk.k4.tools.scripts.RajhradValidate;
+import cz.mzk.k4.tools.configuration.Configuration;
 import org.marc4j.MarcException;
 import org.marc4j.MarcPermissiveStreamReader;
 import org.marc4j.MarcReader;

@@ -1,8 +1,8 @@
 package cz.mzk.k4.tools.utils;
 
 import com.jcraft.jsch.*;
-import cz.mzk.k4.tools.Configuration;
-import cz.mzk.k4.tools.domain.LsItem;
+import cz.mzk.k4.tools.configuration.Configuration;
+import cz.mzk.k4.tools.utils.domain.LsItem;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;

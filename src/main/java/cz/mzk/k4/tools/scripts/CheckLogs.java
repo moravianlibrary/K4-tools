@@ -1,8 +1,8 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import cz.mzk.k4.tools.domain.KrameriusProcess;
-import cz.mzk.k4.tools.domain.ProcessLog;
+import cz.mzk.k4.tools.utils.domain.KrameriusProcess;
+import cz.mzk.k4.tools.utils.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.K4ProcessManager;
 import cz.mzk.k4.tools.utils.Script;
