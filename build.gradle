@@ -11,6 +11,8 @@ repositories {
 
     mavenLocal()
 
+    jcenter()
+
     maven {
         url "https://repository-master.mulesoft.org/nexus/content/repositories/public/"
     }
@@ -18,7 +20,13 @@ repositories {
     maven {
         url "https://repository.jboss.org/nexus/content/repositories/"
     }
+
+
+    maven {
+        url "https://raw.github.com/moravianlibrary/K4-tools/mvn-repo/"
+    }
 }
+
 
 dependencies {
     compile project(':rajhrad')
@@ -39,6 +47,7 @@ dependencies {
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.50'
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
 }
+
 
 jar {
     doFirst {

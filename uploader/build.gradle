@@ -23,7 +23,5 @@ repositories {
 
 dependencies {
     compile project(':utils')
-
-    compile group: 'cz.mzk', name: 'editor-common-server', version: '2.0.0-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

@@ -1,10 +1,5 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.editor.server.config.EditorConfiguration;
-import cz.mzk.editor.server.config.EditorConfigurationImpl;
-import cz.mzk.editor.server.metadataDownloader.OAIPMHClient;
-import cz.mzk.editor.server.metadataDownloader.OAIPMHClientImpl;
-import cz.mzk.editor.shared.rpc.MetadataBundle;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.MapConfiguration;
@@ -23,25 +18,25 @@ public class GraphicsUpload implements Script {
 
     @Override
     public void run(List<String> args) {
-        String sysno = args.get(0);
-        String metadataPrefix = "http://oai.mzk.cz/provider?verb=GetRecord&identifier=oai:cz.mzk.k4.tools.aleph.mzk.cz:MZK03-"+ sysno +"&metadataPrefix=";
-
-        OAIPMHClient client = new OAIPMHClientImpl(getConfigarion());
-        List<MetadataBundle> metadataBundles = client.search(metadataPrefix, "MZK03");
+//        String sysno = args.get(0);
+//        String metadataPrefix = "http://oai.mzk.cz/provider?verb=GetRecord&identifier=oai:cz.mzk.k4.tools.aleph.mzk.cz:MZK03-"+ sysno +"&metadataPrefix=";
+//
+//        OAIPMHClient client = new OAIPMHClientImpl(getConfigarion());
+//        List<MetadataBundle> metadataBundles = client.search(metadataPrefix, "MZK03");
 
 
     }
 
-    public EditorConfiguration getConfigarion() {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("editor.home", System.getProperty("user.home") + File.separatorChar + "k4_tools");
-        Configuration configuration = new MapConfiguration(parameters);
-
-        EditorConfigurationImpl editorConfiguration = new EditorConfigurationImpl();
-        editorConfiguration.setConfiguration(configuration);
-
-        return editorConfiguration;
-    }
+//    public EditorConfiguration getConfigarion() {
+////        Map<String, Object> parameters = new HashMap<String, Object>();
+////        parameters.put("editor.home", System.getProperty("user.home") + File.separatorChar + "k4_tools");
+////        Configuration configuration = new MapConfiguration(parameters);
+////
+////        EditorConfigurationImpl editorConfiguration = new EditorConfigurationImpl();
+////        editorConfiguration.setConfiguration(configuration);
+////
+////        return editorConfiguration;
+//    }
 
 
 

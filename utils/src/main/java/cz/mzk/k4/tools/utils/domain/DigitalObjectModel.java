@@ -27,7 +27,7 @@
 
 package cz.mzk.k4.tools.utils.domain;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
 // TODO: Auto-generated Javadoc
 
@@ -35,7 +35,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * The Enum KrameriusModel.
  */
 public enum DigitalObjectModel
-        implements IsSerializable {
+        implements Serializable {
 
     /** The MONOGRAPH. */
     MONOGRAPH("monograph", "", TopLevelObjectModel.MONOGRAPH),
