@@ -93,22 +93,25 @@ public class ImageserverUtils {
      * @throws JSchException If the connection to image server was unsuccessful
      * @throws SftpException If the upload to image server was unsuccessful
      */
-    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws JSchException, SftpException {
+    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws IOException {
         try {
-            //Connect to image server
-            ChannelSftp imgServerChannel;
             AccessProvider accessProvider = AccessProvider.getInstance();
-            imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
+            ChannelSftp imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
                     accessProvider.getImageserverHost(), accessProvider.getImageserverPassword(), true);
-            //Upload File
-            String imgServerUrl = accessProvider.getImageserverPath();
-            imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
-            //Disconnect from server
-            imgServerChannel.disconnect();
-        } catch (JSchException e) {
-            throw new JSchException("Chyba připojení se k imageserveru: " + e.getMessage());
-        } catch (SftpException e) {
-            throw new SftpException(e.id, "Chyba uploadu na imageserver: " + e.getMessage());
+
+            try {
+                //Upload File
+                String imgServerUrl = accessProvider.getImageserverPath();
+                imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
+            } catch (SftpException e) {
+                throw new IOException("Upload to imageserver has failed: " + e.getMessage());
+            } finally {
+                //Disconnect from server
+                imgServerChannel.disconnect();
+            }
+
+        }  catch (JSchException e) {
+            throw new IOException("Connecting to imageserver has failed: " + e.getMessage());
         }
     }
 

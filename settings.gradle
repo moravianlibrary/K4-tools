@@ -1,4 +1,6 @@
 include	'rajhrad'
 include 'utils'
 include 'uploader'
+include 'convertor'
+include 'kramerius-client-api'
 

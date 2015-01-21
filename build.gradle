@@ -31,6 +31,9 @@ repositories {
 dependencies {
     compile project(':rajhrad')
     compile project(':uploader')
+    compile project(':utils')
+    compile project(':convertor')
+    compile project(":kramerius-client-api")
 
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.2'
     compile group: 'org.json', name: 'json', version: '20070829'

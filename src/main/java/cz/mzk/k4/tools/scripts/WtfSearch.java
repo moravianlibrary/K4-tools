@@ -7,6 +7,7 @@ import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import cz.mzk.k4.tools.workers.ValidateWorker;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -35,30 +36,38 @@ public class WtfSearch implements Script {
         fedoraUtils = new FedoraUtils(accessProvider);
 
         if (args.size() == 1) {
-            String uuid = args.get(0);
-            LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix() + ", uuid: " + uuid);
+            // validuj konkrétní model
+            if (args.get(0).startsWith("model:")) {
+                DigitalObjectModel model = DigitalObjectModel.parseString(args.get(0).substring(6));
+                UuidWorker validateWorker = new ValidateWorker(accessProvider);
+                fedoraUtils.applyToAllUuidOfModel(model, validateWorker);
+            } else {
 
-            // porovnání s triplety
-            // není rekurzivní (každý model zvlášť)
-            worker.run(uuid);
+                String uuid = args.get(0);
+                LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix() + ", uuid: " + uuid);
 
-            // kontrola existence obrázků u stránek
-            try {
-                List<String> uuidList = fedoraUtils.getChildrenUuids(uuid);
+                // porovnání s triplety
+                // není rekurzivní (každý model zvlášť)
+                worker.run(uuid);
 
-                for (String childUuid : uuidList) {
-                    DigitalObjectModel model = fedoraUtils.getModel(uuid);
-   //                 if (fedoraUtils.getModel(uuid).equals(DigitalObjectModel.PAGE)) {
+                // kontrola existence obrázků u stránek
+                try {
+                    List<String> uuidList = fedoraUtils.getChildrenUuids(uuid);
+
+                    for (String childUuid : uuidList) {
+                        DigitalObjectModel model = fedoraUtils.getModel(uuid);
+                        //                 if (fedoraUtils.getModel(uuid).equals(DigitalObjectModel.PAGE)) {
                         checkImageExistence(childUuid);
-     //               }
+                        //               }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
-            // + kontrola konzistence ORC
-            fedoraUtils.checkChildrenAndOcrExistance(uuid);
+                // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
+                // + kontrola konzistence ORC
+                fedoraUtils.checkChildrenAndOcrExistance(uuid);
+            }
 
         } else {
 

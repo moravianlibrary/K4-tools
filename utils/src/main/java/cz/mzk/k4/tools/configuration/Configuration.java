@@ -9,15 +9,17 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class Configuration {
 
+    private String libraryPrefix;
+
     private PropertiesConfiguration configuration;
 
     public Configuration() {
         try {
-            configuration = new PropertiesConfiguration("rajhrad.properties");
+            configuration = new PropertiesConfiguration("k4_tools_config.properties");
+            libraryPrefix = configuration.getString("knihovna");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         }
-
     }
 
     public String getPathPrivateKey() {

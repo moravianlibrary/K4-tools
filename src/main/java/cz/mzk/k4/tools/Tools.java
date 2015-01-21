@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools;
 
+import cz.mzk.k4.tools.convertor.ConvertDJvuToJp2;
 import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 

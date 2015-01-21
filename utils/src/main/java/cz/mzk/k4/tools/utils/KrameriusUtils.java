@@ -199,7 +199,5 @@ public class KrameriusUtils {
         } else {
             LOGGER.error("Nepodařilo se přidat soubor " + pid);
         }
-
     }
-
 }

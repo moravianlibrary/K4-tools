@@ -22,6 +22,8 @@ repositories {
 }
 
 dependencies {
+    compile project(':kramerius-client-api')
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile group: 'commons-configuration', name: 'commons-configuration', version: '1.9'
     compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.17.1'
