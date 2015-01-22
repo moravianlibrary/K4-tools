@@ -1,28 +1,64 @@
 package cz.mzk.k4.tools.workers;
 
+import com.yourmediashelf.fedora.client.FedoraClient;
+import com.yourmediashelf.fedora.client.FedoraClientException;
+import com.yourmediashelf.fedora.client.FedoraCredentials;
+import com.yourmediashelf.fedora.client.request.FedoraRequest;
+import com.yourmediashelf.fedora.client.response.FedoraResponse;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.validators.SupplementValidator;
+import cz.mzk.k4.tools.validators.ArticleValidator;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 /**
  * Created by rumanekm on 20.1.15.
  */
 public class ValidateWorker extends UuidWorker {
 
-    private AccessProvider accessProvider;
+    private static final Logger LOGGER = Logger.getLogger(ValidateWorker.class);
+    private FedoraClient fedora;
+
 
     //TODO input list with validator objects
     public ValidateWorker(AccessProvider accessProvider) {
         super(false);
-        this.accessProvider = accessProvider;
+
+        try {
+            FedoraCredentials credentials = new FedoraCredentials("http://" + accessProvider.getFedoraHost(),
+                    accessProvider.getFedoraUser(), accessProvider.getFedoraPassword());
+            FedoraClient fedora = new FedoraClient(credentials);
+            FedoraRequest.setDefaultClient(fedora);
+        } catch (MalformedURLException e) {
+            LOGGER.error("Malformed URL to Fedora");
+        }
+
     }
 
     @Override
     public void run(String uuid) {
-        System.out.println(uuid);
-        SupplementValidator supplementValidator = new SupplementValidator(accessProvider);
-
-        if (!supplementValidator.validate(uuid)) {
-            System.out.printf("validation error");
+        FedoraResponse response = null;
+        ArticleValidator articleValidator = new ArticleValidator();
+        try {
+            LOGGER.info("Download foxml " + uuid);
+            response = fedora.getObjectXML(uuid).execute();
+            String xml = IOUtils.toString(response.getEntityInputStream());
+            articleValidator.validate(xml);
+        } catch (FedoraClientException e) {
+            LOGGER.error("Fedora client exception");
+        } catch (IOException e) {
+            LOGGER.error("IO error " + e);
         }
+
+
+
+//
+//        SupplementValidator supplementValidator = new SupplementValidator();
+//
+//        if (!supplementValidator.validate(foxml)) {
+//            System.out.printf("validation error");
+//        }
     }
 }

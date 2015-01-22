@@ -32,6 +32,7 @@ dependencies {
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.50'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'com.intellij', name: 'annotations', version: '9.0.4'
+    compile group: 'com.yourmediashelf.fedora.client', name: 'fedora-client-core', version: '0.7'
 }
 
 buildscript{
