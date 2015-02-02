@@ -30,11 +30,10 @@ infinitest.filters
 
 # Logs
 *.log
-/logs
+logs
 
 # Openshift
 deployments/
 
-/build
-/zaloha
-*~
+# Generated sources
+utils/generatedsources/

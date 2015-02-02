@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,7 +45,7 @@ public class DownloadImages implements Script{
             if(!imagesPathFile.exists()) {
                 imagesPathFile.mkdir();
             }
-            LOGGER.info("Vytvořen adresář images.");
+            LOGGER.info("Vytvořen adresář images v adresáři " + dir.getName());
 
             File homeDir = new File(dir.getAbsolutePath());
 
@@ -70,6 +69,7 @@ public class DownloadImages implements Script{
                             File inputImgLocation = new File(INPUT_ADRESS + imgLocaion);
                             File outputImgLocation = new File(homeDir.getAbsolutePath() + "/images/"+inputImgLocation.getName());
                             FileUtils.copyFile(inputImgLocation, outputImgLocation);
+                            LOGGER.info("Stažen obrázek " + inputImgLocation.getName());
                         }
 
 
@@ -90,6 +90,7 @@ public class DownloadImages implements Script{
             }
 
         }
+        LOGGER.info("Dokončeno stahování obrázků v " + homeFile.getName());
 
     }
 

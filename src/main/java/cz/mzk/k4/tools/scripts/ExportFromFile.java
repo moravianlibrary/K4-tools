@@ -4,7 +4,6 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.log4j.Logger;
-
 import java.io.*;
 import java.util.List;
 
@@ -21,6 +20,7 @@ public class ExportFromFile implements Script {
             return;
         }
 
+        //TODO: může spouštět lib. fce krameria nad souborem uuid -> zobecnit, ne jen "export"
         LOGGER.info("Otvírání souboru.");
         File inputFile = new File(args.get(0));
         BufferedReader reader = null;
@@ -34,13 +34,16 @@ public class ExportFromFile implements Script {
             String uuid = null;
 
             LOGGER.info("Export ze souboru zahájen.");
+//            LOGGER.info("Reindexace uuid ze souboru zahájeno.");
             //Parse file by line
             while ((uuid = reader.readLine()) != null) {
                 uuid = parseUuid(uuid);
                 //Export each file with Kramerius API
                 krameriusUtils.export(uuid);
+//                krameriusUtils.reindex(uuid);
             }
             LOGGER.info("Export ze souboru ukončen.");
+//            LOGGER.info("Reindexace uuid ze souboru ukončeno.");
 
         } catch (FileNotFoundException e) {
             System.out.println("Špatně zadána cesta k souboru.");
