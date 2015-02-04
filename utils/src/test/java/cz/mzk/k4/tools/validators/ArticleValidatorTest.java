@@ -27,7 +27,7 @@ public class ArticleValidatorTest {
         String invalidFoxml = IOUtils.toString(invalidArticle);
 
         InputStream validArticle = classLoader.getResourceAsStream("validArticle.xml");
-        String validFoxml = IOUtils.toString(invalidArticle);
+        String validFoxml = IOUtils.toString(validArticle);
 
         ArticleValidator articleValidator = new ArticleValidator();
         assertFalse(articleValidator.validate(invalidFoxml));
