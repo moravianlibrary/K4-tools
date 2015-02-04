@@ -10,6 +10,7 @@ import cz.mzk.k4.tools.validators.ArticleValidator;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
@@ -45,13 +46,14 @@ public class ValidateWorker extends UuidWorker {
             LOGGER.info("Download foxml " + uuid);
             response = fedora.getObjectXML(uuid).execute();
             String xml = IOUtils.toString(response.getEntityInputStream());
-            articleValidator.validate(xml);
+            if (!articleValidator.validate(xml)) {
+                LOGGER.warn(uuid + " is corrupted");
+            }
         } catch (FedoraClientException e) {
             LOGGER.error("Fedora client exception");
         } catch (IOException e) {
             LOGGER.error("IO error " + e);
         }
-
 
 
 //
