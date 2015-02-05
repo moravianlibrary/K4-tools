@@ -4,3 +4,5 @@ include 'uploader'
 include 'convertor'
 include 'K5-API'
 
+include 'Fedora-API'
+

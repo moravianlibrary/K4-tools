@@ -342,6 +342,8 @@ public class FedoraUtils {
                 URLEncoder.encode("* <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Deleted>", "UTF-8"));
     }
 
+    @Deprecated
+    // chro vraci cely resource jako string
     public String getAllRelationships(String uuid) {  // plain string returned from risearch
         String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
         WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
