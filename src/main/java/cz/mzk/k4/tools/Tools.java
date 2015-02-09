@@ -3,7 +3,6 @@ package cz.mzk.k4.tools;
 import cz.mzk.k4.tools.convertor.ConvertDJvuToJp2;
 import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.utils.ScriptRunner;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +34,7 @@ public class Tools {
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());
         runner.register("importKolekce", new ImportCollection());
+        runner.register("getBookOCR", new GetWholeBookOCR());
         runner.register("test", new TestScript());
 
         if (args.length < 1 || args[0] == null) {

@@ -1,24 +1,14 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.jcraft.jsch.*;
-import cz.mzk.k4.tools.configuration.Configuration;
-import cz.mzk.k4.tools.utils.domain.LsItem;
-import cz.mzk.k4.tools.domain.aleph.RecordHolder;
-import cz.mzk.k4.tools.utils.ImageserverUtils;
-import cz.mzk.k4.tools.utils.Script;
-import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import cz.mzk.k4.tools.configuration.*;
+import cz.mzk.k4.tools.domain.aleph.*;
+import cz.mzk.k4.tools.utils.*;
+import cz.mzk.k4.tools.utils.domain.*;
+import org.apache.commons.io.*;
+import org.joda.time.*;
+import java.io.*;
+import java.util.*;
 
 /**
 * Created by rumanekm on 27.3.14.

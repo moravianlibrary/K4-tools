@@ -8,7 +8,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.xpath.XPath;
@@ -53,7 +52,6 @@ public class KrameriusUtils {
                 .type(MediaType.APPLICATION_JSON)
                 .entity(json, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class);
-
 
         if (response.getStatus() == 201) {
             LOGGER.info("Deleting object " + pid_path);
