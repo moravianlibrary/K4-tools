@@ -6,12 +6,22 @@ import com.yourmediashelf.fedora.client.FedoraCredentials;
 import com.yourmediashelf.fedora.client.request.FedoraRequest;
 import com.yourmediashelf.fedora.client.response.FedoraResponse;
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.validators.ArticleValidator;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 
 /**
@@ -22,19 +32,21 @@ public class ValidateWorker extends UuidWorker {
     private static final Logger LOGGER = Logger.getLogger(ValidateWorker.class);
     private FedoraClient fedora;
 
+    private FedoraUtils fedoraUtils;
+
 
     //TODO input list with validator objects
     public ValidateWorker(AccessProvider accessProvider) {
         super(false);
-
-        try {
-            FedoraCredentials credentials = new FedoraCredentials("http://" + accessProvider.getFedoraHost(),
-                    accessProvider.getFedoraUser(), accessProvider.getFedoraPassword());
-            FedoraClient fedora = new FedoraClient(credentials);
-            FedoraRequest.setDefaultClient(fedora);
-        } catch (MalformedURLException e) {
-            LOGGER.error("Malformed URL to Fedora");
-        }
+        fedoraUtils = new FedoraUtils(accessProvider);
+//        try {
+//            FedoraCredentials credentials = new FedoraCredentials("http://" + accessProvider.getFedoraHost(),
+//                    accessProvider.getFedoraUser(), accessProvider.getFedoraPassword());
+//            FedoraClient fedora = new FedoraClient(credentials);
+//            FedoraRequest.setDefaultClient(fedora);
+//        } catch (MalformedURLException e) {
+//            LOGGER.error("Malformed URL to Fedora");
+//        }
 
     }
 
@@ -43,16 +55,29 @@ public class ValidateWorker extends UuidWorker {
         FedoraResponse response = null;
         ArticleValidator articleValidator = new ArticleValidator();
         try {
-            LOGGER.info("Download foxml " + uuid);
-            response = fedora.getObjectXML(uuid).execute();
-            String xml = IOUtils.toString(response.getEntityInputStream());
-            if (!articleValidator.validate(xml)) {
+            Document relsext = fedoraUtils.getRelsExt(uuid);
+            StringWriter sw = new StringWriter();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            transformer.transform(new DOMSource(relsext), new StreamResult(sw));
+
+//            LOGGER.info("Download foxml " + uuid);
+//            response = fedora.getDatastream(uuid, "RELS-EXT").execute();
+//            String relsext = IOUtils.toString(response.getEntityInputStream());
+            if (!articleValidator.validate(sw.toString())) {
                 LOGGER.warn(uuid + " is corrupted");
             }
-        } catch (FedoraClientException e) {
-            LOGGER.error("Fedora client exception");
         } catch (IOException e) {
             LOGGER.error("IO error " + e);
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
         }
 
 
