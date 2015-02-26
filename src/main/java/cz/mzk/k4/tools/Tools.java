@@ -35,6 +35,7 @@ public class Tools {
         runner.register("indexaceZeSeznamu", new IndexList());
         runner.register("importKolekce", new ImportCollection());
         runner.register("getBookOCR", new GetWholeBookOCR());
+        runner.register("articleRepair", new OdpojeniVadnychClanku());
         runner.register("test", new TestScript());
 
         if (args.length < 1 || args[0] == null) {

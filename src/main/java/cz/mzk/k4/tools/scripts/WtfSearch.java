@@ -18,7 +18,7 @@ import java.util.List;
  * Created by holmanj on 12/12/13.
  */
 public class WtfSearch implements Script {
-    private static final Logger LOGGER = Logger.getLogger(FindLonelyMonographs.class);
+    private static final Logger LOGGER = Logger.getLogger(WtfSearch.class);
     private static UuidWorker worker = new RelationshipCounterWorker(false);
     private AccessProvider accessProvider;
     private KrameriusUtils krameriusUtils;
@@ -40,6 +40,7 @@ public class WtfSearch implements Script {
             if (args.get(0).startsWith("model:")) {
                 DigitalObjectModel model = DigitalObjectModel.parseString(args.get(0).substring(6));
                 UuidWorker validateWorker = new ValidateWorker(accessProvider);
+//                validateWorker.run(args.get(1));
                 fedoraUtils.applyToAllUuidOfModel(model, validateWorker);
             } else {
 

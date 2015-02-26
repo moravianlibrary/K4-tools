@@ -6,21 +6,23 @@ package domain;
 public class Details {
 
     // page
-    private String pagenumber;
+//    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
     private String type;
 
     // periodical item:
     private String issueNumber;
     private String date;
     private String partNumber;
+    private String year;
+    private String volumeNumber;
 
-    public String getPagenumber() {
-        return pagenumber;
-    }
-
-    public void setPagenumber(String pagenumber) {
-        this.pagenumber = pagenumber;
-    }
+//    public String getPagenumber() {
+//        return pagenumber;
+//    }
+//
+//    public void setPagenumber(String pagenumber) {
+//        this.pagenumber = pagenumber;
+//    }
 
     public String getType() {
         return type;
@@ -52,5 +54,21 @@ public class Details {
 
     public void setPartNumber(String partNumber) {
         this.partNumber = partNumber;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getVolumeNumber() {
+        return volumeNumber;
+    }
+
+    public void setVolumeNumber(String volumeNumber) {
+        this.volumeNumber = volumeNumber;
     }
 }

@@ -21,7 +21,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -350,6 +349,24 @@ public class FedoraUtils {
                 + query);
         String result = resource.get(String.class);
         return result;
+    }
+
+    public List<String> getParentUuids(String childUuid) {
+        String query = "*%20*%20%3Cinfo:fedora/" + childUuid + "%3E";
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+                + query);
+        List<String> parents = new ArrayList<>();
+        String[] result = resource.get(String.class).split("\n");
+        for (int i = 0; i < result.length; i++) {
+            // <info:fedora/uuid:b80668e6-435d-11dd-b505-00145e5790ea>
+            String parentUuid = result[i].split(" ")[0];
+            // uuid:b80668e6-435d-11dd-b505-00145e5790ea>
+            parentUuid = parentUuid.replace("<info:fedora/", "");
+            // uuid:b80668e6-435d-11dd-b505-00145e5790ea
+            parentUuid = parentUuid.replace(">", "");
+            parents.add(parentUuid);
+        }
+        return parents;
     }
 
     /**
@@ -741,6 +758,23 @@ public class FedoraUtils {
         pid = checkPid(pid);
         try {
             WebResource resource = accessProvider.getFedoraWebResource("/objects/" + pid + "/datastreams/DC/content");
+            Document result = resource.accept(MediaType.APPLICATION_XML_TYPE).get(Document.class);
+            return result;
+        } catch (UniformInterfaceException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * @param pid
+     * @return
+     * @throws IOException
+     */
+    public Document getMODSStream(String pid) throws IOException {
+        pid = checkPid(pid);
+        try {
+            WebResource resource = accessProvider.getFedoraWebResource("/objects/" + pid + "/datastreams/BIBLIO_MODS/content");
             Document result = resource.accept(MediaType.APPLICATION_XML_TYPE).get(Document.class);
             return result;
         } catch (UniformInterfaceException e) {

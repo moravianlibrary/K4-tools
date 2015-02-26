@@ -1,17 +1,12 @@
 package cz.mzk.k4.tools.workers;
 
 import com.yourmediashelf.fedora.client.FedoraClient;
-import com.yourmediashelf.fedora.client.FedoraClientException;
-import com.yourmediashelf.fedora.client.FedoraCredentials;
-import com.yourmediashelf.fedora.client.request.FedoraRequest;
 import com.yourmediashelf.fedora.client.response.FedoraResponse;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.validators.ArticleValidator;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -19,10 +14,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 
 /**
  * Created by rumanekm on 20.1.15.
@@ -70,6 +63,8 @@ public class ValidateWorker extends UuidWorker {
 //            response = fedora.getDatastream(uuid, "RELS-EXT").execute();
 //            String relsext = IOUtils.toString(response.getEntityInputStream());
             if (!articleValidator.validate(sw.toString())) {
+                // bohatě by stačilo:
+//                if (sw.toString().contains("fedora/null")) {
                 LOGGER.warn(uuid + " is corrupted");
             }
         } catch (IOException e) {

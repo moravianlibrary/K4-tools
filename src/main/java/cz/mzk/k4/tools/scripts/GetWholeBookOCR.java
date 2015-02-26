@@ -16,7 +16,8 @@ public class GetWholeBookOCR implements Script {
 
     public GetWholeBookOCR() {
         AccessProvider accessProvider = new AccessProvider();
-        api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());    }
+        api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    }
 
     public void run(List<String> args) {
         String monographUuid = args.get(0);
