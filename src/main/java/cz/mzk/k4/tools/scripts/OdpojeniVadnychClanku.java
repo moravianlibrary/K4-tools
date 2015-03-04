@@ -36,6 +36,8 @@ public class OdpojeniVadnychClanku implements Script {
 
     @Override
     public void run(List<String> args) {
+        LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix());
+
         if (args.size() != 1) {
             System.out.println("Součástí příkazu musí být i název souboru. (A nic dalšího)");
             return;
@@ -95,17 +97,17 @@ public class OdpojeniVadnychClanku implements Script {
             e.printStackTrace();
         }
 
-        for (String issueUuid : parentUuids) {
-            try {
-                detach(articleUuid, issueUuid);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (TransformerException e) {
-                e.printStackTrace();
-            } catch (CreateObjectException e) {
-                e.printStackTrace();
-            }
-        }
+//        for (String issueUuid : parentUuids) {
+//            try {
+//                detach(articleUuid, issueUuid);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } catch (TransformerException e) {
+//                e.printStackTrace();
+//            } catch (CreateObjectException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private void clearArticle(String articleUuid) throws IOException {
@@ -130,16 +132,19 @@ public class OdpojeniVadnychClanku implements Script {
 
         try {
             PrintWriter relsFile = new PrintWriter("rels-zalohy/" + articleUuid + "-article");
+//            PrintWriter relsFile = new PrintWriter("rels-zalohy/" + articleUuid + "-internalpart");
             relsFile.println(prettyPrint(relsExt));
             relsFile.close();
             // TODO: save RESL-EXT
             fedora.setRelsExt(articleUuid, "rels-zalohy/" + articleUuid + "-article");
+//            fedora.setRelsExt(articleUuid, "rels-zalohy/" + articleUuid + "-internalpart");
             System.out.println("Nové RELS článku " + articleUuid + ":\n" + prettyPrint(relsExt));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         LOGGER.info("Článek " + articleUuid + " byl vyčištěn od nullových vazeb");
+//        LOGGER.info("Příloha " + articleUuid + " byla vyčištěna od nullových vazeb");
     }
 
     private void detach(String articleUuid, String issueUuid) throws IOException, TransformerException, CreateObjectException {

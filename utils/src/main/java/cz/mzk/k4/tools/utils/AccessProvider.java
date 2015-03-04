@@ -41,6 +41,7 @@ public class AccessProvider {
     private String imageserverPassword;
     private String imageserverPath;
     private String imageserverUrlPath;
+    private String solrHost;
     private String libraryPrefix;
     private Client client;
     private String confFileName = "k4_tools_config.properties";
@@ -76,6 +77,8 @@ public class AccessProvider {
         imageserverPassword = properties.getProperty(libraryPrefix + ".imageserver.password");
         imageserverPath = properties.getProperty(libraryPrefix + ".imageserver.path");
         imageserverUrlPath = properties.getProperty(libraryPrefix + ".imageserver.urlPath");
+
+        solrHost = properties.getProperty(libraryPrefix + ".solr.host");
 
         client = Client.create();
     }
@@ -302,5 +305,13 @@ public class AccessProvider {
 
     public void setImageserverUrlPath(String imageserverUrlPath) {
         this.imageserverUrlPath = imageserverUrlPath;
+    }
+
+    public String getSolrHost() {
+        return solrHost;
+    }
+
+    public void setSolrHost(String solrHost) {
+        this.solrHost = solrHost;
     }
 }
