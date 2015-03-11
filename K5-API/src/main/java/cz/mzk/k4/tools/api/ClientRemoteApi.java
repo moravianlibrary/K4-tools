@@ -12,6 +12,8 @@ public class ClientRemoteApi {
     private ClientRemoteApiJSON apiJSON;
     private ClientRemoteApiString apiString;
 
+    // získávat API přes factory:
+    // ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     public ClientRemoteApi(ClientRemoteApiJSON apiJSON, ClientRemoteApiString apiString) {
         this.apiJSON = apiJSON;
         this.apiString = apiString;

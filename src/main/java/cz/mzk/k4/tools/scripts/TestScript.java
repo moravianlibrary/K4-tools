@@ -1,10 +1,9 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.providers.ChildrenUuid;
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 
 import java.util.List;
@@ -18,13 +17,18 @@ import java.util.List;
  */
 public class TestScript implements Script {
 
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-    //private static KrameriusUtils krameriusUtils = new KrameriusUtils(new AccessProvider());
+    private static FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
+    private static KrameriusUtils krameriusUtils = new KrameriusUtils(AccessProvider.getInstance());
 
     @Override
     public void run(List<String> args) {
 
-        String uuid = args.get(0);
+//        String uuid = args.get(0);
+        String filePath = args.get(0);
+        List<String> uuidList = GeneralUtils.loadUuidsFromFile(filePath);
+        for (String uuid : uuidList) {
+            krameriusUtils.export(uuid);
+        }
 
         //fedoraUtils.applyToAllUuid(new ChildrenUuid(uuid, DigitalObjectModel.PAGE));
 
