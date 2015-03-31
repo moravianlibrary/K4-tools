@@ -39,6 +39,7 @@ public class Tools {
         runner.register("solr", new SolrDotaz());
         runner.register("pripojeniPeriodik", new AttachPeriodicals());
         runner.register("xmlstarlet", new XMLStarlet());
+        runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
         runner.register("test", new TestScript());
 
 
