@@ -6,23 +6,23 @@ package domain;
 public class Details {
 
     // page
-//    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
     private String type;
 
     // periodical item:
-    private String issueNumber;
+    private String issueNumber; // používá se?
     private String date;
-    private String partNumber;
+    private String partNumber; // aspoň u Lidovek je číslo tady
     private String year;
     private String volumeNumber;
 
-//    public String getPagenumber() {
-//        return pagenumber;
-//    }
-//
-//    public void setPagenumber(String pagenumber) {
-//        this.pagenumber = pagenumber;
-//    }
+    public String getPagenumber() {
+        return pagenumber;
+    }
+
+    public void setPagenumber(String pagenumber) {
+        this.pagenumber = pagenumber;
+    }
 
     public String getType() {
         return type;

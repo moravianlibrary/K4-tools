@@ -49,6 +49,7 @@ dependencies {
     compile group: 'org.mod4j.com.ibm', name: 'icu', version: '4.0.1'
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.50'
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
 }
 
 

@@ -14,17 +14,31 @@ import cz.mzk.k4.tools.utils.exception.LexerException;
 import cz.mzk.k4.tools.utils.util.PIDParser;
 import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.fedora.api.DatastreamDef;
 import org.fedora.api.RelationshipTuple;
+import org.jsoup.Jsoup;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -376,12 +390,32 @@ public class FedoraUtils {
     public List<RelationshipTuple> getSubjectOrObjectPids(String query) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
 
-        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         String result = resource.get(String.class);
         String[] lines = result.split("\n");
         for (String line : lines) {
-            String[] tokens = line.split(" ");
+//            String[] tokens = line.split(" "); // platná hodnota je i " ", ale to by se rozdělilo na 2x ", nebyl by to triplet
+//            String[] tokens = line.split(" (?=([^\"]*\"[^\"]*\")*[^\"]*$)"); //split on the space only if that comma has zero, or an even number of quotes ahead of it. - nefunguje, když je např. v title lichý počet "
+            String[] tokens = line.split(" (?=([<*>]))"); // rozdělit kolem mezer, za kterýma následuje text ve tvaru <..>
+            if (tokens.length == 2) {
+                String[] rest;
+                if (tokens[1].contains("<http://www.w3.org/2001/XMLSchema#dateTime>")) {
+                    // 2. token je ve tvaru <info:fedora/fedora-system:def/view#lastModifiedDate> "2011-08-10T09:19:13.641Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+                    tokens[1] = tokens[1].replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "");
+                }
+                // 2. token by měl být ve tvaru: <http://purl.org/dc/elements/1.1/language> "cze" .
+                rest = new String[2];
+                rest[0] = tokens[1].substring(0, tokens[1].indexOf(" ")); // všechno po první mezeru (bez ní)
+                rest[1] = tokens[1].substring(tokens[1].indexOf(" ") + 1); // všechno od první mezery (bez ní)
+                String[] tokensCorrected = new String[3];
+                tokensCorrected[0] = tokens[0]; // objekt: <...>
+                tokensCorrected[1] = rest[0];   // predikát <...>
+                tokensCorrected[2] = rest[1];   // subjekt "..."
+                tokens = tokensCorrected;
+            }
+            tokens[2] = tokens[2].substring(0, tokens[2].length() - 2); // odstranění " ." z konce
+
             if (tokens.length < 3) continue;
             try {
                 RelationshipTuple tuple = new RelationshipTuple();
@@ -391,12 +425,14 @@ public class FedoraUtils {
                 tuple.setIsLiteral(false);
                 retval.add(tuple);
             } catch (Exception ex) {
-                LOGGER.info("Problem parsing RDF, skipping line:" + Arrays.toString(tokens) + " : " + ex);
+                LOGGER.warn("Problem parsing RDF, skipping line:" + Arrays.toString(tokens) + " : " + ex);
             }
         }
 
         return retval;
     }
+
+    // používat FedoraApiM: List<RelationshipTuple> getRelationships; boolean addRelationship; boolean purgeRelationship
 
     /**
      * @param uuid
@@ -420,7 +456,7 @@ public class FedoraUtils {
      * @throws IOException
      */
     public Document getRelsExt(String uuid) throws IOException {
-        String query = "/get/" + uuid + "/RELS-EXT";
+        String query = "get/" + uuid + "/RELS-EXT";
 //        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
@@ -440,6 +476,35 @@ public class FedoraUtils {
             }
         } else {
             throw new IOException("Could not get RELS-EXT for object " + uuid + "\nResponse status:" + response.getStatus());
+        }
+    }
+
+    /**
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    public Document getFullObjectXml(String uuid) throws IOException {
+        String query = "/objects/" + uuid + "/objectXML";
+        LOGGER.debug("Reading object XML from " + accessProvider.getFedoraHost() + query);
+        WebResource resource = accessProvider.getFedoraWebResource(query);
+        ClientResponse response = resource.get(ClientResponse.class);
+        if (response.getStatus() == 200) {
+            String docString = response.getEntity(String.class);
+            if (docString == null) {
+                throw new ConnectionException("Cannot get objectXML data.");
+            }
+            try {
+                return XMLUtils.parseDocument(docString, true);
+            } catch (ParserConfigurationException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new IOException(e);
+            } catch (SAXException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new IOException(e);
+            }
+        } else {
+            throw new IOException("Could not get objectXML for object " + uuid + "\nResponse status:" + response.getStatus());
         }
     }
 
@@ -514,10 +579,9 @@ public class FedoraUtils {
      * @return
      * @throws IOException
      */
-    //TODO dopsat mimetypy jako enum
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
         ClientResponse response =
-                accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
+                accessProvider.getFedoraWebResource("objects/" + uuid + "/datastreams/IMG_FULL/content")
                         .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
             throw new FileNotFoundException("Failed : HTTP error code : "
@@ -525,6 +589,76 @@ public class FedoraUtils {
         }
         InputStream is = response.getEntityInputStream();
         return is;
+    }
+
+    public String getDjVuImgName(String uuid) throws IOException {
+        // <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        //  <rdf:Description rdf:about="info:fedora/uuid:56775c82-435f-11dd-b505-00145e5790ea">
+        //      <file xmlns="http://www.nsdl.org/ontologies/relationships#">ABA001_2106500001.djvu</file>
+        //  </rdf:Description>
+        // </rdf:RDF>
+        Document rdf = getRelsExt(uuid);
+        NodeList fileList = rdf.getElementsByTagNameNS("http://www.nsdl.org/ontologies/relationships#", "file");
+        Node file = fileList.item(0);
+        String imgName = file.getTextContent();
+        return imgName;
+    }
+
+    /**
+     * najde umístění obrázku v imageserveru (z datastreamu IMG_FULL)
+     *
+     * @param uuid
+     * @return
+     */
+    public String getImgLocation(String uuid) throws IOException {
+        if (uuid == null || uuid.equals("")) {
+            LOGGER.error("uuid can't be empty");
+        }
+        String query = "/objects/" + uuid + "/datastreams/IMG_FULL";
+        String username = accessProvider.getFedoraUser();
+        String password = accessProvider.getFedoraPassword();
+        if (username == null || username.equals("")) {
+            LOGGER.warn("Fedora username not specified in config file");
+        }
+        if (password == null || password.equals("")) {
+            LOGGER.warn("Fedora password not specified in config file");
+        }
+        String login = username + ":" + password;
+        String base64login = new String(Base64.encodeBase64(login.getBytes()));
+        org.jsoup.nodes.Document html = Jsoup.connect("http://" + accessProvider.getFedoraHost() + query)
+                .header("Authorization", "Basic " + base64login)
+                .get();
+        // http://jsoup.org/apidocs/org/jsoup/select/Selector.html
+        // http://try.jsoup.org/
+        org.jsoup.nodes.Element locationElement = html.select("td:contains(Datastream Location:) ~ td").first();
+        String imgLocation = locationElement.text();
+        if (imgLocation.startsWith("http")) {
+            return imgLocation.replace("/big.jpg", ".jp2");
+        } else {
+            // TODO udělat líp (managed datastream)
+            throw new IOException("Obrázek mimo fedoru nenalezen");
+        }
+    }
+
+    public String getImgName(String uuid) throws IOException {
+        String imgPath = getImgLocation(uuid);
+        String[] splitPath = imgPath.split("/");
+        String imgName = splitPath[splitPath.length - 1];
+        return imgName;
+    }
+
+    /**
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    public void saveImg(String uuid, String mimetype, String outputPath) throws IOException {
+        if (getDigitalObjectModel(uuid).equals(DigitalObjectModel.PAGE)) {
+            // může mít obrázek i něco jinýho než PAGE?
+
+        }
+        InputStream inputStream = getImgFull(uuid, mimetype);
+
     }
 
     /**
@@ -595,6 +729,19 @@ public class FedoraUtils {
 
     /**
      * Method sets IMG_FULL datastream value to external source
+     *
+     * @param uuid Uuid of file to be changed
+     * @param path Path to external source
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setImgPreviewFromExternal(String uuid, String path) throws CreateObjectException {
+        return insertExternalDatastream(Constants.DATASTREAM_ID.IMG_PREVIEW, uuid, path, false, "image/jpeg");
+    }
+
+    /**
+     * Method sets IMG_FULL datastream value to external source
+     *
      * @param uuid Uuid of file to be changed
      * @param path Path to external source
      * @return True if successful
@@ -606,6 +753,7 @@ public class FedoraUtils {
 
     /**
      * Method sets IMG_THUMB datastream value to external source
+     *
      * @param uuid Uuid of file to be changed
      * @param path Path to external source
      * @return True if successful
@@ -617,6 +765,7 @@ public class FedoraUtils {
 
     /**
      * Methods replaces RELS-EXT file
+     *
      * @param uuid Uuid of file to be changed
      * @param path Path to new RELS-EXT file
      * @return True if successful
@@ -657,48 +806,51 @@ public class FedoraUtils {
         return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "M", "true", "A");
     }
 
-    //Inserts datastream with controulGroup="R"
+    //    Inserts datastream with controulGroup="R"
+    //Inserts datastream with controulGroup="E"
     private boolean insertExternalDatastream(Constants.DATASTREAM_ID dsId,
-                                            String uuid,
-                                            String filePathOrContent,
-                                            boolean isFile,
-                                            String mimeType) throws CreateObjectException {
-        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "R", "false", "A");
+                                             String uuid,
+                                             String filePathOrContent,
+                                             boolean isFile,
+                                             String mimeType) throws CreateObjectException {
+//        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "R", "false", "A");
+        return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "E", "false", "A");
     }
 
     //Inserts datastream with controulGroup="X"
     private boolean insertXDataStream(Constants.DATASTREAM_ID dsId,
-                                        String uuid,
-                                        String filePathOrContent,
-                                        boolean isFile,
-                                        String mimeType) throws CreateObjectException {
+                                      String uuid,
+                                      String filePathOrContent,
+                                      boolean isFile,
+                                      String mimeType) throws CreateObjectException {
         return insertDataStream(dsId, uuid, filePathOrContent, isFile, mimeType, "X", "true", "A");
     }
 
     /**
      * Inserts any stream
+     *
      * @param dsId
      * @param uuid
      * @param filePathOrContent
      * @param isFile
      * @param mimeType
-     * @param controlGroup control group - M or R
+     * @param controlGroup      control group - M or R
      * @param versionable
      * @param dsState
      * @return
      * @throws CreateObjectException
      */
     private boolean insertDataStream(Constants.DATASTREAM_ID dsId,
-                                               String uuid,
-                                               String filePathOrContent,
-                                               boolean isFile,
-                                               String mimeType,
-                                               String controlGroup,
-                                               String versionable,
-                                               String dsState) throws CreateObjectException {
+                                     String uuid,
+                                     String filePathOrContent,
+                                     boolean isFile,
+                                     String mimeType,
+                                     String controlGroup,
+                                     String versionable,
+                                     String dsState) throws CreateObjectException {
 
         String query =
-                "/objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
+                "objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
 
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("controlGroup", controlGroup);
@@ -708,7 +860,7 @@ public class FedoraUtils {
 
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = null;
-        if(controlGroup == "R") {
+        if (controlGroup == "R" || controlGroup == "E") {
             queryParams.add("dsLocation", filePathOrContent);
             resource.delete();
         }
@@ -734,7 +886,7 @@ public class FedoraUtils {
         }
 
         if (response.getStatus() == 201) {
-            LOGGER.info("An " + dsId.getValue() + (isFile ? (" file: " + filePathOrContent) : "")
+            LOGGER.debug("An " + dsId.getValue() + (isFile ? (" file: " + filePathOrContent) : "")
                     + " has been inserted to the digital object: " + uuid + " as a " + dsId.getValue()
                     + " datastream.");
 
@@ -807,5 +959,82 @@ public class FedoraUtils {
             pid = "uuid:" + pid;
         }
         return pid;
+    }
+
+    /**
+     * Opraví vazbu na dlaždice v RELS-EXT
+     * Smaže příp. vazbu na DjVu nebo DeepZoom cache
+     *
+     * @param uuid
+     */
+    // TODO asi spíš smazat všechny file / tiles a dát nový odkaz
+    public void repairImageserverTilesRelation(String uuid) throws IOException, CreateObjectException, TransformerException {
+        File tempDom = null;
+        String krameriusNS = "http://www.nsdl.org/ontologies/relationships#";
+        String imagePath = "";
+        // najít cestu k obrázku v imageserveru
+        try {
+            imagePath = getImgLocation(uuid);
+            if (imagePath.equals("")) {
+                throw new IOException();
+            } else {
+                imagePath = imagePath.replace(".jp2", "");
+            }
+        } catch (IOException e) {
+            IOException exception = new IOException("Napodařilo se získat cestu k obrázku objektu " + uuid);
+            exception.setStackTrace(e.getStackTrace());
+            throw exception;
+        }
+
+        // je cesta k obrázku - smazat všechny elementy <file> a <tiles-url>, nahradit novou vazbou
+        try {
+            Document dom = getRelsExt(uuid);
+
+            // smazat elementy <file> (např. vazba na DjVu obrázek)
+            NodeList fileNodeList = dom.getElementsByTagNameNS(krameriusNS, "file");
+            int fileNodeListLength = fileNodeList.getLength(); // délka seznamu se během cyklu mění
+            for (int i = 0; i < fileNodeListLength; i++) {
+                Node file = fileNodeList.item(0); // seznam se odmazáváním zmenšuje, maže se vždycky první uzel
+                file.getParentNode().removeChild(file);
+            }
+
+            // smazat elementy <tiles-url> (případné existující vazby na imageserver nebo DeepZoom cache)
+            NodeList tilesUrlNodeList = dom.getElementsByTagNameNS(krameriusNS, "tiles-url");
+
+            int tilesNodeListLength = tilesUrlNodeList.getLength(); // délka seznamu se během cyklu mění
+            for (int i = 0; i < tilesNodeListLength; i++) {
+                Node tilesUrlNode = tilesUrlNodeList.item(0); // seznam se odmazáváním zmenšuje, maže se vždycky první uzel
+                tilesUrlNode.getParentNode().removeChild(tilesUrlNode);
+            }
+
+            // potřeba? Co atribut rdf:about?
+            if (dom.getChildNodes().getLength() == 0) {
+                dom.appendChild(dom.createElement("rdf:Description"));
+            }
+            Element currentElement = (Element) dom.getElementsByTagName("rdf:Description").item(0);
+            //Add element kramerius:tiles-url
+            Element tiles = dom.createElementNS(krameriusNS, "tiles-url");
+            tiles.setTextContent(imagePath); // find from img stream
+            currentElement.appendChild(tiles);
+
+            //save XML file temporary
+            tempDom = File.createTempFile("relsExt", ".rdf");
+            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(dom), new StreamResult(tempDom));
+            //Copy temporary file to document
+            setRelsExt(uuid, tempDom.getAbsolutePath());
+
+        } catch (CreateObjectException e) {
+            throw new CreateObjectException("Chyba při změně XML: " + e.getMessage());
+        } catch (TransformerConfigurationException e) {
+            throw new TransformerConfigurationException("Chyba při změně XML: " + e.getMessage());
+        } catch (TransformerException e) {
+            throw new TransformerException("Chyba při změně XML: " + e.getMessage());
+        } catch (IOException e) {
+            throw new IOException("Chyba při změně XML: " + e.getMessage());
+        } finally {
+            if (tempDom != null) {
+                tempDom.delete();
+            }
+        }
     }
 }

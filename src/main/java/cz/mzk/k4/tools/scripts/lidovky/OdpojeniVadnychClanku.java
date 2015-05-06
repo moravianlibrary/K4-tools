@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.scripts;
+package cz.mzk.k4.tools.scripts.lidovky;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;

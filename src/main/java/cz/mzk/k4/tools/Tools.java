@@ -2,6 +2,8 @@ package cz.mzk.k4.tools;
 
 import cz.mzk.k4.tools.convertor.ConvertDJvuToJp2;
 import cz.mzk.k4.tools.scripts.*;
+import cz.mzk.k4.tools.scripts.lidovky.LnPresunImg;
+import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +41,8 @@ public class Tools {
         runner.register("solr", new SolrDotaz());
         runner.register("pripojeniPeriodik", new AttachPeriodicals());
         runner.register("xmlstarlet", new XMLStarlet());
+        runner.register("lidovky", new LnPresunImg());
+        runner.register("soundunits", new RepairImgRels());
         runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
         runner.register("test", new TestScript());
 

@@ -26,15 +26,12 @@ public class ExportFromFile implements Script {
         List<String> uuidList = GeneralUtils.loadUuidsFromFile(filePath);
         for (String uuid : uuidList) {
             krameriusUtils.export(uuid);
+            LOGGER.debug("Export planned for object " + uuid);
         }
     }
 
     @Override
     public String getUsage() {
         return "Export všech dokumentů ze zadaného souboru.";
-    }
-
-    private String parseUuid(String uuid) {
-        return uuid.substring(uuid.indexOf("uuid:"));
     }
 }

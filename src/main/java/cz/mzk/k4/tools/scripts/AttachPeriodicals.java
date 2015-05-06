@@ -1,7 +1,10 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.api.ClientRemoteApi;
+import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
+import domain.Context;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -31,9 +34,9 @@ public class AttachPeriodicals implements Script {
         model = model.replace("model:", ""); // parametr může být včetně model: i bez
         // model_path:periodicalvolume
         String query = "model_path:" + model + "*";
-        List<String> uuidList = null;
+        List<String> childList = null;
         try {
-            uuidList = solrQuery(query);
+            childList = solrQuery(query);
         } catch (MalformedURLException e) {
             LOGGER.error("Špatné url solr serveru");
             e.printStackTrace();
@@ -42,15 +45,17 @@ public class AttachPeriodicals implements Script {
             e.printStackTrace();
         }
 
-        for (String pid : uuidList) {
+        for (String pid : childList) {
             System.out.println(pid);
         }
         // zavolá API v Praze a najde rodiče
-        Map<String,String> uuidMap = findParents(uuidList); // key = child, value = parent
-        for (String child : uuidList) {
+        Map<String,String> uuidMap = findParents(childList); // key = child, value = parent
+        for (String child : childList) {
             String parent = uuidMap.get(child);
+            System.out.println("child " + child + ", parent " + parent);
             // atd
         }
+        // TODO možná u některých jen reindexovat rodiče - skoro určitě: ty, co to najde bez hvězdičky zařadit; ty, co to potom najde jen s hvězdičkou stačí reindexovat (nemusí se ani rodič - možná spíš přes gui)
         // přidá uuid do RELS-EXT rodiče
         // reindexuje rodiče
     }
@@ -80,10 +85,15 @@ public class AttachPeriodicals implements Script {
 
     private Map<String,String> findParents(List<String> uuidList) {
         Map<String,String> uuidMap = new HashMap<>(); // key = child, value = parent
-
-
-        // TODO NKP API, najít rodiče
-
+        ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi("kramerius4.nkp.cz", "", "");
+        for (String child : uuidList) {
+            Context[] contexts = k5Api.getItem(child).getContext()[0];
+            int hloubka = contexts.length;
+            // poslední kontext je daný objekt, kontext před ním je jeho rodič (indexace od 0)
+            String parent = contexts[hloubka-2].getPid();
+            // TODO co chyby?
+            uuidMap.put(child, parent);
+        }
         return uuidMap;
     }
 

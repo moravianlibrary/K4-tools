@@ -28,7 +28,6 @@ public class DownloadImages implements Script{
     public static final String DATASTREAM_NAME = "IMG_FULL";
     public static final String DATASTREAM_LOCATION_TAG = "foxml:contentLocation";
     public static final String DATASTREAM_SUFFIX= "/big.jpg";
-
     public static final String INPUT_ADRESS = "/data/imageserver/";
 
     @Override

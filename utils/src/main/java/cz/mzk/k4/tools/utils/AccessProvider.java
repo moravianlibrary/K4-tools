@@ -5,7 +5,8 @@ import com.sun.jersey.api.client.WebResource;
 import org.apache.log4j.Logger;
 import org.fedora.api.FedoraAPIA;
 import org.fedora.api.FedoraAPIAService;
-
+import org.fedora.api.FedoraAPIM;
+import org.fedora.api.FedoraAPIMService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.File;
@@ -30,6 +31,7 @@ public class AccessProvider {
     private static AccessProvider accessProvider;
 
     private FedoraAPIA fedoraAPIA;
+    private FedoraAPIM fedoraAPIM; // asi nefunguje
     private String fedoraHost;
     private String fedoraUser;
     private String fedoraPassword;
@@ -125,7 +127,7 @@ public class AccessProvider {
      * @return
      */
     public WebResource getFedoraWebResource(String query) {
-        String url = "http://" + fedoraHost + query;
+        String url = "http://" + fedoraHost + "/" + query;
 //        LOGGER.debug("Fedora url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
@@ -156,6 +158,7 @@ public class AccessProvider {
         }
         return fedoraAPIA;
     }
+
     /**
      * Inits the apia.
      */
@@ -186,6 +189,48 @@ public class AccessProvider {
         fedoraAPIA = APIAservice.getPort(FedoraAPIA.class);
         ((BindingProvider) fedoraAPIA).getRequestContext().put(BindingProvider.USERNAME_PROPERTY, user);
         ((BindingProvider) fedoraAPIA).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, pwd);
+    }
+
+    /*
+     * @see https://wiki.duraspace.org/display/FEDORA35/API-A
+     */
+    public FedoraAPIM getFedoraAPIM() {
+        if (fedoraAPIM == null) {
+            initAPIM();
+        }
+        return fedoraAPIM;
+    }
+
+    /**
+     * Inits the apiM.
+     */
+    private void initAPIM() {
+        final String user = getFedoraUser();
+        final String pwd = getFedoraPassword();
+        Authenticator.setDefault(new Authenticator() {
+
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, pwd.toCharArray());
+            }
+        });
+
+        FedoraAPIMService APIMservice = null;
+        try {
+            APIMservice =
+                    new FedoraAPIMService(
+                            new URL("http://" + getFedoraHost() + "/wsdl?api=API-M"),
+                            new QName("http://www.fedora.info/definitions/1/0/api/",
+//                                    "Fedora-API-M-Service"));
+//                            new QName("http://www.fedora.info/definitions/1/0/types/",
+                                    "Fedora-API-M-Service"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("InvalidURL API-M:" + e);
+            throw new RuntimeException(e);
+        }
+        fedoraAPIM = APIMservice.getPort(FedoraAPIM.class);
+        ((BindingProvider) fedoraAPIM).getRequestContext().put(BindingProvider.USERNAME_PROPERTY, user);
+        ((BindingProvider) fedoraAPIM).getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, pwd);
     }
 
     public String getFedoraHost() {

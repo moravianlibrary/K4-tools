@@ -1,7 +1,6 @@
 package cz.mzk.k4.tools.utils;
 
 import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,18 +50,18 @@ public class FormatConvertor {
      * @return Converted tiff file
      * @throws IOException If the conversion was unsuccessful
      */
-    public static File convertDjvuToTiff(InputStream djvu) throws IOException {
+    public static File convertDjvuToTiff(File djvu) throws IOException {
 
         //Create temporary file on disk
-        File djvuFile = File.createTempFile("convertdjvu", ".djvu");
+        File djvuTempFile = File.createTempFile("convertdjvu", ".djvu");
         File tiffFile = File.createTempFile("converttiff", ".tiff");
-        FileUtils.copyInputStreamToFile(djvu, djvuFile);
+        FileUtils.copyFile(djvu, djvuTempFile);
 
         //Create terminal command
         List<String> cmdParams = new ArrayList<String>();
         cmdParams.add("ddjvu");
         cmdParams.add("-format=tiff");
-        cmdParams.add(djvuFile.getAbsolutePath());
+        cmdParams.add(djvuTempFile.getAbsolutePath());
         cmdParams.add(tiffFile.getAbsolutePath());
 
         //Run the command
@@ -77,7 +76,7 @@ public class FormatConvertor {
             throw new IOException("Chyba při převodu djvu na tiff: " + e.getMessage());
         } finally {
             //Delete temporary files that are no longer needed
-            djvuFile.delete();
+            djvuTempFile.delete();
         }
     }
 
@@ -158,10 +157,51 @@ public class FormatConvertor {
      * @return Input stream of converted file
      * @throws IOException If some part of conversion was unsuccessful
      */
-    public static InputStream convertDjvuToJp2(InputStream inputDjvu) throws IOException {
+    public static InputStream convertDjvuToJp2(File inputDjvu) throws IOException {
 
         File tiffConversionTempFiles = FormatConvertor.convertDjvuToTiff(inputDjvu);
         File decompressedTiffTempFiles = FormatConvertor.decompressTiff(tiffConversionTempFiles);
         return FormatConvertor.convertTiffToJpg2(decompressedTiffTempFiles);
+    }
+
+    /**
+     * Method converting jpeg file to jpeg2000. The conversion to jpeg2000 is made through tiff file format.
+     *
+     * @param inputJpg jped input stream to be converted
+     * @return Input stream of converted file
+     * @throws IOException If some part of conversion was unsuccessful
+     */
+    public static InputStream convertJpgToJp2(File inputJpg) throws IOException {
+        File tiffConversionTempFile = FormatConvertor.convertJpgToTiff(inputJpg);
+        return FormatConvertor.convertTiffToJpg2(tiffConversionTempFile);
+    }
+
+    private static File convertJpgToTiff(File jpg) throws IOException {
+        //Create temporary file on disk
+        File jpgTempFile = File.createTempFile("convertjpg", ".jpg");
+        File tiffFile = File.createTempFile("converttiff", ".tiff");
+        FileUtils.copyFile(jpg, jpgTempFile);
+
+        //Create terminal command
+        List<String> cmdParams = new ArrayList<String>();
+        cmdParams.add("convert");
+        cmdParams.add("-compress");
+        cmdParams.add("none");
+        cmdParams.add(jpgTempFile.getAbsolutePath());
+        cmdParams.add(tiffFile.getAbsolutePath());
+
+        //Run the command
+        Process process = new ProcessBuilder(cmdParams).start();
+
+        try {
+            process.waitFor();
+            process.getErrorStream();
+            return tiffFile;
+        } catch (InterruptedException e) {
+            throw new IOException("Chyba při převodu djvu na tiff: " + e.getMessage());
+        } finally {
+            //Delete temporary files that are no longer needed
+            jpgTempFile.delete();
+        }
     }
 }

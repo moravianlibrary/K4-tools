@@ -6,11 +6,10 @@ import cz.mzk.k4.tools.utils.ImageserverUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.Constants;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -50,13 +49,16 @@ public class ConvertDjvuWorker extends UuidWorker {
             //Get djvu image for given uuid
             String mimetype = fedoraUtils.getMimeTypeForStream(uuid, Constants.DATASTREAM_ID.IMG_FULL.getValue());
             InputStream djvuInputStream = fedoraUtils.getImgFull(uuid, mimetype);
+            File tempDjvuFile = new File("temp.djvu");
+            FileUtils.copyInputStreamToFile(djvuInputStream, tempDjvuFile);
             if (djvuInputStream != null) {
 
                 //Convert image to jpeg2000
                 System.out.println("MIMETYPE: " + mimetype);
                 if(mimetype.equals("image/vnd.djvu")) {
-                    InputStream jp2Stream = FormatConvertor.convertDjvuToJp2(djvuInputStream);
+                    InputStream jp2Stream = FormatConvertor.convertDjvuToJp2(tempDjvuFile);
                     LOGGER.info("Proběhla konverze obrázku.");
+                    tempDjvuFile.delete();
 
                     //Upload image to image server
                     ImageserverUtils imageServer = new ImageserverUtils();
