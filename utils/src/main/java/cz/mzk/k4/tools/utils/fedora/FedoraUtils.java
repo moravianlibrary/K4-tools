@@ -1037,4 +1037,11 @@ public class FedoraUtils {
             }
         }
     }
+
+    public void repairImageStreams(String uuid, String imageUrl) throws CreateObjectException {
+        imageUrl = imageUrl.replace(".jp2", ""); // odstranit suffix, pokud ho url obsahuje
+        setImgFullFromExternal(uuid, imageUrl + "/big.jpg");
+        setImgPreviewFromExternal(uuid, imageUrl + "/preview.jpg");
+        setImgThumbnailFromExternal(uuid, imageUrl + "/thumb.jpg");
+    }
 }
