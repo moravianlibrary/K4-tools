@@ -7,6 +7,10 @@ import cz.mzk.k4.tools.utils.*;
 import cz.mzk.k4.tools.utils.domain.*;
 import org.apache.commons.io.*;
 import org.joda.time.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.*;
 
@@ -15,7 +19,7 @@ import java.util.*;
 */
 public class RajhradValidate implements Script {
 
-    private static final String EXPORT_PATH = "/home/rumanekm/mzk03.m21";
+    private static final String EXPORT_PATH = System.getProperty("user.home") + "/mzk03.m21";
 
     private Configuration configuration = new Configuration();
 
@@ -69,16 +73,16 @@ public class RajhradValidate implements Script {
         System.out.println("------------------------------");
         holder.writeAlephScript();
 
-//        Client client = ClientBuilder.newClient();
-//        for (String url : holder.getImageserverLinkList()) {
-//            WebTarget webTarget = client.target(url + "/preview.jpg");
-//            Response response = webTarget.request().get();
-//            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
-//                System.err.println(url + " returned status code " + response.getStatus());
-//            } else {
-//                System.out.println(url + " is ok");
-//            }
-//        }
+        Client client = JerseyClientBuilder.newClient();
+        for (String url : holder.getImageserverLinkList()) {
+            WebTarget webTarget = client.target(url + "/preview.jpg");
+            Response response = webTarget.request().get();
+            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+                System.err.println(url + " returned status code " + response.getStatus());
+            } else {
+                System.out.println(url + " is ok");
+            }
+        }
     }
 
     //ensure that base is updated
