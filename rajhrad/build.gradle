@@ -29,5 +29,5 @@ dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
     compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0'
     compile group: 'org.tigris', name: 'marc4j', version: '2.4'
-
+    compile group: 'org.jboss.resteasy', name: 'resteasy-client', version: '3.0.2.Final'
 }
