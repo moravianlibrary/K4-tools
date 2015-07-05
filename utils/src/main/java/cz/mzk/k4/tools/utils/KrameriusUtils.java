@@ -174,7 +174,7 @@ public class KrameriusUtils {
         WebResource resource = accessProvider.getKrameriusWebResource("/search//lr");
         ClientResponse response = resource.queryParams(queryParams).get(ClientResponse.class);
         if(response.getStatus() == 200){
-            LOGGER.info("Reindexováno: " +pid);
+            LOGGER.debug("Reindexováno: " +pid);
         } else {
             LOGGER.error("Nepodařila se reindexace souboru " + pid);
         }
