@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import retrofit.converter.ConversionException;
 
 /**
  * Created by holmanj on 12.6.15.
@@ -47,7 +48,7 @@ public class BatchConfiguration {
     private static AccessProvider accessProvider = new AccessProvider();
     private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
-    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("abbyyrest.mzk.cz/AbbyyRest/ocr");
+    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr");
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
     public static final String OVERRIDEN_BY_EXPRESSION_VALUE = "overriden by expression value";
@@ -60,8 +61,9 @@ public class BatchConfiguration {
 
     @Bean
     @StepScope
-    public ItemReader<Img> reader(@Value("#{jobParameters[rootPid]}") String rootPid) {
-        return new ImgReader(fedoraUtils, abbyApi, rootPid);
+    public ItemReader<Img> reader(@Value("#{jobParameters[rootPid]}") String rootPid, @Value("#{jobParameters[overwrite]}") String overwrite) {
+        boolean overwriteOcr = "overwrite".equals(overwrite);
+        return new ImgReader(fedoraUtils, abbyApi, rootPid, overwriteOcr);
     }
 
     @Bean
@@ -92,8 +94,8 @@ public class BatchConfiguration {
     @Bean
     public Step step() {
         return stepBuilderFactory.get("step")
-                .<Img, Ocr>chunk(10) // počet najednou zpracovávaných stran
-                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v kontruktoru nahradí
+                .<Img, Ocr>chunk(50) // počet najednou zpracovávaných stran
+                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE, OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v kontruktoru nahradí
                 .processor(processor())
                 .writer(writer())
                 .listener(readListener())
@@ -107,6 +109,7 @@ public class BatchConfiguration {
                 .skip(IllegalStateException.class)
                 .skip(CreateObjectException.class)
                 .skip(ClassCastException.class) // pro případy java.lang.String cannot be cast to cz.mzk.k4.tools.ocr.domain.QueuedImage
+                .skip(ConversionException.class)
                 .listener(new StepCompletionStatisticsListener())
                 .build();
     }

@@ -42,7 +42,7 @@ public class PollingProcessor implements ItemProcessor<Img, Ocr> {
         final Ocr pageOcr = new Ocr(image.getPagePid(), textOcr, altoOcr);
         abbyApi.deleteItem(result.getId());
 
-        LOGGER.debug("Page " + image.getPagePid() + image.getMd5() + " OCR processed.");
+        LOGGER.info("Page " + image.getPagePid() + image.getMd5() + " OCR processed.");
         return pageOcr;
     }
 
@@ -56,7 +56,7 @@ public class PollingProcessor implements ItemProcessor<Img, Ocr> {
                         "polling " + image.getPagePid() + image.getMd5());
                 Thread.sleep(100);
         }
-        LOGGER.debug(result.getMessage());
+        LOGGER.info(result.getMessage());
         return result;
     }
 }

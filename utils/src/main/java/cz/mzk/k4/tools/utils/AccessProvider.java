@@ -127,7 +127,7 @@ public class AccessProvider {
      * @return
      */
     public WebResource getFedoraWebResource(String query) {
-        String url = "http://" + fedoraHost + "/" + query;
+        String url = "http://" + fedoraHost + query;
 //        LOGGER.debug("Fedora url: " + url);
         WebResource resource = client.resource(url);
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);

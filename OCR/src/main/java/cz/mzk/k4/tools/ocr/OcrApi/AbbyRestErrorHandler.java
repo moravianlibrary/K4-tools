@@ -3,6 +3,7 @@ package cz.mzk.k4.tools.ocr.OcrApi;
 import cz.mzk.k4.tools.ocr.domain.QueuedImage;
 import cz.mzk.k4.tools.ocr.exceptions.BadRequestException;
 import cz.mzk.k4.tools.ocr.exceptions.ConflictException;
+import cz.mzk.k4.tools.ocr.exceptions.EntityTooLargeException;
 import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
 import cz.mzk.k4.tools.ocr.exceptions.ItemNotFoundException;
 import org.codehaus.jettison.json.JSONException;
@@ -18,6 +19,13 @@ public class AbbyRestErrorHandler implements ErrorHandler {
     @Override
     public Throwable handleError(RetrofitError cause) {
         Response r = cause.getResponse();
+
+        if (r != null && r.getStatus() == 413) {
+            // vyhazuje tomcat při malém limitu na velikost souboru, tělo je html (další parsování by házelo retrofit chyby)
+            // případně to dělá proxy nebo tak něco po cestě..
+            return new EntityTooLargeException("Malý limit v tomcatu (defaultně 2 MB)");
+        }
+
         String message = "";
         try {
             // dělá problémy při chybě během získávání OCR (typy QueuedImage a String)

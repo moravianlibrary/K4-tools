@@ -21,9 +21,12 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableAutoConfiguration
 public class OcrMain {
     public static void main(String[] args) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-        JobParameters jobParameters = new JobParametersBuilder()
-                .addString("rootPid", args[0])
-                .toJobParameters();
+        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+        jobParametersBuilder.addString("rootPid", args[0]);
+        if (args.length >= 2) {
+            jobParametersBuilder.addString("overwrite", args[1]);
+        }
+        JobParameters jobParameters = jobParametersBuilder.toJobParameters();
 
         SpringApplication app = new SpringApplication(BatchConfiguration.class);
         app.setWebEnvironment(false);

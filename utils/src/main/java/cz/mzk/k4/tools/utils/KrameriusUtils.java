@@ -159,9 +159,9 @@ public class KrameriusUtils {
                 .entity(json,MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class);
         if(response.getStatus() == 201) {
-            LOGGER.info("Exportováno: " + pid);
+            LOGGER.info("Proces exportu naplánován: " + pid);
         } else {
-            LOGGER.error("Export " + pid + "se nepodaril. CHYBA: " + response.getStatus());
+            LOGGER.error("Nepodařil se naplánovat proces exportu dokumentu " + pid + ". CHYBA: " + response.getStatus());
         }
     }
 
@@ -170,18 +170,23 @@ public class KrameriusUtils {
         queryParams.add("action","start");
         queryParams.add("def", "reindex");
         queryParams.add("out", "text");
-        queryParams.add("params", "reindexDoc," + pid);
-        WebResource resource = accessProvider.getKrameriusWebResource("/search//lr");
+        queryParams.add("params", "fromKrameriusModel," + pid);
+//        queryParams.add("params", "reindexDoc," + pid); // reindexDoc indexuje jen nové větve, ne celý strom
+        WebResource resource = accessProvider.getKrameriusWebResource("/search/lr");
         ClientResponse response = resource.queryParams(queryParams).get(ClientResponse.class);
         if(response.getStatus() == 200){
-            LOGGER.debug("Reindexováno: " +pid);
+            LOGGER.debug("Proces reindexace naplánován: " + pid);
         } else {
-            LOGGER.error("Nepodařila se reindexace souboru " + pid);
+            LOGGER.error("Nepodařila se naplánovat reindexace souboru " + pid + ". CHYBA: " + response.getStatus());
         }
 
     }
 
     public void addToCollection(String pid, String collectionPid) {
+        // odstranění "uuid:" a "vc:"
+        pid = pid.substring(pid.indexOf(':')+1, pid.length());
+        collectionPid = collectionPid.substring(collectionPid.indexOf(':')+1, collectionPid.length());
+        // plánování procesu
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("action","start");
         queryParams.add("def", "aggregate");
@@ -192,10 +197,10 @@ public class KrameriusUtils {
         ClientResponse response = resource.queryParams(queryParams)
                 .type(MediaType.TEXT_PLAIN)
                 .get(ClientResponse.class);
-        if(response.getStatus() == 200){
-            LOGGER.info("Přidáno: " +pid);
+        if (response.getStatus() == 200) {
+            LOGGER.info("Proces přidání do kolekce naplánován: " + pid);
         } else {
-            LOGGER.error("Nepodařilo se přidat soubor " + pid);
+            LOGGER.error("Nepodařilo se naplánovat přidání do kolekce u dokumentu " + pid + ". CHYBA: " + response.getStatus());
         }
     }
 }

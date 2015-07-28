@@ -1,6 +1,10 @@
 package cz.mzk.k4.tools.api;
 
-import retrofit.*;
+import com.squareup.okhttp.OkHttpClient;
+import retrofit.RestAdapter;
+import retrofit.client.OkClient;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by holmanj on 8.2.15.
@@ -27,12 +31,17 @@ public class KrameriusClientRemoteApiFactory {
 
     public static ClientRemoteApi getClientRemoteApi(String krameriusHostUrl, String login, String password) {
 
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setReadTimeout(60, TimeUnit.SECONDS);
+        okHttpClient.setConnectTimeout(60, TimeUnit.SECONDS);
+
         // hlavičky Authorization a User-Agent (pro identifikaci v logu)
         final AuthenticationInterceptor authInterceptor = new AuthenticationInterceptor(login, password);
 
         RestAdapter.Builder builder = new RestAdapter.Builder()
                 // přidání hlaviček
                 .setRequestInterceptor(authInterceptor)
+                .setClient(new OkClient(okHttpClient))
                 // základ URL
                 .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API);
                 // deserializace defaultně jako JSON

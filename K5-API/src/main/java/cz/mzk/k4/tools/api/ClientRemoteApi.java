@@ -1,7 +1,9 @@
 package cz.mzk.k4.tools.api;
 
-import domain.*;
-import java.util.*;
+import domain.Item;
+import retrofit.RetrofitError;
+
+import java.util.List;
 
 /**
  * Created by holmanj on 8.2.15.
@@ -24,7 +26,12 @@ public class ClientRemoteApi {
     }
 
     public List<Item> getChildren(String pid) {
-        return apiJSON.getChildren(pid);
+        try {
+            return apiJSON.getChildren(pid);
+        } catch (RetrofitError error) {
+            System.out.println(error.getUrl());
+            throw error;
+        }
     }
 
     public String getOCR(String pid) {

@@ -359,7 +359,7 @@ public class FedoraUtils {
     // chro vraci cely resource jako string
     public String getAllRelationships(String uuid) {  // plain string returned from risearch
         String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
-        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         String result = resource.get(String.class);
         return result;
@@ -367,7 +367,7 @@ public class FedoraUtils {
 
     public List<String> getParentUuids(String childUuid) {
         String query = "*%20*%20%3Cinfo:fedora/" + childUuid + "%3E";
-        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         List<String> parents = new ArrayList<>();
         String[] result = resource.get(String.class).split("\n");
@@ -390,7 +390,7 @@ public class FedoraUtils {
     public List<RelationshipTuple> getSubjectOrObjectPids(String query) {
         List<RelationshipTuple> retval = new ArrayList<RelationshipTuple>();
 
-        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         String result = resource.get(String.class);
         String[] lines = result.split("\n");
@@ -456,7 +456,7 @@ public class FedoraUtils {
      * @throws IOException
      */
     public Document getRelsExt(String uuid) throws IOException {
-        String query = "get/" + uuid + "/RELS-EXT";
+        String query = "/get/" + uuid + "/RELS-EXT";
 //        LOGGER.debug("Reading rels ext from " + accessProvider.getFedoraHost() + query);
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = resource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
@@ -544,6 +544,85 @@ public class FedoraUtils {
         }
     }
 
+    public void setPolicy(String uuid, String policy) throws IOException {
+        Document relsExt = getRelsExt(uuid);
+        File tempRels = null;
+
+        // get policy element
+        try {
+            Element foundElement =
+                    XMLUtils.findElement(relsExt.getDocumentElement(),
+                            "policy",
+                            FedoraNamespaces.KRAMERIUS_URI);
+            if (foundElement != null) {
+                // change value
+                foundElement.setTextContent("policy:" + policy);
+            } else {
+                throw new IllegalArgumentException("Cannot find policy of " + uuid);
+            }
+
+            // Save XML file temporary
+            tempRels = File.createTempFile("relsExt", ".rdf");
+            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(relsExt), new StreamResult(tempRels));
+            // Send temporary file to fedora
+            setRelsExt(uuid, tempRels.getAbsolutePath());
+
+        } catch (DOMException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (CreateObjectException e) {
+            e.printStackTrace();
+        } finally {
+            if (tempRels != null) {
+                tempRels.delete();
+            }
+        }
+    }
+
+    public void setPrivate(String uuid) throws IOException {
+        setPolicy(uuid, "private");
+    }
+
+    public void setPublic(String uuid) throws IOException {
+        setPolicy(uuid, "public");
+    }
+
+    public boolean isPublic(String uuid) throws IOException {
+        return getPolicy(getRelsExt(uuid)).equals("public");
+    }
+
+    public boolean isPrivate(String uuid) throws IOException {
+        return getPolicy(getRelsExt(uuid)).equals("private");
+    }
+
+    public String getPolicy(String uuid) throws IOException {
+        return getPolicy(getRelsExt(uuid));
+    }
+
+    /**
+     * @param relsExt
+     * @return
+     */
+    public String getPolicy(Document relsExt) {
+        try {
+            Element foundElement =
+                    XMLUtils.findElement(relsExt.getDocumentElement(),
+                            "policy",
+                            FedoraNamespaces.KRAMERIUS_URI);
+            if (foundElement != null) {
+                String value = foundElement.getTextContent();
+                String policy = value.replace("policy:", "");
+                return policy;
+            } else
+                throw new IllegalArgumentException("Cannot find policy");
+        } catch (DOMException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     /**
      * Gets the fedora datastreams list.
      *
@@ -581,8 +660,27 @@ public class FedoraUtils {
      */
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
         ClientResponse response =
-                accessProvider.getFedoraWebResource("objects/" + uuid + "/datastreams/IMG_FULL/content")
+                accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
                         .accept(mimetype).get(ClientResponse.class);
+        if (response.getStatus() != 200) {
+            throw new FileNotFoundException("Failed : HTTP error code : "
+                    + response.getStatus());
+        }
+        InputStream is = response.getEntityInputStream();
+        return is;
+    }
+
+    /**
+     * @param uuid
+     * @return
+     * @throws IOException
+     *         NullPointerException if image url not found
+     */
+    public InputStream getImgJp2(String uuid) throws IOException {
+        String imageUrl = getTilesLocation(uuid);
+        ClientResponse response =
+                accessProvider.getClient().resource(imageUrl)
+                        .accept("image/jp2").get(ClientResponse.class);
         if (response.getStatus() != 200) {
             throw new FileNotFoundException("Failed : HTTP error code : "
                     + response.getStatus());
@@ -610,7 +708,7 @@ public class FedoraUtils {
      * @param uuid
      * @return
      */
-    public String getImgLocation(String uuid) throws IOException {
+    public String getImgLocationFromHtml(String uuid) throws IOException {
         if (uuid == null || uuid.equals("")) {
             LOGGER.error("uuid can't be empty");
         }
@@ -635,13 +733,27 @@ public class FedoraUtils {
         if (imgLocation.startsWith("http")) {
             return imgLocation.replace("/big.jpg", ".jp2");
         } else {
-            // TODO udělat líp (managed datastream)
+            // TODO udělat líp
             throw new IOException("Obrázek mimo fedoru nenalezen");
         }
     }
 
+    /**
+     * najde umístění obrázku v imageserveru (z tiles-url v RELS-EXT)
+     *
+     * @param uuid
+     * @throws NullPointerException if img not in imageserver (no tiles-url element in RELS-EXT)
+     * @return
+     */
+    public String getTilesLocation(String uuid) throws IOException {
+
+        Document rels = getRelsExt(uuid);
+        String tilesUrl = rels.getElementsByTagName("tiles-url").item(0).getTextContent();
+        return tilesUrl + ".jp2";
+    }
+
     public String getImgName(String uuid) throws IOException {
-        String imgPath = getImgLocation(uuid);
+        String imgPath = getTilesLocation(uuid);
         String[] splitPath = imgPath.split("/");
         String imgName = splitPath[splitPath.length - 1];
         return imgName;
@@ -850,7 +962,7 @@ public class FedoraUtils {
                                      String dsState) throws CreateObjectException {
 
         String query =
-                "objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
+                "/objects/" + (uuid.contains("uuid:") ? uuid : "uuid:".concat(uuid)) + "/datastreams/" + dsId.getValue();
 
         MultivaluedMap queryParams = new MultivaluedMapImpl();
         queryParams.add("controlGroup", controlGroup);
@@ -974,7 +1086,7 @@ public class FedoraUtils {
         String imagePath = "";
         // najít cestu k obrázku v imageserveru
         try {
-            imagePath = getImgLocation(uuid);
+            imagePath = getImgLocationFromHtml(uuid); // get tiles by nefungovalo
             if (imagePath.equals("")) {
                 throw new IOException();
             } else {

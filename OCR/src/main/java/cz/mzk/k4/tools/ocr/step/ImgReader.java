@@ -34,12 +34,13 @@ public class ImgReader implements ItemReader<Img> {
 
     private FedoraUtils fedoraUtils;
     private AbbyRestApi abbyApi;
-
+    private boolean overwrite;
     private List<String> pagePids;
 
-    public ImgReader(FedoraUtils fedoraUtils, AbbyRestApi abbyApi, String rootPid) {
+    public ImgReader(FedoraUtils fedoraUtils, AbbyRestApi abbyApi, String rootPid, boolean overwrite) {
         this.fedoraUtils = fedoraUtils;
         this.abbyApi = abbyApi;
+        this.overwrite = overwrite;
         LOGGER.info("Spuštěno OCR na dokumentu " + rootPid);
         pagePids = fedoraUtils.getChildrenUuids(rootPid, DigitalObjectModel.PAGE);
         LOGGER.info("Načteno " + pagePids.size() + " stran");
@@ -55,16 +56,25 @@ public class ImgReader implements ItemReader<Img> {
             return null; // konec
         }
 
-        LOGGER.debug("Reading item " + pagePid);
-        if (fedoraUtils.getOcr(pagePid) != null) {
+        LOGGER.info("Reading item " + pagePid);
+        if (fedoraUtils.getOcr(pagePid) != null && !overwrite) {
             return new Img(pagePid, null); // strana už má OCR (filter - strana se dál nezpracovává)
         }
 
-        String mimetype = JPEG_MIMETYPE;
-        // stahuje IMG_FULL datastream -> jpeg a mnohem menší kvalita, než jpeg2000 na imageserveru
-        InputStream imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
+        String mimetype;
+        InputStream imgStream;
+
+        try {
+            mimetype = JPEG2000_MIMETYPE;
+            imgStream = fedoraUtils.getImgJp2(pagePid);
+        } catch (NullPointerException ex) {
+            // stahuje IMG_FULL datastream -> jpeg a menší kvalita, než jpeg2000 na imageserveru
+            mimetype = JPEG_MIMETYPE;
+            imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
+        }
+
         String md5 = sendImageToOcrEngine(imgStream, pagePid, mimetype);
-        LOGGER.debug(md5);
+        LOGGER.info(md5);
         return new Img(pagePid, md5);
     }
 
@@ -73,7 +83,12 @@ public class ImgReader implements ItemReader<Img> {
         FileUtils.copyInputStreamToFile(imgStream, temp);
         TypedFile fileToSend = new TypedFile(mimeType, temp);
 
-        QueuedImage result = abbyApi.sendImageJpeg(fileToSend);
+        QueuedImage result;
+        if (mimeType.equals(JPEG2000_MIMETYPE)) {
+            result = abbyApi.sendImageJp2(fileToSend);
+        } else {
+            result = abbyApi.sendImageJpeg(fileToSend);
+        }
 
         // možná není potřeba - stav bude processing (event. done), nebo vyhodí výjimku
         // na druhou stranu v read listeneru je jen výjimka, ne item -> není přístup k uuid a md5 objektu
@@ -83,8 +98,9 @@ public class ImgReader implements ItemReader<Img> {
             throw new IllegalStateException("Abby API nevrátilo ID objektu " + pagePid);
         }
 
-        LOGGER.debug("Strana " + pagePid + result.getId() + " byla odeslána na OCR server: " + result.getMessage());
+        LOGGER.info("Strana " + pagePid + result.getId() + " byla odeslána na OCR server: " + result.getMessage());
         temp.delete();
         return result.getId();
     }
+
 }
