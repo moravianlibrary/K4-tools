@@ -103,7 +103,7 @@ public class StehovaniHades implements Script {
             String uuid = pages.get(i).getPid();
             try {
                 // vzít url
-                String imageUrl = fedoraUtils.getImgLocation(uuid);
+                String imageUrl = fedoraUtils.getImgLocationFromHtml(uuid);
                 // opravit
                 imageUrl = imageUrl.replace("2619298376/001", "mzk03/001");
                 System.out.println(imageUrl);

@@ -21,13 +21,13 @@ import cz.mzk.k4.tools.scripts.RegenerateAudioServer;
 import cz.mzk.k4.tools.scripts.RegenerateThumbnailPdf;
 import cz.mzk.k4.tools.scripts.RepairImgRels;
 import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
+import cz.mzk.k4.tools.scripts.RepairTrees;
 import cz.mzk.k4.tools.scripts.SolrDotaz;
 import cz.mzk.k4.tools.scripts.StehovaniHades;
 import cz.mzk.k4.tools.scripts.TestScript;
 import cz.mzk.k4.tools.scripts.UnindexedFedoraModels;
 import cz.mzk.k4.tools.scripts.WtfSearch;
 import cz.mzk.k4.tools.scripts.XMLStarlet;
-import cz.mzk.k4.tools.scripts.lidovky.LnPresunImg;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 
@@ -67,10 +67,11 @@ public class Tools {
         runner.register("solr", new SolrDotaz());
         runner.register("pripojeniPeriodik", new AttachPeriodicals());
         runner.register("xmlstarlet", new XMLStarlet());
-        runner.register("lidovky", new LnPresunImg());
+//        runner.register("lidovky", new LnPresunImg());
         runner.register("soundunits", new RepairImgRels());
         runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
         runner.register("hades", new StehovaniHades());
+        runner.register("opravitDostupnost", new RepairTrees());
         runner.register("test", new TestScript());
 
 
