@@ -56,7 +56,7 @@ public class ImgReader implements ItemReader<Img> {
             return null; // konec
         }
 
-        LOGGER.info("Reading item " + pagePid);
+        LOGGER.debug("Reading item " + pagePid);
         if (fedoraUtils.getOcr(pagePid) != null && !overwrite) {
             return new Img(pagePid, null); // strana už má OCR (filter - strana se dál nezpracovává)
         }
@@ -74,7 +74,7 @@ public class ImgReader implements ItemReader<Img> {
         }
 
         String md5 = sendImageToOcrEngine(imgStream, pagePid, mimetype);
-        LOGGER.info(md5);
+        LOGGER.debug(md5);
         return new Img(pagePid, md5);
     }
 
@@ -98,7 +98,7 @@ public class ImgReader implements ItemReader<Img> {
             throw new IllegalStateException("Abby API nevrátilo ID objektu " + pagePid);
         }
 
-        LOGGER.info("Strana " + pagePid + result.getId() + " byla odeslána na OCR server: " + result.getMessage());
+        LOGGER.debug("Strana " + pagePid + result.getId() + " byla odeslána na OCR server: " + result.getMessage());
         temp.delete();
         return result.getId();
     }

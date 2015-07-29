@@ -26,7 +26,7 @@ public class OcrWriter implements ItemWriter<Ocr> {
         for (Ocr ocr : items) {
             fedoraUtils.setOcr(ocr.getPid(), ocr.getOcrText());
             fedoraUtils.setAltoOcr(ocr.getPid(), ocr.getOcrAlto());
-            LOGGER.info("Saved OCR of " + ocr.getPid());
+            LOGGER.debug("Saved OCR of " + ocr.getPid());
         }
     }
 }
