@@ -9,7 +9,7 @@ else
   PREVIEW=$NEWTILES/preview.jpg
   BIG=$NEWTILES/big.jpg
   echo $1";"$NEWTILES
-  xmlstarlet ed --inplace -N kramerius4="http://www.nsdl.org/ontologies/relationships#" \
+  xmlstarlet ed --inplace  --pf  -N kramerius4="http://www.nsdl.org/ontologies/relationships#" \
    -N foxml="info:fedora/fedora-system:def/foxml#" \
    -u "//kramerius4:tiles-url" -v $NEWTILES \
    -u "//foxml:datastream[@ID='IMG_THUMB']//foxml:contentLocation/@REF" -v $THUMB \
