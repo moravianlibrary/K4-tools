@@ -1,0 +1,57 @@
+#!/bin/bash
+workingDir=`pwd`
+outputDir="`pwd`/../k3ScriptOutputMikulov"
+echo "Printing out workingDir: $workingDir"
+echo "Printing out outputDir: $outputDir"
+
+echo "starting deletion of unuseful files and folders"
+find $workingDir -type d -name jpg_amd -exec rm -rfv '{}' \;
+find $workingDir -type d -name djvu_amd -exec rm -rfv '{}' \;
+find $workingDir -type d -name djvu -exec rm -rfv '{}' \;
+find $workingDir -type d -name txt_amd -exec rm -rfv '{}' \;
+find $workingDir -name *.md5 -exec rm -fv '{}' \;
+find $workingDir -name *.amd -exec rm -fv '{}' \;
+find $workingDir -name *.cnv -exec rm -fv '{}' \;
+find $workingDir -name *#.xml -exec rm -fv '{}' \;
+find $workingDir -name *_djvu.xml -exec rm -fv '{}' \;
+echo "completed deletion of unuseful files and folders"
+
+if [ ! -d $outputDir ]; then
+    echo "creating output directory at: $outputDir"
+    mkdir $outputDir
+fi
+
+for yearDir in */ ; do
+    # in outuput directory, make year folder (with same name as in input directory)
+    mkdir "$outputDir/$yearDir"
+	cd "$workingDir/$yearDir"
+	if [ -d archiv ]; then
+
+        echo "Archiv directory exists in $yearDir"
+        cd archiv
+        cp -vr * "$outputDir/$yearDir"
+        cd ..
+	else
+		echo "No archiv directory exists in $yearDir"
+        ls -1 | grep ^[-0-9]*$ | xargs cp -rvt "$outputDir/$yearDir"
+	fi
+done
+
+# in output folder move *.jpg and *.txt files
+cd "$outputDir"
+echo "I should be in output dir: `pwd`"
+
+j='jpg/*'
+t='txt/*'
+
+for yearDir in */ ; do
+    cd "$yearDir"
+    for dir in */ ; do
+        mv $dir$j "$outputDir/$yearDir/$dir"
+        mv $dir$t "$outputDir/$yearDir/$dir"
+    done
+    cd ..
+done
+
+find $ouputDir -type d -name jpg -exec rm -rfv '{}' \;
+find $ouputDir -type d -name txt -exec rm -rfv '{}' \;
