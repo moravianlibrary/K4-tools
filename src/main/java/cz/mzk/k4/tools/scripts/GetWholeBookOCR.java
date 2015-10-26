@@ -21,7 +21,12 @@ public class GetWholeBookOCR implements Script {
 
     public void run(List<String> args) {
         String monographUuid = args.get(0);
-        List<Item> children = api.getChildren(monographUuid);
+        List<Item> children = null;
+        try {
+            children = api.getChildren(monographUuid);
+        } catch (InternalServerErroException e) {
+            e.printStackTrace();
+        }
         LOGGER.info("Got children of object " + monographUuid);
         PrintWriter out = null;
 
@@ -33,7 +38,12 @@ public class GetWholeBookOCR implements Script {
 
         for (Item item : children) {
             String pageUuid = item.getPid();
-            String pageOCR = api.getOCR(pageUuid);
+            String pageOCR = null;
+            try {
+                pageOCR = api.getOCR(pageUuid);
+            } catch (InternalServerErroException e) {
+                e.printStackTrace();
+            }
             out.println(pageOCR);
             out.println();
             LOGGER.info("Got OCR stream of object " + pageUuid);

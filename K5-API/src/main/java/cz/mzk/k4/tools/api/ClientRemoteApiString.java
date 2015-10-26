@@ -8,5 +8,5 @@ import retrofit.http.*;
 public interface ClientRemoteApiString {
 
     @GET("/item/{pid}/streams/TEXT_OCR")
-    public String getOCR(@Path("pid") String pid); // uuid:...
+    public String getOCR(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
 }

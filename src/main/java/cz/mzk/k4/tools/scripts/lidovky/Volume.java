@@ -14,8 +14,14 @@ public class Volume implements Serializable {
     String pid;
     List<Issue> issues; // title, issue
 
+    public Volume(String year, String pid) {
+        this.year = year;
+        this.pid = pid;
+        this.issues = new ArrayList<>();
+    }
+
     public Volume() {
-        issues = new ArrayList<>();
+        this(null,null);
     }
 
     public String getXmlFileName() {

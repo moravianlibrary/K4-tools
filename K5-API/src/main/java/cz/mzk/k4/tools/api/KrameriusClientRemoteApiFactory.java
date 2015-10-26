@@ -43,7 +43,8 @@ public class KrameriusClientRemoteApiFactory {
                 .setRequestInterceptor(authInterceptor)
                 .setClient(new OkClient(okHttpClient))
                 // základ URL
-                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API);
+                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
+                .setErrorHandler(new ClientRemoteErrorHandler());
                 // deserializace defaultně jako JSON
         ClientRemoteApiJSON apiJSON = builder.build().create(ClientRemoteApiJSON.class);
 
@@ -51,7 +52,8 @@ public class KrameriusClientRemoteApiFactory {
                 .setRequestInterceptor(authInterceptor)
                 // deserializace jako String
                 .setConverter(new StringConverter())
-                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API);
+                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
+                .setErrorHandler(new ClientRemoteErrorHandler());
         ClientRemoteApiString apiString = builder.build().create(ClientRemoteApiString.class);
 
         // spojení do 1 objektu

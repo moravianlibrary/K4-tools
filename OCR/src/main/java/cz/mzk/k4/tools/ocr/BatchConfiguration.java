@@ -48,7 +48,8 @@ public class BatchConfiguration {
     private static AccessProvider accessProvider = new AccessProvider();
     private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
-    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr");
+    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
+//    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
     public static final String OVERRIDEN_BY_EXPRESSION_VALUE = "overriden by expression value";
@@ -101,7 +102,7 @@ public class BatchConfiguration {
                 .listener(readListener())
                 .listener(processListener())
                 .faultTolerant()
-                .skipLimit(10) // maximální počet chyb během zpracovávání dokumentu
+                .skipLimit(20) // maximální počet chyb během zpracovávání dokumentu
                 .skip(BadRequestException.class)
                 .skip(ConflictException.class)
                 .skip(InternalServerErroException.class)

@@ -21,11 +21,11 @@ public class ClientRemoteApi {
         this.apiString = apiString;
     }
 
-    public Item getItem(String pid) {
+    public Item getItem(String pid) throws InternalServerErroException {
         return apiJSON.getItem(pid);
     }
 
-    public List<Item> getChildren(String pid) {
+    public List<Item> getChildren(String pid) throws InternalServerErroException {
         try {
             return apiJSON.getChildren(pid);
         } catch (RetrofitError error) {
@@ -34,7 +34,7 @@ public class ClientRemoteApi {
         }
     }
 
-    public String getOCR(String pid) {
+    public String getOCR(String pid) throws InternalServerErroException {
         return apiString.getOCR(pid);
     }
 }

@@ -6,10 +6,16 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
+import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.log4j.Logger;
 
+import javax.xml.transform.TransformerException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,18 +35,107 @@ public class TestScript implements Script {
 
     @Override
     public void run(List<String> args) {
-        int counter = 0;
-        List<String> uuids = GeneralUtils.loadUuidsFromFile("LN-strany");
+//        int counter = 0;
+//        repair("Notizen-Blatt");
+
+//        for (String issue : map.keySet()) {
+//            try {
+//                fedoraUtils.addChild(map.get(issue), issue);
+//            } catch (CreateObjectException e) {
+//                e.printStackTrace();
+//            } catch (TransformerException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            LOGGER.info("Číslo " + issue + " bylo zařazeno do ročníku " + map.get(issue) + ".");
+//        }
+//        LOGGER.info("Zbytek LN: " + counter + " stran.");
+
+
+
+//        // muzeum - obrázky
+//        int counter = 1;
+//        List<String> topUuids = GeneralUtils.loadUuidsFromFile("muzeum");
+//        for (String topUuid : topUuids) {
+//            List<String> pageUuids = fedoraUtils.getChildrenUuids(topUuid, DigitalObjectModel.PAGE);
+//            for (String pageUuid : pageUuids) {
+//                try {
+//                    fedoraUtils.repairImageserverTilesRelation(pageUuid);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (CreateObjectException e) {
+//                    e.printStackTrace();
+//                } catch (TransformerException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            LOGGER.info("Repaired " + topUuid);
+//            LOGGER.info(counter + " out of " + topUuids.size());
+//            counter++;
+//        }
+        List<String> uuids = GeneralUtils.loadUuidsFromFile("null-indexace");
         for (String uuid : uuids) {
-            List<String> pageUuids = fedoraUtils.getChildrenUuids(uuid, DigitalObjectModel.PAGE);
-            counter += pageUuids.size();
-            LOGGER.debug("Ročník: " + uuid + " má " + pageUuids.size() + " stran.");
+            krameriusUtils.reindex(uuid);
+            LOGGER.info(uuid + " zařazeno k indexaci");
         }
-        LOGGER.info("Zbytek LN: " + counter + " stran.");
+
     }
 
     @Override
     public String getUsage() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    private void repair(String filePath) {
+
+        LOGGER.debug("Otvírání souboru " + filePath);
+        File inputFile = new File(filePath);
+        BufferedReader reader = null;
+        int counter = 0;
+
+        try {
+            //Open file and load content
+            reader = new BufferedReader(new FileReader(inputFile));
+            String volume;
+            String issue;
+            String empty;
+
+            //Parse file by line
+            while ((issue = reader.readLine()) != null) {
+                issue = "uuid:" + issue;
+                volume = "uuid:" + reader.readLine();
+                empty = reader.readLine();
+                if (empty != null && !"".equals(empty)) {
+                    System.out.println("Chyba");
+                }
+                try {
+                    fedoraUtils.addChild(volume, issue);
+                } catch (CreateObjectException e) {
+                    e.printStackTrace();
+                } catch (TransformerException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                LOGGER.info("Číslo " + issue + " bylo zařazeno do ročníku " + volume + ".");
+                counter++;
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Chyba při otvírání souboru: " + filePath + ".");
+            e.printStackTrace();
+        } catch (IOException e) {
+            LOGGER.error("Chyba při čtení souboru: ");
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    LOGGER.error("Chyba při zavírání souboru: " + e.getStackTrace());
+                }
+            }
+        }
+        LOGGER.info("Zpracováno " + counter + " čísel.");
     }
 }

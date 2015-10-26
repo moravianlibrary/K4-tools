@@ -17,7 +17,7 @@ public class ImportCollection implements Script {
     public void run(List<String> args) {
 
         if(args.size() < 2 || !args.get(0).contains("uuid:") || !args.get(1).contains("vc:")) {
-            System.out.println("Musí být zadáno první uuid dokumentu a poté uud sbírky.");
+            System.out.println("Musí být zadáno první uuid dokumentu a poté uuid sbírky.");
             return;
         }
 

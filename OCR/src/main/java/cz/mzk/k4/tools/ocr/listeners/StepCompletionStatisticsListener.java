@@ -23,7 +23,7 @@ public class StepCompletionStatisticsListener implements StepExecutionListener {
         LOGGER.info("OCR dokončeno");
         LOGGER.info("Bylo zpracováno celkem " + stepExecution.getReadCount() + " stran.");
         LOGGER.info("U " + stepExecution.getSkipCount() + " z nich došlo k chybě.");
-        LOGGER.info(stepExecution.getFilterCount() + " stran bylo přeskočeno (už obsahují OCR).");
+        LOGGER.info(stepExecution.getFilterCount() + " stran bylo přeskočeno (už obsahují OCR i ALTO).");
         return stepExecution.getExitStatus();
     }
 }

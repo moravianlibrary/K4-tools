@@ -38,6 +38,7 @@ public class IndexList implements Script {
     @Override
     public String getUsage() {
         return "indexaceZeSeznamu\n" +
-                "Provede reindexaci pro seznam uuid oddělených pomocí \\';\\'\n";
+                "Provede reindexaci pro seznam uuid oddělených pomocí \\';\\'\n" +
+                "Zastaralé - požívat uuid na řádek, načítání přes GeneraUtils";
     }
 }

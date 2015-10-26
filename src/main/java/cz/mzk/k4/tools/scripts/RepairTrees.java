@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.api.ClientRemoteApi;
+import cz.mzk.k4.tools.api.InternalServerErroException;
 import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
@@ -51,10 +52,12 @@ public class RepairTrees implements Script {
             e.printStackTrace();
         } catch (SolrServerException e) {
             e.printStackTrace();
+        } catch (InternalServerErroException e) {
+            e.printStackTrace();
         }
     }
 
-    public boolean repairTree(String uuid) throws IOException {
+    public boolean repairTree(String uuid) throws IOException, InternalServerErroException {
 //        if (isPublic(uuid)) {
 //            // nebo ne? má cenu prolézat všechny stromy kompletně? Třeba když je špatně jen 1 ročník..?
 //            LOGGER.debug("Uzel " + uuid + " už je public.");
