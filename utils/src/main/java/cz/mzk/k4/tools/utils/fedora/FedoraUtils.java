@@ -15,6 +15,7 @@ import cz.mzk.k4.tools.utils.util.PIDParser;
 import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.fedora.api.DatastreamDef;
 import org.fedora.api.RelationshipTuple;
@@ -646,7 +647,7 @@ public class FedoraUtils {
                         .accept("application/pdf").get(ClientResponse.class);
 
         if (response.getStatus() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
+            throw new RuntimeException("Getting PDF of " + uuid + " failed. HTTP error code: "
                     + response.getStatus());
         }
         InputStream is = response.getEntityInputStream();
@@ -663,7 +664,7 @@ public class FedoraUtils {
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
                         .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
-            throw new FileNotFoundException("Failed : HTTP error code : "
+            throw new FileNotFoundException("Getting IMG_FULL stream of " + uuid + " failed. HTTP error code: "
                     + response.getStatus());
         }
         InputStream is = response.getEntityInputStream();
@@ -682,7 +683,7 @@ public class FedoraUtils {
                 accessProvider.getClient().resource(imageUrl)
                         .accept("image/jp2").get(ClientResponse.class);
         if (response.getStatus() != 200) {
-            throw new FileNotFoundException("Failed : HTTP error code : "
+            throw new FileNotFoundException("Getting jp2 image of " + uuid + " failed. HTTP error code: "
                     + response.getStatus());
         }
         InputStream is = response.getEntityInputStream();
@@ -781,7 +782,7 @@ public class FedoraUtils {
         ClientResponse response = accessProvider.getFedoraWebResource("/objects/" + uuid).delete(ClientResponse.class);
 
         if (response.getStatus() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : "
+            throw new RuntimeException("Purging object " + uuid + " failed. HTTP error code: "
                     + response.getStatus());
         }
     }
@@ -796,6 +797,25 @@ public class FedoraUtils {
         try {
             String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
             return ocrOutput;
+        } catch (UniformInterfaceException e) {
+            if (e.getResponse().getStatus() == 404) {
+                return null;
+            } else {
+                throw new UniformInterfaceException(e.getResponse());
+            }
+        }
+    }
+
+    /**
+     * @param uuid
+     * @return
+     */
+    public String getAlto(String uuid) {
+        String altoUrl = alto(uuid);
+        LOGGER.debug("Reading ALTO +" + altoUrl);
+        try {
+            String altoOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/ALTO/content").get(String.class);
+            return altoOutput;
         } catch (UniformInterfaceException e) {
             if (e.getResponse().getStatus() == 404) {
                 return null;
@@ -896,6 +916,18 @@ public class FedoraUtils {
     private String ocr(String uuid) {
         String fedoraObject =
                 accessProvider.getFedoraHost() + "/objects/" + uuid + "/datastreams/TEXT_OCR/content";
+        return fedoraObject;
+    }
+
+    /**
+     * Alto.
+     *
+     * @param uuid the uuid
+     * @return the string
+     */
+    private String alto(String uuid) {
+        String fedoraObject =
+                accessProvider.getFedoraHost() + "/objects/" + uuid + "/datastreams/ALTO/content";
         return fedoraObject;
     }
 
@@ -1098,6 +1130,9 @@ public class FedoraUtils {
             throw exception;
         }
 
+        // oprava img datastreamů TODO zrušit?
+        repairImageStreams(uuid, imagePath);
+
         // je cesta k obrázku - smazat všechny elementy <file> a <tiles-url>, nahradit novou vazbou
         try {
             Document dom = getRelsExt(uuid);
@@ -1155,5 +1190,50 @@ public class FedoraUtils {
         setImgFullFromExternal(uuid, imageUrl + "/big.jpg");
         setImgPreviewFromExternal(uuid, imageUrl + "/preview.jpg");
         setImgThumbnailFromExternal(uuid, imageUrl + "/thumb.jpg");
+    }
+
+    public void addChild(String parent, String child) throws CreateObjectException, TransformerException, IOException {
+        File tempDom = null;
+        String krameriusNS = "http://www.nsdl.org/ontologies/relationships#";
+
+        // je cesta k obrázku - smazat všechny elementy <file> a <tiles-url>, nahradit novou vazbou
+        try {
+            Document dom = getRelsExt(parent);
+
+            Element currentElement = (Element) dom.getElementsByTagName("rdf:Description").item(0);
+            //Add element
+            DigitalObjectModel childModel = getModel(child);
+            Element childElement = null;
+            if (childModel.equals(DigitalObjectModel.PERIODICALITEM)) {
+                childElement = dom.createElementNS(krameriusNS, "hasItem");
+            } else if (childModel.equals(DigitalObjectModel.SUPPLEMENT)) {
+                childElement = dom.createElementNS(krameriusNS, "hasIntCompPart");
+            } else if (childModel.equals(DigitalObjectModel.PERIODICALVOLUME)) {
+                childElement = dom.createElementNS(krameriusNS, "hasVolume");
+            } else {
+                throw new NotImplementedException(childModel + " not yet implemented");
+            }
+            childElement.setAttribute("rdf:resource", "info:fedora/" + child);
+            currentElement.appendChild(childElement);
+
+            //save XML file temporary
+            tempDom = File.createTempFile("relsExt", ".rdf");
+            TransformerFactory.newInstance().newTransformer().transform(new DOMSource(dom), new StreamResult(tempDom));
+            //Copy temporary file to document
+            setRelsExt(parent, tempDom.getAbsolutePath());
+
+        } catch (CreateObjectException e) {
+            throw new CreateObjectException("Chyba při změně XML: " + e.getMessage());
+        } catch (TransformerConfigurationException e) {
+            throw new TransformerConfigurationException("Chyba při změně XML: " + e.getMessage());
+        } catch (TransformerException e) {
+            throw new TransformerException("Chyba při změně XML: " + e.getMessage());
+        } catch (IOException e) {
+            throw new IOException("Chyba při změně XML: " + e.getMessage());
+        } finally {
+            if (tempDom != null) {
+                tempDom.delete();
+            }
+        }
     }
 }

@@ -37,7 +37,7 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
             LOGGER.info("OCR dokončeno");
             String rootPid = jobExecution.getJobParameters().getString("rootPid");
             krameriusUtils.reindex(rootPid);
-            LOGGER.info("Dokument " + rootPid + " se reindexuje");
+            LOGGER.info("Naplánována reindexace dokumentu " + rootPid);
         }
     }
 }

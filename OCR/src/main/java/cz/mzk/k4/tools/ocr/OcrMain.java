@@ -20,7 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 @EnableAutoConfiguration
 public class OcrMain {
-    // spouštění s 1 povinným parametrem: uuid dokumentu/stromu) a 1 volitelným: "overwrite" pro nepřeskakování stran s OCR a dělání všeho znova
+    // spouštění s 1 povinným parametrem: uuid dokumentu/stromu a 1 volitelným: "overwrite" pro nepřeskakování stran s OCR a dělání všeho znova
     public static void main(String[] args) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("rootPid", args[0]);

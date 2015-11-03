@@ -11,6 +11,7 @@ public class Page implements Serializable {
     String pid;
     String jpgImgName;
     String imageserverImgLocation;
+    String djvuImgName;
 
     public String getTitle() {
         return title;
@@ -42,5 +43,13 @@ public class Page implements Serializable {
 
     public void setImageserverImgLocation(String imageserverImgLocation) {
         this.imageserverImgLocation = imageserverImgLocation;
+    }
+
+    public String getDjvuImgName() {
+        return djvuImgName;
+    }
+
+    public void setDjvuImgName(String djvuImgName) {
+        this.djvuImgName = djvuImgName;
     }
 }

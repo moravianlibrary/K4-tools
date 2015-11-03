@@ -29,7 +29,7 @@ public class PollingProcessor implements ItemProcessor<Img, Ocr> {
     public Ocr process(final Img image) throws BadRequestException, ItemNotFoundException, InterruptedException, InternalServerErroException, IOException {
 
         if (image.getMd5() == null) {
-            LOGGER.debug("Strana " + image.getPagePid() + " už má OCR"); // filter
+            LOGGER.debug("Strana " + image.getPagePid() + " už má OCR i ALTO"); // filter
             return null;
         }
 

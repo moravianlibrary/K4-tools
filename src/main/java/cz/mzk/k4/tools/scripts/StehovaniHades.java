@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.api.ClientRemoteApi;
+import cz.mzk.k4.tools.api.InternalServerErroException;
 import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
@@ -97,7 +98,12 @@ public class StehovaniHades implements Script {
         // načíst strany
         String topUuid = "uuid:760607f4-5a62-4015-9d49-7afc17042e65";
 //        List<String> pages = fedoraUtils.getChildrenUuids(topUuid, DigitalObjectModel.PAGE);
-        List<Item> pages = k5Api.getChildren(topUuid);
+        List<Item> pages = null;
+        try {
+            pages = k5Api.getChildren(topUuid);
+        } catch (InternalServerErroException e) {
+            e.printStackTrace();
+        }
         System.out.println(pages.size());
         for (int i = 0; i < pages.size(); i++) {
             String uuid = pages.get(i).getPid();
