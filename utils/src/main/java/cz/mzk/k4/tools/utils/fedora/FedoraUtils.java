@@ -660,12 +660,34 @@ public class FedoraUtils {
      * @throws IOException
      */
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
+        return getImgFull(uuid, mimetype, 1);
+    }
+    /**
+     * @param uuid
+     * @return
+     * @throws IOException
+     */
+    public InputStream getImgFull(String uuid, String mimetype, int attempt) throws IOException {
         ClientResponse response =
                 accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content")
                         .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
-            throw new FileNotFoundException("Getting IMG_FULL stream of " + uuid + " failed. HTTP error code: "
-                    + response.getStatus());
+            if (attempt <= 5) {
+            LOGGER.warn("Attempt " + attempt + " to get IMG_FULL stream of " + uuid + " failed. HTTP error code: "
+                    + response.getStatus() + "\n"
+                    + "Trying again.");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                attempt++;
+                return getImgFull(uuid, mimetype, attempt);
+            } else {
+                throw new FileNotFoundException("Getting IMG_FULL stream of " + uuid + " failed. HTTP error code: "
+                        + response.getStatus() + "\n"
+                        + " request: " + accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/IMG_FULL/content").toString());
+            }
         }
         InputStream is = response.getEntityInputStream();
         return is;
