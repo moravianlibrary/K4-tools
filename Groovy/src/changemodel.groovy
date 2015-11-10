@@ -28,10 +28,9 @@ if (args.isEmpty()) {
     return
 }
 
-
 FedoraCredentials credentials = new FedoraCredentials('http://fedoratest.mzk.cz/fedora', "fedoraAdmin", "fedoraAdmin");
-FedoraClient fedora = new FedoraClient(credentials);
-FedoraRequest.setDefaultClient(fedora);
+FedoraClient fedoraClient = new FedoraClient(credentials);
+FedoraRequest.setDefaultClient(fedoraClient);
 
 String xmlString = getXml()
 def xml = new XmlSlurper(false, false).parseText(xmlString)
@@ -40,7 +39,7 @@ xml.'dc:type'.replaceNode {
     'dc:type'(args[1])
 }
 String editedXmlString = XmlUtil.serialize(xml)
-fedora.modifyDatastream(args[0], "DC").content(editedXmlString).execute();
+fedoraClient.modifyDatastream(args[0], "DC").content(editedXmlString).execute();
 
 println('Printing modified xml from Fedora:\n\n')
 println(getXml())
