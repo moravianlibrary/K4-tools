@@ -69,7 +69,7 @@ void modifyImageDataStreamUrl(uuid, dataStreamId, fedoraClient) {
 }
 
 String fixMzkUrl(url) {
-    url = url.replace('imageserver.mzk.cz', 'imageserver.mzk.cz/mzk03')
+    url = url.replaceFirst('2619298350', 'mzk03')
     return url.replace('2619298350/', '')
 }
 
