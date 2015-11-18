@@ -1,15 +1,15 @@
 package cz.mzk.k4.tools.scripts.lidovky;
 
 import com.google.common.base.CharMatcher;
-import cz.mzk.k4.tools.api.ClientRemoteApi;
-import cz.mzk.k4.tools.api.InternalServerErroException;
-import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import domain.Item;
+import cz.mzk.k5.api.client.domain.Item;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -49,7 +49,7 @@ public class LnKonverze implements Script {
         // fáze 1: načíst a serializovat data z K5 (děje se vždycky)
 
         List<Volume> lidovky = null;
-        String serializedDataName = "LN.ser";
+        String serializedDataName = "lidovky-converted.ser";
         if (new File(serializedDataName).exists()) {
             try {
                 lidovky = deserializeLN(serializedDataName);
@@ -78,15 +78,15 @@ public class LnKonverze implements Script {
         }
 
         // fáze 3: doplnění vazeb do fedory
-        try {
-            addDatastreams(lidovky);
-        } catch (CreateObjectException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            addDatastreams(lidovky);
+//        } catch (CreateObjectException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (TransformerException e) {
+//            e.printStackTrace();
+//        }
 
         // fáze 4: (možná) čištění starých djvu - není potřeba, fedora maže nepotřebné datastreamy sama
 
@@ -159,18 +159,25 @@ public class LnKonverze implements Script {
     }
 
     private void copyImages(List<Volume> lidovky) throws IOException {
-        // sshfs imageserver@imageserver.mzk.cz:/data/georef/ /mnt/imageserver -o follow_symlinks
+        // sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
         for (Volume volume : lidovky) {
-            LOGGER.info("Converting " + getPageNumber(volume) + "pages of volume " + volume.getYear());
+            LOGGER.info("Converting " + getPageNumber(volume) + " pages of volume " + volume.getYear());
             for (Issue issue : volume.getIssues()) {
                 for (Page page : issue.getPages()) {
-
-                    String djvuName = fedoraUtils.getDjVuImgName(page.getPid());
-                    page.setDjvuImgName(djvuName); // name
+                    String djvuName = page.getDjvuImgName();
+                    if ("".equals(djvuName) || djvuName == null) {
+                        djvuName = fedoraUtils.getDjVuImgName(page.getPid());
+                        page.setDjvuImgName(djvuName); // name
+                    }
                     String imageserverPath = "/mnt/imageserver/mzk01/000/244/261/" + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()) + ".jp2";
                     page.setImageserverImgLocation("http://imageserver.mzk.cz/mzk01/000/244/261/" + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()));
                     File tempDjvuImage = new File(page.getDjvuImgName());
-                    FileUtils.copyInputStreamToFile(fedoraUtils.getImgFull(page.getPid(), "image/djvu"), tempDjvuImage);
+                    try {
+                        FileUtils.copyInputStreamToFile(fedoraUtils.getImgFull(page.getPid(), "image/djvu"), tempDjvuImage);
+                    } catch (FileNotFoundException e) {
+                        LOGGER.error(e.getMessage());
+                    }
+
                     File imageserverFile = new File(imageserverPath);
 
                     // copy file to imageserver
@@ -186,11 +193,11 @@ public class LnKonverze implements Script {
                         tempDjvuImage.delete();
                     } catch (IOException e) {
                         LOGGER.error("Kopírování obrázku z " + djvuName + " do " + imageserverPath + " selhalo.");
-                        throw new IOException(e);
+                        continue;
                     }
                 }
             }
-            LOGGER.info("Obrázky z ročníku " + volume.getYear() + " jsou zkopírovány.");
+            LOGGER.info("Obrázky z ročníku " + volume.getYear() + " jsou zkonvertovány.");
             serializeLN(lidovky, "lidovky-converted.ser");
         }
         LOGGER.info("Obrázky jsou přesunuty");

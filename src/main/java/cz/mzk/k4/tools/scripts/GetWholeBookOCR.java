@@ -1,11 +1,15 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.api.*;
-import cz.mzk.k4.tools.utils.*;
-import domain.*;
-import org.apache.log4j.*;
-import java.io.*;
-import java.util.*;
+import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.client.domain.Item;
+import org.apache.log4j.Logger;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  * Created by holmanj on 5.2.15.

@@ -1,4 +1,4 @@
-package domain;
+package cz.mzk.k5.api.client.domain;
 
 /**
  * Created by holmanj on 5.2.15.

@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.api;
+package cz.mzk.k5.api.common;
 
 import org.apache.commons.codec.binary.*;
 import retrofit.*;

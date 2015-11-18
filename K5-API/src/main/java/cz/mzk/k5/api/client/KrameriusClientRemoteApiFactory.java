@@ -1,6 +1,8 @@
-package cz.mzk.k4.tools.api;
+package cz.mzk.k5.api.client;
 
 import com.squareup.okhttp.OkHttpClient;
+import cz.mzk.k5.api.common.AuthenticationInterceptor;
+import cz.mzk.k5.api.common.ClientRemoteErrorHandler;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
 

@@ -8,8 +8,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':utils')
-
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
     compile group:'com.squareup.retrofit', name:'retrofit', version:'1.9.0'

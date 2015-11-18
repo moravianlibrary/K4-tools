@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.api;
+package cz.mzk.k5.api.common;
 
 import retrofit.ErrorHandler;
 import retrofit.RetrofitError;
@@ -40,7 +40,7 @@ public class ClientRemoteErrorHandler implements ErrorHandler {
 //            return new BadRequestException(message);
         /** } else **/
         if (r != null && (r.getStatus() == 500 || r.getStatus() == 404)) {
-            return new InternalServerErroException(r.getStatus() + " Item not found in K5 NKP.");
+            return new InternalServerErroException(r.getStatus() + " Item not found in K5.");
         }
         return cause;
     }

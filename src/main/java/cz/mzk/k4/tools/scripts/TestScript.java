@@ -1,13 +1,16 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.api.ClientRemoteApi;
-import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
+import cz.mzk.k5.api.remote.domain.Process;
 import org.apache.log4j.Logger;
 
 import javax.xml.transform.TransformerException;
@@ -31,60 +34,32 @@ public class TestScript implements Script {
     private static FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     private static KrameriusUtils krameriusUtils = new KrameriusUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = new AccessProvider();
-    ClientRemoteApi krameriusApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
 
     @Override
     public void run(List<String> args) {
-//        int counter = 0;
-//        repair("Notizen-Blatt");
-
-//        for (String issue : map.keySet()) {
-//            try {
-//                fedoraUtils.addChild(map.get(issue), issue);
-//            } catch (CreateObjectException e) {
-//                e.printStackTrace();
-//            } catch (TransformerException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            LOGGER.info("Číslo " + issue + " bylo zařazeno do ročníku " + map.get(issue) + ".");
-//        }
-//        LOGGER.info("Zbytek LN: " + counter + " stran.");
-
-
-
-//        // muzeum - obrázky
-//        int counter = 1;
-//        List<String> topUuids = GeneralUtils.loadUuidsFromFile("muzeum");
-//        for (String topUuid : topUuids) {
-//            List<String> pageUuids = fedoraUtils.getChildrenUuids(topUuid, DigitalObjectModel.PAGE);
-//            for (String pageUuid : pageUuids) {
-//                try {
-//                    fedoraUtils.repairImageserverTilesRelation(pageUuid);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (CreateObjectException e) {
-//                    e.printStackTrace();
-//                } catch (TransformerException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            LOGGER.info("Repaired " + topUuid);
-//            LOGGER.info(counter + " out of " + topUuids.size());
-//            counter++;
-//        }
-        List<String> uuids = GeneralUtils.loadUuidsFromFile("null-indexace");
-        for (String uuid : uuids) {
-            krameriusUtils.reindex(uuid);
-            LOGGER.info(uuid + " zařazeno k indexaci");
+        try {
+            Process process = remoteApi.reindexRecursive("uuid:11e23bca-9c7f-4b43-8361-bbb442761360");
+            System.out.printf("new process: " + process.toString());
+            String processUuid = process.getUuid();
+            while (!process.getState().equals("FINISHED")) {
+                Thread.sleep(1000);
+                process = remoteApi.getProcess(processUuid);
+            }
+            System.out.println("hotovo");
+            System.out.printf(process.toString());
+        } catch (InternalServerErroException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
 
     @Override
     public String getUsage() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     private void repair(String filePath) {

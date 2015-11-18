@@ -1,14 +1,14 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k4.tools.api.ClientRemoteApi;
-import cz.mzk.k4.tools.api.InternalServerErroException;
-import cz.mzk.k4.tools.api.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import domain.Item;
+import cz.mzk.k5.api.client.domain.Item;
 import org.apache.log4j.Logger;
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;

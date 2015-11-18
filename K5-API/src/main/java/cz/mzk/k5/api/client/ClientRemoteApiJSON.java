@@ -1,6 +1,7 @@
-package cz.mzk.k4.tools.api;
+package cz.mzk.k5.api.client;
 
-import domain.*;
+import cz.mzk.k5.api.client.domain.Item;
+import cz.mzk.k5.api.common.InternalServerErroException;
 import retrofit.http.*;
 import java.util.*;
 
