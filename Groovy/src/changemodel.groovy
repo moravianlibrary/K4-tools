@@ -28,7 +28,7 @@ FedoraRequest.setDefaultClient(fedoraClient);
 
 ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(KRAMERIUS_URL, KRAMERIUS_USER, KRAMERIUS_PASWORD);
 
-// < list of uuids (earch uuid on separate line)
+
 System.in.eachLine() { line ->
     def uuid = line
 
@@ -37,7 +37,7 @@ System.in.eachLine() { line ->
     def xml = new XmlSlurper(false, false).parseText(xmlString)
 
     xml.'dc:type'.replaceNode {
-        'dc:type'(args[1])
+        'dc:type'(CHANGE_TO_MODEL)
     }
 
     String editedXmlString = XmlUtil.serialize(xml)
