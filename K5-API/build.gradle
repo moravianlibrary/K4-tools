@@ -1,6 +1,7 @@
 apply plugin: 'java'
+apply plugin: "maven"
 
-sourceCompatibility = 1.5
+group = "cz.mzk.k5.api"
 version = '1.0'
 
 repositories {
