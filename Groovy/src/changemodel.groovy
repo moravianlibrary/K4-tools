@@ -1,55 +1,49 @@
-/**
- * Created by kreplj on 10/26/15.
- * Usage: changemodel uuid model
- *
- * Example:
- *        changemodel uuid:530719f5-ee95-4449-8ce7-12b0f4cadb22 model:sheetmusic
- */
-
+#!/usr/bin/env groovy
 @Grab(group = 'com.sun.jersey', module = 'jersey-core', version = '1.17.1')
 @Grab('com.yourmediashelf.fedora.client:fedora-client-core:0.7')
 @GrabExclude('xml-apis:xml-apis')
 @GrabExclude('xerces:xercesImpl')
-
 import com.yourmediashelf.fedora.client.*
 import com.yourmediashelf.fedora.client.response.*
 import com.yourmediashelf.fedora.client.request.*
 import groovy.xml.XmlUtil
 
-def config = new ConfigSlurper().parse(new File('Groovy/src/config.groovy').toURI().toURL());
+@GrabResolver(name = 'mzkrepo', root = 'http://ftp-devel.mzk.cz/mvnrepo/')
+@Grab('cz.mzk.k5.api:K5-API:1.0')
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory
+import cz.mzk.k5.api.remote.ProcessRemoteApi
 
-// parse arguments and print usage (if called without any arguments)
-def cli = new CliBuilder(usage: 'changemodel uuid model')
-def options = cli.parse(args)
-def args = options.arguments()
+def CHANGE_TO_MODEL = "model:*"
+def FEDORA_URL = "http://fedora*/fedora"
+def FEDORA_USER = "fedoraAdmin"
+def FEDORA_PASSWORD = "*"
+def KRAMERIUS_URL = "kramerius.mzk.cz"
+def KRAMERIUS_USER = "krameriusAdmin"
+def KRAMERIUS_PASWORD = "*"
 
-if (args.isEmpty()) {
-    cli.usage()
-    return
-}
 
-FedoraCredentials credentials = new FedoraCredentials('http://fedoratest.mzk.cz/fedora', "fedoraAdmin", "fedoraAdmin");
+FedoraCredentials credentials = new FedoraCredentials(FEDORA_URL, FEDORA_USER, FEDORA_PASSWORD);
 FedoraClient fedoraClient = new FedoraClient(credentials);
 FedoraRequest.setDefaultClient(fedoraClient);
 
-String xmlString = getXml()
-def xml = new XmlSlurper(false, false).parseText(xmlString)
+ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(KRAMERIUS_URL, KRAMERIUS_USER, KRAMERIUS_PASWORD);
 
-xml.'dc:type'.replaceNode {
-    'dc:type'(args[1])
-}
-String editedXmlString = XmlUtil.serialize(xml)
-fedoraClient.modifyDatastream(args[0], "DC").content(editedXmlString).execute();
 
-println('Printing modified xml from Fedora:\n\n')
-println(getXml())
+System.in.eachLine() { line ->
+    def uuid = line
 
-/**
- * get Xml String from Fedora
- *
- * @return String xml
- */
-String getXml() {
-    FedoraResponse r = FedoraClient.getDatastreamDissemination(args[0], "DC").execute();
-    return r.getEntity(String.class);
+    println line + ": mění se model na " + CHANGE_TO_MODEL
+    String xmlString = FedoraClient.getDatastreamDissemination(uuid, "DC").execute().getEntity(String)
+    def xml = new XmlSlurper(false, false).parseText(xmlString)
+
+    xml.'dc:type'.replaceNode {
+        'dc:type'(args[1])
+    }
+
+    String editedXmlString = XmlUtil.serialize(xml)
+
+    fedoraClient.modifyDatastream(uuid, "DC").content(editedXmlString).execute();
+    println line + ": plánuje se reindexace"
+    remoteApi.reindexRecursive(uuid)
+
 }
