@@ -17,7 +17,7 @@ def CHANGE_TO_MODEL = "model:*"
 def FEDORA_URL = "http://fedora*/fedora"
 def FEDORA_USER = "fedoraAdmin"
 def FEDORA_PASSWORD = "*"
-def KRAMERIUS_URL = "kramerius.mzk.cz"
+def KRAMERIUS_URL = "kramerius.*.cz"
 def KRAMERIUS_USER = "krameriusAdmin"
 def KRAMERIUS_PASWORD = "*"
 
@@ -28,7 +28,7 @@ FedoraRequest.setDefaultClient(fedoraClient);
 
 ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(KRAMERIUS_URL, KRAMERIUS_USER, KRAMERIUS_PASWORD);
 
-
+// < list of uuids (earch uuid on separate line)
 System.in.eachLine() { line ->
     def uuid = line
 
