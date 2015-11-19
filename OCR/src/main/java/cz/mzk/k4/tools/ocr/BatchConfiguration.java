@@ -111,7 +111,7 @@ public class BatchConfiguration {
                 .skip(CreateObjectException.class)
                 .skip(ClassCastException.class) // pro případy java.lang.String cannot be cast to cz.mzk.k4.tools.ocr.domain.QueuedImage
                 .skip(ConversionException.class)
-                .listener(new StepCompletionStatisticsListener())
+                //.listener(new StepCompletionStatisticsListener())
                 .build();
     }
 
