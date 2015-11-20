@@ -39,11 +39,17 @@ System.in.eachLine() { line ->
     xml.'dc:type'.replaceNode {
         'dc:type'(CHANGE_TO_MODEL)
     }
-
     String editedXmlString = XmlUtil.serialize(xml)
-
     fedoraClient.modifyDatastream(uuid, "DC").content(editedXmlString).execute();
+
+    // change model in RELS-EXT
+    def rdfRDFString = fedoraClient.getDatastreamDissemination(uuid, 'RELS-EXT').execute().getEntity(String)
+    def rdfRDF = new XmlSlurper(false, false).parseText(rdfRDFString)
+    rdfRDF.'rdf:Description'.hasModel.'@rdf:resource' = 'info:fedora/' + CHANGE_TO_MODEL
+    def rdfRDFEditedString = XmlUtil.serialize(rdfRDF)
+    fedoraClient.modifyDatastream(uuid, "RELS-EXT").content(rdfRDFEditedString).execute();
+
+
     println line + ": plánuje se reindexace"
     remoteApi.reindexRecursive(uuid)
-
 }
