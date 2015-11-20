@@ -1,6 +1,5 @@
 package cz.mzk.k4.tools.scripts;
 
-import com.google.gson.JsonObject;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
@@ -9,28 +8,19 @@ import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
-import cz.mzk.k5.api.client.domain.Streams;
 import cz.mzk.k5.api.common.InternalServerErroException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import cz.mzk.k5.api.remote.domain.ProcessLog;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -69,43 +59,15 @@ public class TestScript implements Script {
 
         // client
         // item včetně title
-        // všechny datastreamy
-        // children
         // siblings
-        // jiná třída na listed item
-        // /streams
-        // /streams/stream_id
         // foxml
 
-        Document mods = null;
         try {
-            InputStream input = clientApi.getImgFull("uuid:afdd8ea1-ad6f-474c-9611-152cfd3a14b3");
-            FileUtils.copyInputStreamToFile(input, new File("full.jpg"));
-
-//            input = clientApi.getImgPreview("uuid:afdd8ea1-ad6f-474c-9611-152cfd3a14b3");
-//            FileUtils.copyInputStreamToFile(input, new File("preview.jpg"));
-
-            input = clientApi.getImgThumb("uuid:afdd8ea1-ad6f-474c-9611-152cfd3a14b3");
-            FileUtils.copyInputStreamToFile(input, new File("thumb.jpg"));
-
-            input = clientApi.getRecordingMp3("uuid:9dc2a9bc-24d0-4614-aa89-85824aa20720");
-            FileUtils.copyInputStreamToFile(input, new File("sound.mp3"));
-
-            input = clientApi.getRecordingOgg("uuid:9dc2a9bc-24d0-4614-aa89-85824aa20720");
-            FileUtils.copyInputStreamToFile(input, new File("sound.ogg"));
-
-            input = clientApi.getRecordingWav("uuid:9dc2a9bc-24d0-4614-aa89-85824aa20720");
-            FileUtils.copyInputStreamToFile(input, new File("sound.wav"));
-
+            Document foxml = clientApi.getFoxml("uuid:afdd8ea1-ad6f-474c-9611-152cfd3a14b3");
+            System.out.println(GeneralUtils.toString(foxml));
         } catch (InternalServerErroException e) {
             System.out.println(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-
-//
-
     }
 
     @Override

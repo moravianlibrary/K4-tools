@@ -16,4 +16,7 @@ public interface ClientRemoteApiXML {
 
     @GET("/item/{pid}/streams/{streamId}")
     Document getStream(@Path("pid") String pid, @Path("streamId") String streamId) throws InternalServerErroException;
+
+    @GET("/item/{pid}/foxml")
+    Document getFoxml(@Path("pid") String pid) throws InternalServerErroException;
 }

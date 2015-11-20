@@ -57,6 +57,10 @@ public class ClientRemoteApi {
         }
     }
 
+    public Document getFoxml(String pid) throws InternalServerErroException {
+        return apiXML.getFoxml(pid);
+    }
+
     public Streams listStreams(String pid) throws InternalServerErroException {
         return apiJSON.listStreams(pid);
     }
