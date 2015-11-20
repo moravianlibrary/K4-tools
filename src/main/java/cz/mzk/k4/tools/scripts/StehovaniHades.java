@@ -1,7 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k5.api.client.ClientRemoteApi;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
@@ -101,7 +101,7 @@ public class StehovaniHades implements Script {
         List<Item> pages = null;
         try {
             pages = k5Api.getChildren(topUuid);
-        } catch (InternalServerErroException e) {
+        } catch (K5ApiException e) {
             e.printStackTrace();
         }
         System.out.println(pages.size());

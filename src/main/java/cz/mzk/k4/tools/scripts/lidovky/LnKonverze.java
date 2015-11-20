@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.scripts.lidovky;
 
 import com.google.common.base.CharMatcher;
 import cz.mzk.k5.api.client.ClientRemoteApi;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
@@ -61,7 +61,7 @@ public class LnKonverze implements Script {
             lidovky = fillSecondStage();
             try {
                 lidovky = getDataFromK5(lidovky);
-            } catch (InternalServerErroException e) {
+            } catch (K5ApiException e) {
                 e.printStackTrace();
             }
             serializeLN(lidovky, serializedDataName);
@@ -211,7 +211,7 @@ public class LnKonverze implements Script {
         return pageNumber;
     }
 
-    private List<Volume> getDataFromK5(List<Volume> lidovky) throws InternalServerErroException {
+    private List<Volume> getDataFromK5(List<Volume> lidovky) throws K5ApiException {
 //        for (Volume volume : lidovky) {
         for (int k = 0; k < lidovky.size(); k++) {
             Volume volume = lidovky.get(k);

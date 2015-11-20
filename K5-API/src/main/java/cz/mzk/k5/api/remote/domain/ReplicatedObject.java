@@ -72,4 +72,16 @@ public class ReplicatedObject {
     public void setHandle(String handle) {
         this.handle = handle;
     }
+
+    @Override
+    public String toString() {
+        return "ReplicatedObject{" +
+                "identifiers=" + identifiers +
+                ", publishers=" + publishers +
+                ", creators=" + creators +
+                ", title='" + title + '\'' +
+                ", type='" + type + '\'' +
+                ", handle='" + handle + '\'' +
+                '}';
+    }
 }

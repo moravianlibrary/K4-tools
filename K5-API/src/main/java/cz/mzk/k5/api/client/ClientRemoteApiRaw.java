@@ -1,7 +1,6 @@
 package cz.mzk.k5.api.client;
 
-import cz.mzk.k5.api.common.InternalServerErroException;
-import org.w3c.dom.Document;
+import cz.mzk.k5.api.common.K5ApiException;
 import retrofit.http.GET;
 import retrofit.http.Path;
 
@@ -13,5 +12,5 @@ import java.io.InputStream;
 public interface ClientRemoteApiRaw {
 
     @GET("/item/{pid}/streams/{streamId}")
-    InputStream getStream(@Path("pid") String pid, @Path("streamId") String streamId) throws InternalServerErroException;
+    InputStream getStream(@Path("pid") String pid, @Path("streamId") String streamId) throws K5ApiException;
 }

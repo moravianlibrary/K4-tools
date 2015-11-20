@@ -1,9 +1,8 @@
 package cz.mzk.k5.api.client;
 
-import com.google.gson.JsonObject;
 import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.client.domain.Streams;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import org.w3c.dom.Document;
 import retrofit.RetrofitError;
 
@@ -44,11 +43,11 @@ public class ClientRemoteApi {
         this.apiRaw = apiRaw;
     }
 
-    public Item getItem(String pid) throws InternalServerErroException {
+    public Item getItem(String pid) throws K5ApiException {
         return apiJSON.getItem(pid);
     }
 
-    public List<Item> getChildren(String pid) throws InternalServerErroException {
+    public List<Item> getChildren(String pid) throws K5ApiException {
         try {
             return apiJSON.getChildren(pid);
         } catch (RetrofitError error) {
@@ -57,63 +56,63 @@ public class ClientRemoteApi {
         }
     }
 
-    public Document getFoxml(String pid) throws InternalServerErroException {
+    public Document getFoxml(String pid) throws K5ApiException {
         return apiXML.getFoxml(pid);
     }
 
-    public Streams listStreams(String pid) throws InternalServerErroException {
+    public Streams listStreams(String pid) throws K5ApiException {
         return apiJSON.listStreams(pid);
     }
 
-    public String getOCR(String pid) throws InternalServerErroException {
+    public String getOCR(String pid) throws K5ApiException {
         return apiString.getStream(pid, TEXT_OCR);
     }
 
-    public Document getAlto(String pid) throws InternalServerErroException {
+    public Document getAlto(String pid) throws K5ApiException {
         return apiXML.getStream(pid, ALTO);
     }
 
-    public Document getDublinCore(String pid) throws InternalServerErroException {
+    public Document getDublinCore(String pid) throws K5ApiException {
         return apiXML.getStream(pid, DC);
     }
 
-    public Document getMods(String pid) throws InternalServerErroException {
+    public Document getMods(String pid) throws K5ApiException {
         return apiXML.getStream(pid, BIBLIO_MODS);
     }
 
-    public Document getTei(String pid) throws InternalServerErroException {
+    public Document getTei(String pid) throws K5ApiException {
         return apiXML.getStream(pid, TEI_P5);
     }
 
-    public Document getImgFullAmd(String pid) throws InternalServerErroException {
+    public Document getImgFullAmd(String pid) throws K5ApiException {
         return apiXML.getStream(pid, IMG_FULL_AMD);
     }
 
-    public Document getOcrAmd(String pid) throws InternalServerErroException {
+    public Document getOcrAmd(String pid) throws K5ApiException {
         return apiXML.getStream(pid, TEXT_OCR_AMD);
     }
 
-    public InputStream getImgFull(String pid) throws InternalServerErroException {
+    public InputStream getImgFull(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, IMG_FULL);
     }
 
-    public InputStream getImgPreview(String pid) throws InternalServerErroException {
+    public InputStream getImgPreview(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, IMG_PREVIEW);
     }
 
-    public InputStream getImgThumb(String pid) throws InternalServerErroException {
+    public InputStream getImgThumb(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, IMG_THUMB);
     }
 
-    public InputStream getRecordingWav(String pid) throws InternalServerErroException {
+    public InputStream getRecordingWav(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, WAV);
     }
 
-    public InputStream getRecordingOgg(String pid) throws InternalServerErroException {
+    public InputStream getRecordingOgg(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, OGG);
     }
 
-    public InputStream getRecordingMp3(String pid) throws InternalServerErroException {
+    public InputStream getRecordingMp3(String pid) throws K5ApiException {
         return apiRaw.getStream(pid, MP3);
     }
 }
