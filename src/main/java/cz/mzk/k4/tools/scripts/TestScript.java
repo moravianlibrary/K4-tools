@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
@@ -10,15 +11,16 @@ import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.common.InternalServerErroException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import cz.mzk.k5.api.remote.domain.Process;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
+import org.w3c.dom.Document;
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -33,28 +35,39 @@ public class TestScript implements Script {
     private static final Logger LOGGER = Logger.getLogger(TestScript.class);
     private static FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     private static KrameriusUtils krameriusUtils = new KrameriusUtils(AccessProvider.getInstance());
-    AccessProvider accessProvider = new AccessProvider();
+    AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
 
     @Override
     public void run(List<String> args) {
-        try {
-            Process process = remoteApi.reindexRecursive("uuid:11e23bca-9c7f-4b43-8361-bbb442761360");
-            System.out.printf("new process: " + process.toString());
-            String processUuid = process.getUuid();
-            while (!process.getState().equals("FINISHED")) {
-                Thread.sleep(1000);
-                process = remoteApi.getProcess(processUuid);
-            }
-            System.out.println("hotovo");
-            System.out.printf(process.toString());
-        } catch (InternalServerErroException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
+        // remote
+//        import?
+//        reindex - různý parametry
+//        reindexNewBranches
+//        stopProcess
+//        deleteProcess
+//        getReplicatedObjectInfo
+//        getReplicatedObjectTree
+//        listProcesses - počet, offset, filtrování
+//        replikace - spuštění
+//        třídění
+//         addToCollection
+//        ještě něco jde?
+        // serializace domain věcí (toString)
+
+        // client
+        // item včetně title
+        // siblings
+        // foxml
+
+        try {
+            Document foxml = clientApi.getFoxml("uuid:afdd8ea1-ad6f-474c-9611-152cfd3a14b3");
+            System.out.println(GeneralUtils.toString(foxml));
+        } catch (InternalServerErroException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

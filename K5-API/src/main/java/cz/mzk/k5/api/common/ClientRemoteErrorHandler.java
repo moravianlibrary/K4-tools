@@ -40,7 +40,7 @@ public class ClientRemoteErrorHandler implements ErrorHandler {
 //            return new BadRequestException(message);
         /** } else **/
         if (r != null && (r.getStatus() == 500 || r.getStatus() == 404)) {
-            return new InternalServerErroException(r.getStatus() + " Item not found in K5.");
+            return new InternalServerErroException("Request " +  cause.getUrl() + " returned status " + r.getStatus());
         }
         return cause;
     }

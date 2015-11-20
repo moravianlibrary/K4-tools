@@ -23,6 +23,7 @@ import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -54,11 +55,13 @@ public class BatchConfiguration {
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
     public static final String OVERRIDEN_BY_EXPRESSION_VALUE = "overriden by expression value";
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
+    private JobBuilderFactory jobs;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
-    private StepBuilderFactory stepBuilderFactory;
+    private StepBuilderFactory steps;
 
     @Bean
     @StepScope
@@ -93,10 +96,15 @@ public class BatchConfiguration {
     }
 
     @Bean
+    public StepExecutionListener statisticsListener() {
+        return new StepCompletionStatisticsListener();
+    }
+
+    @Bean
     public Step step() {
-        return stepBuilderFactory.get("step")
+        return steps.get("step")
                 .<Img, Ocr>chunk(50) // počet najednou zpracovávaných stran
-                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE, OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v kontruktoru nahradí
+                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE, OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v konstruktoru nahradí
                 .processor(processor())
                 .writer(writer())
                 .listener(readListener())
@@ -111,13 +119,13 @@ public class BatchConfiguration {
                 .skip(CreateObjectException.class)
                 .skip(ClassCastException.class) // pro případy java.lang.String cannot be cast to cz.mzk.k4.tools.ocr.domain.QueuedImage
                 .skip(ConversionException.class)
-                //.listener(new StepCompletionStatisticsListener())
+//                .listener(statisticsListener())
                 .build();
     }
 
     @Bean
     public Job job(Step step) throws Exception {
-        return jobBuilderFactory.get("job")
+        return jobs.get("job")
                 .incrementer(new RunIdIncrementer())
                 .listener(jobCompletionListener())
                 .flow(step)
