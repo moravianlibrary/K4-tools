@@ -1,4 +1,15 @@
 #!/usr/bin/env groovy
+
+/**
+ * BASH USAGE
+ *
+ * One UUID
+ * $ echo "uuid:632edaed-9852-11e0-bd44-0050569d679d" | groovy changeModel.groovy
+ *
+ * UUIDs are in <file> (every UUID is on one line)
+ * $ groovy changeModel.groovy < <file>
+ */
+
 @Grab(group = 'com.sun.jersey', module = 'jersey-core', version = '1.17.1')
 @Grab('com.yourmediashelf.fedora.client:fedora-client-core:0.7')
 @GrabExclude('xml-apis:xml-apis')
