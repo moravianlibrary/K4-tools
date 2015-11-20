@@ -18,7 +18,7 @@ public class KrameriusClientRemoteApiFactory {
 
     // TODO: asi lepší mít 1 interface a custom adapter (converter?), který parsuje json, string i xml podle typu dat v response
 
-//    public static ClientRemoteApiJSON getJsonService(String krameriusHostUrl, String login, String password) {
+    //    public static ClientRemoteApiJSON getJsonService(String krameriusHostUrl, String login, String password) {
 //
 //        AuthorizationInterceptor authInterceptor = new AuthorizationInterceptor(login, password);
 //
@@ -30,6 +30,10 @@ public class KrameriusClientRemoteApiFactory {
 //        return clientApi;
 //
 //    }
+
+    public static ClientRemoteApi getClientRemoteApi(String krameriusHostUrl) {
+        return getClientRemoteApi(krameriusHostUrl, "", "");
+    }
 
     public static ClientRemoteApi getClientRemoteApi(String krameriusHostUrl, String login, String password) {
 
@@ -47,8 +51,19 @@ public class KrameriusClientRemoteApiFactory {
                 // základ URL
                 .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
                 .setErrorHandler(new ClientRemoteErrorHandler());
-                // deserializace defaultně jako JSON
+        // deserializace defaultně jako JSON
         ClientRemoteApiJSON apiJSON = builder.build().create(ClientRemoteApiJSON.class);
+
+        builder = new RestAdapter.Builder()
+                // přidání hlaviček
+                .setRequestInterceptor(authInterceptor)
+                .setClient(new OkClient(okHttpClient))
+                // základ URL
+                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
+                // xml deserializace (Document)
+                .setConverter(new XmlConverter())
+                .setErrorHandler(new ClientRemoteErrorHandler());
+        ClientRemoteApiXML apiXML = builder.build().create(ClientRemoteApiXML.class);
 
         builder = new RestAdapter.Builder()
                 .setRequestInterceptor(authInterceptor)
@@ -58,8 +73,16 @@ public class KrameriusClientRemoteApiFactory {
                 .setErrorHandler(new ClientRemoteErrorHandler());
         ClientRemoteApiString apiString = builder.build().create(ClientRemoteApiString.class);
 
+        builder = new RestAdapter.Builder()
+                .setRequestInterceptor(authInterceptor)
+                // bez deserializace - přepošle raw input stream
+                .setConverter(new RawConverter())
+                .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
+                .setErrorHandler(new ClientRemoteErrorHandler());
+        ClientRemoteApiRaw apiRaw = builder.build().create(ClientRemoteApiRaw.class);
+
         // spojení do 1 objektu
-        ClientRemoteApi api = new ClientRemoteApi(apiJSON, apiString);
+        ClientRemoteApi api = new ClientRemoteApi(apiJSON, apiString, apiXML, apiRaw);
         return api;
     }
 }

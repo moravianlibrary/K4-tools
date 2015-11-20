@@ -1,6 +1,7 @@
 package cz.mzk.k5.api.client;
 
 import cz.mzk.k5.api.client.domain.Item;
+import cz.mzk.k5.api.client.domain.Streams;
 import cz.mzk.k5.api.common.InternalServerErroException;
 import retrofit.http.*;
 import java.util.*;
@@ -10,8 +11,11 @@ import java.util.*;
  */
 public interface ClientRemoteApiJSON {
     @GET("/item/{pid}")
-    public Item getItem(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+    Item getItem(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
 
     @GET("/item/{pid}/children")
-    public List<Item> getChildren(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+    List<Item> getChildren(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+
+    @GET("/item/{pid}/streams")
+    Streams listStreams(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
 }

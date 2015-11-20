@@ -159,7 +159,7 @@ public class LnKonverze implements Script {
     }
 
     private void copyImages(List<Volume> lidovky) throws IOException {
-        // sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
+        // sudo sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
         for (Volume volume : lidovky) {
             LOGGER.info("Converting " + getPageNumber(volume) + " pages of volume " + volume.getYear());
             for (Issue issue : volume.getIssues()) {

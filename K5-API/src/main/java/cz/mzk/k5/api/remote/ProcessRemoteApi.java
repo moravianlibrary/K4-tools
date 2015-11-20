@@ -14,6 +14,10 @@ import java.util.List;
  */
 public class ProcessRemoteApi {
 
+    private final String RUNNING = "RUNNING";
+    private final String BATCH_STARTED = "BATCH_STARTED";
+    private final String PLANNED = "PLANNED";
+
     ProcessRemoteApiInterface api;
 
     public ProcessRemoteApi(ProcessRemoteApiInterface api) {
@@ -26,6 +30,9 @@ public class ProcessRemoteApi {
     // TODO: searchByParams
     // TODO: addToCollection
     // TODO: replikace - get foxml - vracení XML nebo JSON: https://github.com/ceskaexpedice/kramerius/wiki/RemoteAPI#z%C3%ADsk%C3%A1n%C3%AD-foxml-objektu
+
+    // TODO: kontrola, jestli proces ještě běží
+        // isRunning, když ne, tak se doptat na stav
 
     public Process deleteObject(String pid_path) throws InternalServerErroException {
         return api.planProcess("delete", new Parameters(pid_path, pid_path));
@@ -78,5 +85,15 @@ public class ProcessRemoteApi {
 
     public List<Process> listProcesses() throws InternalServerErroException {
         return api.listProcesses();
+    }
+
+    public boolean isRunning(String processUuid) throws InternalServerErroException {
+        Process process = this.getProcess(processUuid);
+        return RUNNING.equals(process.getState()) || BATCH_STARTED.equals(process.getBatchState());
+    }
+
+    public boolean hasEnded(String processUuid) throws InternalServerErroException {
+        Process process = this.getProcess(processUuid);
+        return !(RUNNING.equals(process.getState()) || BATCH_STARTED.equals(process.getBatchState()) || PLANNED.equals(process.getState()));
     }
 }
