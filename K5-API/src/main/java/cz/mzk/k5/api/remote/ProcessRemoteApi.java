@@ -124,6 +124,7 @@ public class ProcessRemoteApi {
     Map<String, String> params = new HashMap<>();
     params.put("state", "KILLED");
     List<Process> processes = remoteApi.filterProcesses(params);
+    processes.forEach(System.out::println);
      */
     // asi nefunguje v API
     public List<Process> filterProcesses(Map<String, String> filterMap) throws K5ApiException {

@@ -8,6 +8,7 @@ import retrofit.RetrofitError;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by holmanj on 8.2.15.
@@ -58,6 +59,17 @@ public class ClientRemoteApi {
 
     public Document getFoxml(String pid) throws K5ApiException {
         return apiXML.getFoxml(pid);
+    }
+
+    public Document solrSearch(Map<String, String> queryMap) throws K5ApiException {
+        // solr chce query parametry ve tvaru key:value místo standardního key=value
+        String query = "?q=";
+        for(Map.Entry<String, String> entry : queryMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            query += key + ":" + value;
+        }
+        return apiXML.solrSearch(query);
     }
 
     public Streams listStreams(String pid) throws K5ApiException {
