@@ -16,7 +16,6 @@ import cz.mzk.k4.tools.ocr.step.ImgReader;
 import cz.mzk.k4.tools.ocr.step.OcrWriter;
 import cz.mzk.k4.tools.ocr.step.PollingProcessor;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
@@ -26,11 +25,13 @@ import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -101,7 +102,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public StepExecutionListener statisticsListener() {
+    public StepListener statisticsListener() {
         return new StepCompletionStatisticsListener();
     }
 
@@ -124,7 +125,7 @@ public class BatchConfiguration {
                 .skip(CreateObjectException.class)
                 .skip(ClassCastException.class) // pro případy java.lang.String cannot be cast to cz.mzk.k4.tools.ocr.domain.QueuedImage
                 .skip(ConversionException.class)
-//                .listener(statisticsListener())
+                .listener(statisticsListener())
                 .build();
     }
 
