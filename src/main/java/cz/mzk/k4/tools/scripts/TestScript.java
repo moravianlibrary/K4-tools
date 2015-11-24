@@ -10,20 +10,16 @@ import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import cz.mzk.k5.api.remote.domain.Process;
-import cz.mzk.k5.api.remote.domain.ReplicatedObject;
-import cz.mzk.k5.api.remote.domain.ReplicationTree;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,7 +32,6 @@ public class TestScript implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(TestScript.class);
     private static FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
@@ -45,12 +40,17 @@ public class TestScript implements Script {
     public void run(List<String> args) {
 
         try {
-            // asi nefunguje v K5 API
-            Map<String, String> params = new HashMap<>();
-            params.put("state", "KILLED");
-            List<Process> processes = remoteApi.filterProcesses(params);
-            processes.forEach(System.out::println);
+//            InputStream raw = clientApi.getRecordingMp3("uuid:cfe2b585-7c3d-4ef0-8694-85150fb23065");
+            InputStream mp3 = clientApi.getRecordingMp3("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(mp3, new File("sound.mp3"));
+            System.out.println(mp3.available());
+            InputStream wav = clientApi.getRecordingWav("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(wav, new File("sound.wav"));
+            InputStream ogg = clientApi.getRecordingOgg("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(ogg, new File("sound.ogg"));
         } catch (K5ApiException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

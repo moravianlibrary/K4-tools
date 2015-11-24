@@ -19,6 +19,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
@@ -46,9 +48,12 @@ import retrofit.converter.ConversionException;
 public class BatchConfiguration {
 
     // TODO Autowired?
-    private static AccessProvider accessProvider = new AccessProvider();
+    private static AccessProvider accessProvider = AccessProvider.getInstance();
+    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+            accessProvider.getKrameriusHost(),
+            accessProvider.getKrameriusUser(),
+            accessProvider.getKrameriusPassword());
     private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
 //    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
@@ -82,7 +87,7 @@ public class BatchConfiguration {
 
     @Bean
     public JobCompletionNotificationListener jobCompletionListener() {
-        return new JobCompletionNotificationListener(fedoraUtils, krameriusUtils);
+        return new JobCompletionNotificationListener(fedoraUtils, krameriusApi);
     }
 
     @Bean

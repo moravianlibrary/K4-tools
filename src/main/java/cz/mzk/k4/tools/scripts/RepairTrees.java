@@ -9,6 +9,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.SolrUtils;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.domain.Item;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
@@ -21,6 +23,10 @@ import java.util.List;
 public class RepairTrees implements Script {
 
     private static AccessProvider accessProvider = AccessProvider.getInstance();
+    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+                        accessProvider.getKrameriusHost(),
+                        accessProvider.getKrameriusUser(),
+                        accessProvider.getKrameriusPassword());
     private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private static SolrUtils solr = new SolrUtils(accessProvider);
@@ -42,7 +48,7 @@ public class RepairTrees implements Script {
                 // indexace při změně
                 if (changed) {
                     LOGGER.info("Došlo ke změně dostupnosti, plánuje se indexace dokumentu " + topLevelUuid);
-                    krameriusUtils.reindex(topLevelUuid);
+                    krameriusApi.reindex(topLevelUuid);
                 } else {
                     LOGGER.info("Strom " + topLevelUuid + " je OK");
                 }
@@ -53,7 +59,8 @@ public class RepairTrees implements Script {
         } catch (SolrServerException e) {
             e.printStackTrace();
         } catch (K5ApiException e) {
-            e.printStackTrace();
+            LOGGER.error("Selhalo plánování reindexace dokumentu");
+            LOGGER.error(e.getMessage());
         }
     }
 

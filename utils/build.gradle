@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile project(':K5-API')
     compile group: 'commons-configuration', name: 'commons-configuration', version: '1.9'
     compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.17.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.2'

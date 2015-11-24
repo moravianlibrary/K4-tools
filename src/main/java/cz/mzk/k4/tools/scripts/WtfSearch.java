@@ -8,6 +8,8 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.ValidateWorker;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class WtfSearch implements Script {
     private static UuidWorker worker = new RelationshipCounterWorker(false);
     private AccessProvider accessProvider;
     private KrameriusUtils krameriusUtils;
+//    private ProcessRemoteApi krameriusApi;
     private FedoraUtils fedoraUtils;
 
     /**
@@ -31,7 +34,11 @@ public class WtfSearch implements Script {
      */
     @Override
     public void run(List<String> args) {
-        accessProvider = new AccessProvider();
+        accessProvider = AccessProvider.getInstance();
+//        krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+//                accessProvider.getKrameriusHost(),
+//                accessProvider.getKrameriusUser(),
+//                accessProvider.getKrameriusPassword());
         krameriusUtils = new KrameriusUtils(accessProvider);
         fedoraUtils = new FedoraUtils(accessProvider);
 

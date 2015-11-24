@@ -72,6 +72,9 @@ public class ClientRemoteApi {
         return apiXML.solrSearch(query);
     }
 
+    // TODO: solr simple search (vrátí seznam uuid)
+    // spec. na hledání podle modelu?
+
     public Streams listStreams(String pid) throws K5ApiException {
         return apiJSON.listStreams(pid);
     }

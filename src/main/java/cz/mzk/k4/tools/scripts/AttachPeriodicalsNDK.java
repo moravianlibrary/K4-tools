@@ -9,6 +9,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.domain.Context;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -32,9 +34,13 @@ import java.util.Set;
  */
 public class AttachPeriodicalsNDK implements Script {
     private static final Logger LOGGER = Logger.getLogger(AttachPeriodicalsNDK.class);
-    private static AccessProvider access = new AccessProvider();
-    private static FedoraUtils fedoraUtils = new FedoraUtils(access);
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(access);
+    private static AccessProvider accessProvider = AccessProvider.getInstance();
+    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+            accessProvider.getKrameriusHost(),
+            accessProvider.getKrameriusUser(),
+            accessProvider.getKrameriusPassword());
+    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+//    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
 
     @Override
     public void run(List<String> args) {  // periodicalitem, periodicalvolume, volume (?), supplement, page (?), monographunit
@@ -89,14 +95,19 @@ public class AttachPeriodicalsNDK implements Script {
             // tak asi ne..
             for (String parent : makeUnique(uuidMap.values())) {
                 LOGGER.info("Reindexace rodiče " + parent);
-                krameriusUtils.reindex(parent);
+                try {
+                    krameriusApi.reindex(parent);
+                } catch (K5ApiException e) {
+                    LOGGER.error("Selhalo plánování reindexace dokumentu " + parent);
+                    LOGGER.error(e.getMessage());
+                }
             }
         }
     }
 
     // specifický dotaz pro tenhle skript - vlastní metoda místo té v utils
     public List<String> solrQuery(String query) throws MalformedURLException, SolrServerException {
-        HttpSolrServer solr = new HttpSolrServer("http://" + access.getSolrHost());
+        HttpSolrServer solr = new HttpSolrServer("http://" + accessProvider.getSolrHost());
         SolrQuery parameters = new SolrQuery();
         parameters.setQuery(query);
         parameters.setFields("root_pid");

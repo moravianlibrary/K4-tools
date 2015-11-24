@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.ocr.listeners;
 
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import cz.mzk.k5.api.common.K5ApiException;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -15,12 +16,12 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
 
     private static final Logger LOGGER = Logger.getLogger(JobCompletionNotificationListener.class);
 
-    private KrameriusUtils krameriusUtils;
+    private ProcessRemoteApi krameriusApi;
     private FedoraUtils fedoraUtils;
 
-    public JobCompletionNotificationListener(FedoraUtils fedoraUtils, KrameriusUtils krameriusUtils) {
+    public JobCompletionNotificationListener(FedoraUtils fedoraUtils, ProcessRemoteApi krameriusApi) {
         this.fedoraUtils = fedoraUtils;
-        this.krameriusUtils = krameriusUtils;
+        this.krameriusApi = krameriusApi;
     }
 
     @Override
@@ -36,7 +37,12 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
             LOGGER.info("OCR dokončeno");
             String rootPid = jobExecution.getJobParameters().getString("rootPid");
-            krameriusUtils.reindex(rootPid);
+            try {
+                krameriusApi.reindex(rootPid);
+            } catch (K5ApiException e) {
+                LOGGER.error("Selhalo plánování reindexace dokumentu " + rootPid);
+                LOGGER.error(e.getMessage());
+            }
             LOGGER.info("Naplánována reindexace dokumentu " + rootPid);
         }
     }

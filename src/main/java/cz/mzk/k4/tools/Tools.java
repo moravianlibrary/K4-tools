@@ -43,6 +43,7 @@ import java.util.List;
  */
 public class Tools {
 
+    // TODO: defaultní konfigurák
     public static void main(String[] args) {
         ScriptRunner runner = new ScriptRunner();
         runner.register("checkLogs", new CheckLogs());

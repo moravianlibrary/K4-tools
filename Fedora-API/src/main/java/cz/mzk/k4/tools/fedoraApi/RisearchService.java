@@ -13,5 +13,5 @@ import retrofit.http.QueryMap;
 public interface RisearchService {
 
     @GET("/risearch?type=triples&flush=true&lang=spo&format=N-Triples&limit=30&distinct=off&stream=off")
-    public String query(@Query("query") String query);
+    String query(@Query("query") String query);
 }

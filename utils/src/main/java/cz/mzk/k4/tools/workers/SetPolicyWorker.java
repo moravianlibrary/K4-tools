@@ -3,11 +3,12 @@ package cz.mzk.k4.tools.workers;
 import cz.mzk.k4.tools.utils.domain.DCConent;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.util.DCContentUtils;
+import cz.mzk.k5.api.common.K5ApiException;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,12 +27,14 @@ public class SetPolicyWorker extends UuidWorker {
 
     private static final Logger LOGGER = Logger.getLogger(SetPolicyWorker.class);
     private FedoraUtils fedoraUtils;
-    private KrameriusUtils krameriusUtils;
+    private ProcessRemoteApi krameriusApi;
+//    private KrameriusUtils krameriusUtils; // nahrazano retrofit API
 
     public SetPolicyWorker(boolean writeEnabled, AccessProvider accessProvider) {
         super(writeEnabled);
         fedoraUtils = new FedoraUtils(accessProvider);
-        krameriusUtils = new KrameriusUtils(accessProvider);
+        krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getFedoraHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+//        krameriusUtils = new KrameriusUtils(accessProvider);
     }
 
     @Override
@@ -51,12 +54,12 @@ public class SetPolicyWorker extends UuidWorker {
             // periodical, more than 70 years old
             if (type.equals("periodical") && (year < (currentYear - 70))) {
                 LOGGER.info("Setting object " + uuid + " to PUBLIC (starý periodikum - " + year + ")");
-                krameriusUtils.setPublic(uuid);
+                krameriusApi.setPublic(uuid);
                 return;
 
                 // periodical, less than 70 years old
             } else if (type.equals("periodical")) {
-                krameriusUtils.setPrivate(uuid);
+                krameriusApi.setPrivate(uuid);
                 LOGGER.info("Setting object " + uuid + " to PRIVATE (mladý periodikum - " + year + ")");
                 return;
 
@@ -75,7 +78,7 @@ public class SetPolicyWorker extends UuidWorker {
                         if (umrti > currentYear - 70) {
                             // private
                             LOGGER.info("Setting object " + uuid + " to PRIVATE, kvuli umrti " + umrti);
-                            krameriusUtils.setPrivate(uuid);
+                            krameriusApi.setPrivate(uuid);
                             return;
                         }
                     } else {
@@ -92,18 +95,18 @@ public class SetPolicyWorker extends UuidWorker {
                     // nebo nejsou uvedeni autoři
                     if (year < (currentYear - 110)) {
                         LOGGER.info("Chybí info, ale " + uuid + " bude PUBLIC (vydání: " + year + ")");
-                        krameriusUtils.setPublic(uuid);
+                        krameriusApi.setPublic(uuid);
                         return;
                     } else {
                         LOGGER.info("Chybí info, ale " + uuid + " bude PRIVATE (vydání: " + year + ")");
-                        krameriusUtils.setPrivate(uuid);
+                        krameriusApi.setPrivate(uuid);
                         return;
                     }
 
                 } else {
                     // všichni dávno mrtví
                     LOGGER.info("Setting object " + uuid + " to PUBLIC, všichni jsou dávno mrtví");
-                    krameriusUtils.setPublic(uuid);
+                    krameriusApi.setPublic(uuid);
                     return;
                 }
 
@@ -116,6 +119,8 @@ public class SetPolicyWorker extends UuidWorker {
             LOGGER.error(e.getMessage() + " on " + uuid);
         } catch (NullPointerException e) {
             LOGGER.error(e.getMessage() + " on " + uuid);
+        } catch (K5ApiException e) {
+            e.printStackTrace();
         }
 
     }

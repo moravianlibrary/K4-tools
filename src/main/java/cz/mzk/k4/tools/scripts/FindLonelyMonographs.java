@@ -5,6 +5,8 @@ import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.util.List;

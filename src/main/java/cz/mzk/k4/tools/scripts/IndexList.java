@@ -1,8 +1,10 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k5.api.common.K5ApiException;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -23,12 +25,20 @@ public class IndexList implements Script {
         String[] allPids = args.get(0).split(";");
 
         AccessProvider accessProvider = AccessProvider.getInstance();
-        KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
+        ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+                accessProvider.getKrameriusHost(),
+                accessProvider.getKrameriusUser(),
+                accessProvider.getKrameriusPassword());
 
         LOGGER.info("Začátek reindexace.");
 
         for (String pid : allPids){
-            krameriusUtils.reindex(pid);
+            try {
+                krameriusApi.reindex(pid);
+            } catch (K5ApiException e) {
+                LOGGER.error("Selhalo plánování reindexace dokumentu " + pid);
+                LOGGER.error(e.getMessage());
+            }
         }
 
         LOGGER.info("Konec reindexace.");
