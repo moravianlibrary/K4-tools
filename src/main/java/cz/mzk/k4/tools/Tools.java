@@ -32,6 +32,7 @@ import cz.mzk.k4.tools.scripts.lidovky.LnKonverze;
 import cz.mzk.k4.tools.scripts.lidovky.LnPresunImg;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
