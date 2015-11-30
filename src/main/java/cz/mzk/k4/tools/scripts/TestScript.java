@@ -1,7 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
@@ -12,6 +11,7 @@ import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,7 +39,20 @@ public class TestScript implements Script {
     @Override
     public void run(List<String> args) {
 
-        LOGGER.warn("TEST");
+        try {
+//            InputStream raw = clientApi.getRecordingMp3("uuid:cfe2b585-7c3d-4ef0-8694-85150fb23065");
+            InputStream mp3 = clientApi.getRecordingMp3("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(mp3, new File("sound.mp3"));
+            System.out.println(mp3.available());
+            InputStream wav = clientApi.getRecordingWav("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(wav, new File("sound.wav"));
+            InputStream ogg = clientApi.getRecordingOgg("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
+            FileUtils.copyInputStreamToFile(ogg, new File("sound.ogg"));
+        } catch (K5ApiException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -12,6 +12,6 @@ dependencies {
 }
 
 dependencies {
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'com.squareup.retrofit', name: 'retrofit',   version: '1.9.0'
+    compile group: 'commons-io',            name: 'commons-io', version: '2.4'
 }

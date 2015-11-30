@@ -12,7 +12,6 @@ import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
 import cz.mzk.k4.tools.scripts.FindLonelyMonographs;
 import cz.mzk.k4.tools.scripts.GetUuidFromMetsPackages;
 import cz.mzk.k4.tools.scripts.GetWholeBookOCR;
-import cz.mzk.k4.tools.scripts.GraphicsUpload;
 import cz.mzk.k4.tools.scripts.ImportCollection;
 import cz.mzk.k4.tools.scripts.IndexList;
 import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
@@ -32,7 +31,6 @@ import cz.mzk.k4.tools.scripts.lidovky.LnKonverze;
 import cz.mzk.k4.tools.scripts.lidovky.LnPresunImg;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +59,6 @@ public class Tools {
         runner.register("kontrolaRajhradu", new RajhradValidate());
         runner.register("djvuNaJp2", new ConvertDJvuToJp2());
         runner.register("regenerateAudioServer", new RegenerateAudioServer());
-        runner.register("grafikyUpload", new GraphicsUpload());
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());
