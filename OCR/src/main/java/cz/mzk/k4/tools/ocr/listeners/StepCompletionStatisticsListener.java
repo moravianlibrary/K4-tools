@@ -3,21 +3,20 @@ package cz.mzk.k4.tools.ocr.listeners;
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by holmanj on 30.6.15.
  */
-public class StepCompletionStatisticsListener implements StepExecutionListener {
+@Component
+public class StepCompletionStatisticsListener extends StepExecutionListenerSupport {
 
-    private static final Logger LOGGER = Logger.getLogger(JobCompletionNotificationListener.class);
-
-    @Override
-    public void beforeStep(StepExecution stepExecution) {
-
-    }
+    private static final Logger LOGGER = Logger.getLogger(StepCompletionStatisticsListener.class);
 
     @Override
+    @AfterStep
     public ExitStatus afterStep(StepExecution stepExecution) {
 //        LOGGER.info(stepExecution.getSummary());
         LOGGER.info("OCR dokončeno");

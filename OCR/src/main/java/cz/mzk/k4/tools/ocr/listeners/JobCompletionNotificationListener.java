@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.annotation.AfterJob;
+import org.springframework.batch.core.annotation.BeforeJob;
 
 /**
 * Created by holmanj on 16.6.15.
@@ -25,6 +27,7 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
     }
 
     @Override
+    @BeforeJob
     public void beforeJob(JobExecution jobExecution) {
         // bude asi potřeba k získávání progresu
         // http://stackoverflow.com/questions/27153162/implement-a-spring-batch-progress-bar-get-total-row-count-on-job-execution
@@ -33,9 +36,9 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
     }
 
     @Override
+    @AfterJob
     public void afterJob(JobExecution jobExecution) {
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
-            LOGGER.info("OCR dokončeno");
             String rootPid = jobExecution.getJobParameters().getString("rootPid");
             try {
                 krameriusApi.reindex(rootPid);

@@ -24,14 +24,12 @@ import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -59,7 +57,7 @@ public class BatchConfiguration {
 //    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
-    public static final String OVERRIDEN_BY_EXPRESSION_VALUE = "overriden by expression value";
+    public static final String NAHRAZENO_V_KONSTRUKTORU = "nahrazeno v konstruktoru";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -110,7 +108,7 @@ public class BatchConfiguration {
     public Step step() {
         return steps.get("step")
                 .<Img, Ocr>chunk(50) // počet najednou zpracovávaných stran
-                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE, OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v konstruktoru nahradí
+                .reader(reader(NAHRAZENO_V_KONSTRUKTORU, NAHRAZENO_V_KONSTRUKTORU))
                 .processor(processor())
                 .writer(writer())
                 .listener(readListener())
