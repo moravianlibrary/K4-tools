@@ -1,10 +1,10 @@
-package cz.mzk.k4.tools.scripts.lidovky;
+package cz.mzk.k4.tools.domain;
 
 import java.io.Serializable;
 
 /**
  * Created by holmanj on 20.3.15.
- * pro načtení údajů o straně LN z xml souboru na Hadovi
+ * pro načtení a serializaci údajů o straně
  */
 public class Page implements Serializable {
     String title;

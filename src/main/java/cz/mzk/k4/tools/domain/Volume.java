@@ -1,4 +1,6 @@
-package cz.mzk.k4.tools.scripts.lidovky;
+package cz.mzk.k4.tools.domain;
+
+import cz.mzk.k4.tools.scripts.lidovky.Issue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,7 +8,7 @@ import java.util.List;
 
 /**
  * Created by holmanj on 20.3.15.
- * pro načtení údajů o ročníku LN z xml souboru na Hadovi
+ * pro načtení a serializaci údajů o ročníku
  */
 public class Volume implements Serializable {
     String xmlFileName;
