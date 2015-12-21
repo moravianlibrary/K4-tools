@@ -33,7 +33,7 @@ public class KrameriusProcessRemoteApiFactory {
                 .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
                 .setErrorHandler(new ClientRemoteErrorHandler());
 
-        ProcessRemoteApiInterface api = builder.build().create(ProcessRemoteApiInterface.class);
+        ProcessRemoteApiRetrofit api = builder.build().create(ProcessRemoteApiRetrofit.class);
         ProcessRemoteApi remoteApi = new ProcessRemoteApi(api);
         return remoteApi;
     }

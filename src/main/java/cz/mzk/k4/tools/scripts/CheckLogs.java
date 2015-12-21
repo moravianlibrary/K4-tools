@@ -1,13 +1,13 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import cz.mzk.k4.tools.utils.domain.KrameriusProcess;
-import cz.mzk.k4.tools.utils.domain.ProcessLog;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.K4ProcessManager;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
+import cz.mzk.k5.api.remote.domain.Process;
+import cz.mzk.k5.api.remote.domain.ProcessLog;
 import org.apache.log4j.Logger;
-
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class CheckLogs implements Script {
 
-	private static K4ProcessManager pm;
+//	private static K4ProcessManager pm;
+	private static ProcessRemoteApi krameriusApi;
 	private static Integer defSize; // default number of processes fetched from Kramerius
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(CheckLogs.class);
     private AccessProvider accessProvider;
@@ -33,9 +34,13 @@ public class CheckLogs implements Script {
      */
 	public void run(List<String> args) {
 
-        accessProvider = new AccessProvider();
+        accessProvider = AccessProvider.getInstance();
+		krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+				accessProvider.getKrameriusHost(),
+				accessProvider.getKrameriusUser(),
+				accessProvider.getKrameriusPassword());
 		defSize = Integer.parseInt(accessProvider.getProperties().getProperty("checkLogs.resultSize"));
-		pm = new K4ProcessManager(accessProvider);
+//		pm = new K4ProcessManager(accessProvider);
 
 		try {
 			// handle URL parameters
@@ -45,7 +50,8 @@ public class CheckLogs implements Script {
 			int resultSize = Integer.parseInt(defSize.toString());
 
 			// fetch processes
-			List<KrameriusProcess> processes = pm.searchByParams(queryParams);
+//			List<KrameriusProcess> processes = pm.searchByParams(queryParams);
+			List<Process> processes = krameriusApi.filterProcesses(queryParams);
 
 			// specified resultSize can be bigger than the actual number of
 			// processes fetched from Kramerius
@@ -60,13 +66,13 @@ public class CheckLogs implements Script {
 			File file = null;
 			for (int i = 0; i < processes.size(); i++) {
 				count++;
-				KrameriusProcess p = processes.get(i);
+				Process process = processes.get(i);
 				try {
-					ProcessLog log = pm.getLog(p.getUuid());
+					ProcessLog log = krameriusApi.getProcessLog(process.getUuid());
 					if (!log.getSerr().equals("")) {
-						LOGGER.info(p.getUuid() + ": " + log.getSerr());
+						LOGGER.info(process.getUuid() + ": " + log.getSerr());
 						try {
-							file = new File("logs/" + p.getUuid() + ".txt");
+							file = new File("logs/" + process.getUuid() + ".txt");
 							writer = new BufferedWriter(new FileWriter(file));
 							writer.write(log.getSerr());
 						} catch (IOException ex) {

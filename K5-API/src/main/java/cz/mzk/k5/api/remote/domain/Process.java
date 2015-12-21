@@ -19,26 +19,7 @@ public class Process {
     String userid;
     String userFirstname;
     String userSurname;
-    List<Process> children; // TODO: dodělat v toString
-
-    @Override
-    public String toString() {
-        return "Process{" +
-                "uuid='" + uuid + '\'' +
-                ", pid='" + pid + '\'' +
-                ", def='" + def + '\'' +
-                ", state='" + state + '\'' +
-                ", batchState='" + batchState + '\'' +
-                ", name='" + name + '\'' +
-                ", started='" + started + '\'' +
-                ", planned='" + planned + '\'' +
-                ", finished='" + finished + '\'' +
-                ", userid='" + userid + '\'' +
-                ", userFirstname='" + userFirstname + '\'' +
-                ", userSurname='" + userSurname + '\'' +
-                ", children=" + children +
-                '}';
-    }
+    List<Process> children;
 
     public String getUuid() {
         return uuid;
@@ -142,5 +123,24 @@ public class Process {
 
     public void setChildren(List<Process> children) {
         this.children = children;
+    }
+
+    @Override
+    public String toString() {
+        return "Process{" +
+                "uuid='" + uuid + '\'' +
+                ", pid='" + pid + '\'' +
+                ", def='" + def + '\'' +
+                ", state='" + state + '\'' +
+                ", batchState='" + batchState + '\'' +
+                ", name='" + name + '\'' +
+                ", started='" + started + '\'' +
+                ", planned='" + planned + '\'' +
+                ", finished='" + finished + '\'' +
+                ", userid='" + userid + '\'' +
+                ", userFirstname='" + userFirstname + '\'' +
+                ", userSurname='" + userSurname + '\'' +
+                ", children=" + children +
+                '}';
     }
 }

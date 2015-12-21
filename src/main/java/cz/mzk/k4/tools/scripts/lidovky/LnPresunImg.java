@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.scripts.lidovky;
 
 import com.google.common.base.CharMatcher;
 import cz.mzk.k5.api.client.ClientRemoteApi;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
@@ -59,7 +59,7 @@ public class LnPresunImg implements Script {
         List<Volume> lidovky = null;
         try {
             lidovky = loadData("lidovky.ser");
-        } catch (InternalServerErroException e) {
+        } catch (K5ApiException e) {
             e.printStackTrace();
         }
 
@@ -211,7 +211,7 @@ public class LnPresunImg implements Script {
         LOGGER.info("Obrázky jsou přesunuty");
     }
 
-    private List<Volume> loadData(String filename) throws InternalServerErroException {
+    private List<Volume> loadData(String filename) throws K5ApiException {
         String serializedLN = filename;
         List<Volume> lidovky = null;
         LOGGER.info("Serializovaná data načtena");
@@ -322,7 +322,7 @@ public class LnPresunImg implements Script {
         return lidovky;
     }
 
-    private List<Volume> getDataFromK5(List<Volume> lidovky) throws InternalServerErroException {
+    private List<Volume> getDataFromK5(List<Volume> lidovky) throws K5ApiException {
 //        for (Volume volume : lidovky) {
         for (int k = 23; k < lidovky.size(); k++) {
             Volume volume = lidovky.get(k);

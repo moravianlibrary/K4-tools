@@ -16,14 +16,15 @@ import cz.mzk.k4.tools.ocr.step.ImgReader;
 import cz.mzk.k4.tools.ocr.step.OcrWriter;
 import cz.mzk.k4.tools.ocr.step.PollingProcessor;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -46,14 +47,17 @@ import retrofit.converter.ConversionException;
 public class BatchConfiguration {
 
     // TODO Autowired?
-    private static AccessProvider accessProvider = new AccessProvider();
+    private static AccessProvider accessProvider = AccessProvider.getInstance();
+    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+            accessProvider.getKrameriusHost(),
+            accessProvider.getKrameriusUser(),
+            accessProvider.getKrameriusPassword());
     private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
 //    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
-    public static final String OVERRIDEN_BY_EXPRESSION_VALUE = "overriden by expression value";
+    public static final String NAHRAZENO_V_KONSTRUKTORU = "nahrazeno v konstruktoru";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -82,7 +86,7 @@ public class BatchConfiguration {
 
     @Bean
     public JobCompletionNotificationListener jobCompletionListener() {
-        return new JobCompletionNotificationListener(fedoraUtils, krameriusUtils);
+        return new JobCompletionNotificationListener(fedoraUtils, krameriusApi);
     }
 
     @Bean
@@ -96,7 +100,7 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public StepExecutionListener statisticsListener() {
+    public StepListener statisticsListener() {
         return new StepCompletionStatisticsListener();
     }
 
@@ -104,7 +108,7 @@ public class BatchConfiguration {
     public Step step() {
         return steps.get("step")
                 .<Img, Ocr>chunk(50) // počet najednou zpracovávaných stran
-                .reader(reader(OVERRIDEN_BY_EXPRESSION_VALUE, OVERRIDEN_BY_EXPRESSION_VALUE)) // hodnota se v konstruktoru nahradí
+                .reader(reader(NAHRAZENO_V_KONSTRUKTORU, NAHRAZENO_V_KONSTRUKTORU))
                 .processor(processor())
                 .writer(writer())
                 .listener(readListener())
@@ -119,7 +123,7 @@ public class BatchConfiguration {
                 .skip(CreateObjectException.class)
                 .skip(ClassCastException.class) // pro případy java.lang.String cannot be cast to cz.mzk.k4.tools.ocr.domain.QueuedImage
                 .skip(ConversionException.class)
-//                .listener(statisticsListener())
+                .listener(statisticsListener())
                 .build();
     }
 

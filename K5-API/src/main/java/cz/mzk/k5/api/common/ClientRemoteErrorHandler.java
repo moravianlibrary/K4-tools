@@ -12,7 +12,7 @@ public class ClientRemoteErrorHandler implements ErrorHandler {
     public Throwable handleError(RetrofitError cause) {
         Response r = cause.getResponse();
 
-//        if (r != null && r.getStatus() == 413) {
+//       if (r != null && r.getStatus() == 413) {
 //            // vyhazuje tomcat při malém limitu na velikost souboru, tělo je html (další parsování by házelo retrofit chyby)
 //            // případně to dělá proxy nebo tak něco po cestě..
 //            return new EntityTooLargeException("Malý limit v tomcatu (defaultně 2 MB)");
@@ -38,9 +38,12 @@ public class ClientRemoteErrorHandler implements ErrorHandler {
 //            return new ConflictException(message);
 //        } else if (r != null && r.getStatus() == 400) {
 //            return new BadRequestException(message);
-        /** } else **/
         if (r != null && (r.getStatus() == 500 || r.getStatus() == 404)) {
-            return new InternalServerErroException("Request " +  cause.getUrl() + " returned status " + r.getStatus());
+            return new K5ApiException("Request " + cause.getKind() + " " + cause.getUrl() + " returned status " + r.getStatus());
+        }
+
+        if (r != null && r.getStatus() == 409) {
+            return new K5ApiException("Request " +  cause.getUrl() + " returned status " + r.getStatus() + ". Only running processes can be stopped.");
         }
         return cause;
     }

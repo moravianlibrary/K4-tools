@@ -21,7 +21,7 @@ import java.util.List;
  * Created by holmanj on 11.3.15.
  */
 public class GeneralUtils {
-    private static final Logger LOGGER = Logger.getLogger(KrameriusUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(GeneralUtils.class);
 
     public static List<String> loadUuidsFromFile(String filePath) {
         List<String> uuidList = new ArrayList<>();

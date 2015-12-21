@@ -93,6 +93,8 @@ public class AccessProvider {
     }
 
 
+    // TODO: duplicitní kód
+
     /**
      * Vrací webresource s cestou ke K4 RemoteAPI
      * @param query

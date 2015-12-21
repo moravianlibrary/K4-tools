@@ -29,4 +29,11 @@ public class ReplicationTree {
     public void setPids(List<String> pids) {
         this.pids = pids;
     }
+
+    @Override
+    public String toString() {
+        return "ReplicationTree{" +
+                "pids=" + pids +
+                '}';
+    }
 }

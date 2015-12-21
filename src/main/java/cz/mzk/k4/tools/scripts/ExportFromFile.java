@@ -2,8 +2,10 @@ package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.GeneralUtils;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k5.api.common.K5ApiException;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -13,7 +15,9 @@ import java.util.List;
  */
 public class ExportFromFile implements Script {
     private static final Logger LOGGER = Logger.getLogger(ExportFromFile.class);
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(AccessProvider.getInstance());
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+//    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
+    private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
 
     @Override
     public void run(List<String> args) {
@@ -25,7 +29,12 @@ public class ExportFromFile implements Script {
         String filePath = args.get(0);
         List<String> uuidList = GeneralUtils.loadUuidsFromFile(filePath);
         for (String uuid : uuidList) {
-            krameriusUtils.export(uuid);
+            try {
+                krameriusApi.export(uuid);
+            } catch (K5ApiException e) {
+                LOGGER.error(e.getMessage());
+                LOGGER.error("Selhalo plánováho procesu export u objektu " + uuid);
+            }
             LOGGER.debug("Export planned for object " + uuid);
         }
     }

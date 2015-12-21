@@ -4,21 +4,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+import org.apache.log4j.Logger;
+import cz.mzk.k5.api.common.K5ApiException;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 
 public class GetUuidFromMetsPackages implements Script {
+    private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(GetUuidFromMetsPackages.class);
     private ArrayList<String> uuidList = new ArrayList<String>();
-    private KrameriusUtils krameriusUtils = new KrameriusUtils(new AccessProvider());
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+//    private KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
+    private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+                                                accessProvider.getKrameriusHost(),
+                                                accessProvider.getKrameriusUser(),
+                                                accessProvider.getKrameriusPassword());
 
     @Override
     public void run(List<String> args) {
@@ -28,7 +35,13 @@ public class GetUuidFromMetsPackages implements Script {
         while(iterator.hasNext()) {
             File file = iterator.next();
             uuidList.add(getUuidFromXml(file));
-            krameriusUtils.exterminate(getUuidFromXml(file));
+            String uuid = getUuidFromXml(file);
+            try {
+                krameriusApi.deleteObject(uuid);
+            } catch (K5ApiException e) {
+                LOGGER.error(e.getMessage());
+                LOGGER.error("Selhalo plánování procesu delete u objektu " + uuid);
+            }
         }
 
         System.out.println(uuidList.toString());

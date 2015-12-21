@@ -2,7 +2,7 @@ package cz.mzk.k5.api.client;
 
 import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.client.domain.Streams;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import retrofit.http.*;
 import java.util.*;
 
@@ -11,11 +11,11 @@ import java.util.*;
  */
 public interface ClientRemoteApiJSON {
     @GET("/item/{pid}")
-    Item getItem(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+    Item getItem(@Path("pid") String pid) throws K5ApiException; // uuid:...
 
     @GET("/item/{pid}/children")
-    List<Item> getChildren(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+    List<Item> getChildren(@Path("pid") String pid) throws K5ApiException; // uuid:...
 
     @GET("/item/{pid}/streams")
-    Streams listStreams(@Path("pid") String pid) throws InternalServerErroException; // uuid:...
+    Streams listStreams(@Path("pid") String pid) throws K5ApiException; // uuid:...
 }

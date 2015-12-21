@@ -12,7 +12,6 @@ import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
 import cz.mzk.k4.tools.scripts.FindLonelyMonographs;
 import cz.mzk.k4.tools.scripts.GetUuidFromMetsPackages;
 import cz.mzk.k4.tools.scripts.GetWholeBookOCR;
-import cz.mzk.k4.tools.scripts.GraphicsUpload;
 import cz.mzk.k4.tools.scripts.ImportCollection;
 import cz.mzk.k4.tools.scripts.IndexList;
 import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
@@ -43,6 +42,7 @@ import java.util.List;
  */
 public class Tools {
 
+    // TODO: defaultní konfigurák
     public static void main(String[] args) {
         ScriptRunner runner = new ScriptRunner();
         runner.register("checkLogs", new CheckLogs());
@@ -59,7 +59,6 @@ public class Tools {
         runner.register("kontrolaRajhradu", new RajhradValidate());
         runner.register("djvuNaJp2", new ConvertDJvuToJp2());
         runner.register("regenerateAudioServer", new RegenerateAudioServer());
-        runner.register("grafikyUpload", new GraphicsUpload());
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
         runner.register("indexaceZeSeznamu", new IndexList());

@@ -2,7 +2,7 @@ package cz.mzk.k4.tools.scripts.lidovky;
 
 import com.google.common.base.CharMatcher;
 import cz.mzk.k5.api.client.ClientRemoteApi;
-import cz.mzk.k5.api.common.InternalServerErroException;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
@@ -15,7 +15,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -61,7 +60,7 @@ public class LnKonverze implements Script {
             lidovky = fillSecondStage();
             try {
                 lidovky = getDataFromK5(lidovky);
-            } catch (InternalServerErroException e) {
+            } catch (K5ApiException e) {
                 e.printStackTrace();
             }
             serializeLN(lidovky, serializedDataName);
@@ -159,7 +158,7 @@ public class LnKonverze implements Script {
     }
 
     private void copyImages(List<Volume> lidovky) throws IOException {
-        // sudo sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
+        // sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
         for (Volume volume : lidovky) {
             LOGGER.info("Converting " + getPageNumber(volume) + " pages of volume " + volume.getYear());
             for (Issue issue : volume.getIssues()) {
@@ -211,7 +210,7 @@ public class LnKonverze implements Script {
         return pageNumber;
     }
 
-    private List<Volume> getDataFromK5(List<Volume> lidovky) throws InternalServerErroException {
+    private List<Volume> getDataFromK5(List<Volume> lidovky) throws K5ApiException {
 //        for (Volume volume : lidovky) {
         for (int k = 0; k < lidovky.size(); k++) {
             Volume volume = lidovky.get(k);

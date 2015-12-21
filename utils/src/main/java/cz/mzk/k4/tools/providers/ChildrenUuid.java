@@ -2,14 +2,10 @@ package cz.mzk.k4.tools.providers;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
-import cz.mzk.k4.tools.utils.fedora.Constants;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.log4j.Logger;
-import org.fedora.api.RelationshipTuple;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**

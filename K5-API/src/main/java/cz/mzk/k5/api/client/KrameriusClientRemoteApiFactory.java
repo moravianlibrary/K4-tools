@@ -16,20 +16,7 @@ public class KrameriusClientRemoteApiFactory {
     private static final String PROTOCOL = "http://";
     private static final String KRAMERIUS_CLIENT_API = "/search/api/v5.0";
 
-    // TODO: asi lepší mít 1 interface a custom adapter (converter?), který parsuje json, string i xml podle typu dat v response
-
-    //    public static ClientRemoteApiJSON getJsonService(String krameriusHostUrl, String login, String password) {
-//
-//        AuthorizationInterceptor authInterceptor = new AuthorizationInterceptor(login, password);
-//
-//        RestAdapter.Builder builder = new RestAdapter.Builder()
-//                .setRequestInterceptor(authInterceptor)
-//                .setEndpoint("http://" + krameriusHostUrl + "/search/api/v5.0");
-//        ClientRemoteApiJSON clientApi = builder.build().create(ClientRemoteApiJSON.class);
-//
-//        return clientApi;
-//
-//    }
+    // TODO: logging v API: http://stackoverflow.com/questions/29163883/retrofit-log4j
 
     public static ClientRemoteApi getClientRemoteApi(String krameriusHostUrl) {
         return getClientRemoteApi(krameriusHostUrl, "", "");
@@ -51,7 +38,7 @@ public class KrameriusClientRemoteApiFactory {
                 // základ URL
                 .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
                 .setErrorHandler(new ClientRemoteErrorHandler());
-        // deserializace defaultně jako JSON
+        // default converter (JSON)
         ClientRemoteApiJSON apiJSON = builder.build().create(ClientRemoteApiJSON.class);
 
         builder = new RestAdapter.Builder()
@@ -75,7 +62,7 @@ public class KrameriusClientRemoteApiFactory {
 
         builder = new RestAdapter.Builder()
                 .setRequestInterceptor(authInterceptor)
-                // bez deserializace - přepošle raw input stream
+                // bez deserializace - přepošle raw input stream - zavírat!
                 .setConverter(new RawConverter())
                 .setEndpoint(PROTOCOL + krameriusHostUrl + KRAMERIUS_CLIENT_API)
                 .setErrorHandler(new ClientRemoteErrorHandler());

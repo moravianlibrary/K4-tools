@@ -33,79 +33,79 @@ public class KrameriusUtils {
         this.accessProvider = accessProvider;
     }
 
-    /**
-     * Naplánuje proces mazání dokumentu (mazání provede Kramerius, vč. rekurze)
-     * cz.incad.kramerius.service.impl.DeleteServiceImpl
-     *
-     * @param pid_path
-     */
-    public void exterminate(String pid_path) {
-        pid_path = checkPid(pid_path);
-
-        // {"parameters":["uuid:...","uuid:..."]}
-        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "delete");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
-
-        if (response.getStatus() == 201) {
-            LOGGER.info("Deleting object " + pid_path);
-        } else {
-            LOGGER.error("An error occured while planning deletion of document " + pid_path + " (code " + response.getStatus() + ")");
-        }
-    }
-
-    public void setPrivate(String pid_path) {
-        pid_path = checkPid(pid_path);
-        // {"parameters":["uuid:...","uuid:..."]}
-        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "setprivate");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
-
-        if (response.getStatus() == 201) {
-            LOGGER.info("Setting object " + pid_path + " policy to private");
-        } else {
-            LOGGER.error("Could not plan process setprivate for object " + pid_path + " (code " + response.getStatus() + ")");
-        }
-    }
-
-    public void setPublic(String pid_path) {
-        pid_path = checkPid(pid_path);
-        // {"parameters":["uuid:...","uuid:..."]}
-        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def", "setpublic");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
-
-        if (response.getStatus() == 201) {
-            LOGGER.info("Setting object " + pid_path + " policy to public");
-        } else {
-            LOGGER.error("Could not plan process setpublic for object " + pid_path + " (code " + response.getStatus() + ")");
-        }
-    }
-
-    private String checkPid(String pid) {
-        if (!pid.contains("uuid")) {
-            pid = "uuid:" + pid;
-        }
-        return pid;
-    }
+//    /**
+//     * Naplánuje proces mazání dokumentu (mazání provede Kramerius, vč. rekurze)
+//     * cz.incad.kramerius.service.impl.DeleteServiceImpl
+//     *
+//     * @param pid_path
+//     */
+//    public void exterminate(String pid_path) {
+//        pid_path = checkPid(pid_path);
+//
+//        // {"parameters":["uuid:...","uuid:..."]}
+//        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "delete");
+//        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
+//        ClientResponse response = resource.queryParams(queryParams)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+//                .post(ClientResponse.class);
+//
+//        if (response.getStatus() == 201) {
+//            LOGGER.info("Deleting object " + pid_path);
+//        } else {
+//            LOGGER.error("An error occured while planning deletion of document " + pid_path + " (code " + response.getStatus() + ")");
+//        }
+//    }
+//
+//    public void setPrivate(String pid_path) {
+//        pid_path = checkPid(pid_path);
+//        // {"parameters":["uuid:...","uuid:..."]}
+//        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "setprivate");
+//        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
+//        ClientResponse response = resource.queryParams(queryParams)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+//                .post(ClientResponse.class);
+//
+//        if (response.getStatus() == 201) {
+//            LOGGER.info("Setting object " + pid_path + " policy to private");
+//        } else {
+//            LOGGER.error("Could not plan process setprivate for object " + pid_path + " (code " + response.getStatus() + ")");
+//        }
+//    }
+//
+//    public void setPublic(String pid_path) {
+//        pid_path = checkPid(pid_path);
+//        // {"parameters":["uuid:...","uuid:..."]}
+//        String json = "{\"parameters\":[\"" + pid_path + "\",\"" + pid_path + "\"]}";
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def", "setpublic");
+//        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
+//        ClientResponse response = resource.queryParams(queryParams)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json, MediaType.APPLICATION_JSON)
+//                .post(ClientResponse.class);
+//
+//        if (response.getStatus() == 201) {
+//            LOGGER.info("Setting object " + pid_path + " policy to public");
+//        } else {
+//            LOGGER.error("Could not plan process setpublic for object " + pid_path + " (code " + response.getStatus() + ")");
+//        }
+//    }
+//
+//    private String checkPid(String pid) {
+//        if (!pid.contains("uuid")) {
+//            pid = "uuid:" + pid;
+//        }
+//        return pid;
+//    }
 
     public List<String> getUuidsByModelSolr(String model) {
         List<String> uuidList = new ArrayList<String>();
@@ -148,39 +148,39 @@ public class KrameriusUtils {
         return uuidList;
     }
 
-    public void export(String pid) {
-        String json = "{ \"parameters\":[ \"" + pid + "\" ]}";
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("def","export");
-        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
-        ClientResponse response = resource.queryParams(queryParams)
-                .accept(MediaType.APPLICATION_JSON)
-                .type(MediaType.APPLICATION_JSON)
-                .entity(json,MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class);
-        if(response.getStatus() == 201) {
-            LOGGER.info("Proces exportu naplánován: " + pid);
-        } else {
-            LOGGER.error("Nepodařil se naplánovat proces exportu dokumentu " + pid + ". CHYBA: " + response.getStatus());
-        }
-    }
-
-    public void reindex(String pid) {
-        MultivaluedMap queryParams = new MultivaluedMapImpl();
-        queryParams.add("action","start");
-        queryParams.add("def", "reindex");
-        queryParams.add("out", "text");
-        queryParams.add("params", "fromKrameriusModel," + pid);
-//        queryParams.add("params", "reindexDoc," + pid); // reindexDoc indexuje jen nové větve, ne celý strom
-        WebResource resource = accessProvider.getKrameriusWebResource("/search/lr");
-        ClientResponse response = resource.queryParams(queryParams).get(ClientResponse.class);
-        if(response.getStatus() == 200){
-            LOGGER.debug("Proces reindexace naplánován: " + pid);
-        } else {
-            LOGGER.error("Nepodařila se naplánovat reindexace souboru " + pid + ". CHYBA: " + response.getStatus());
-        }
-
-    }
+//    public void export(String pid) {
+//        String json = "{ \"parameters\":[ \"" + pid + "\" ]}";
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("def","export");
+//        WebResource resource = accessProvider.getKrameriusRESTWebResource("");
+//        ClientResponse response = resource.queryParams(queryParams)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .type(MediaType.APPLICATION_JSON)
+//                .entity(json,MediaType.APPLICATION_JSON)
+//                .post(ClientResponse.class);
+//        if(response.getStatus() == 201) {
+//            LOGGER.info("Proces exportu naplánován: " + pid);
+//        } else {
+//            LOGGER.error("Nepodařil se naplánovat proces exportu dokumentu " + pid + ". CHYBA: " + response.getStatus());
+//        }
+//    }
+//
+//    public void reindex(String pid) {
+//        MultivaluedMap queryParams = new MultivaluedMapImpl();
+//        queryParams.add("action","start");
+//        queryParams.add("def", "reindex");
+//        queryParams.add("out", "text");
+//        queryParams.add("params", "fromKrameriusModel," + pid);
+////        queryParams.add("params", "reindexDoc," + pid); // reindexDoc indexuje jen nové větve, ne celý strom
+//        WebResource resource = accessProvider.getKrameriusWebResource("/search/lr");
+//        ClientResponse response = resource.queryParams(queryParams).get(ClientResponse.class);
+//        if(response.getStatus() == 200){
+//            LOGGER.debug("Proces reindexace naplánován: " + pid);
+//        } else {
+//            LOGGER.error("Nepodařila se naplánovat reindexace souboru " + pid + ". CHYBA: " + response.getStatus());
+//        }
+//
+//    }
 
     public void addToCollection(String pid, String collectionPid) {
         // odstranění "uuid:" a "vc:"
