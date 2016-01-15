@@ -122,12 +122,12 @@ public class RecordRelation {
 
     public String toHtml() {
         StringBuilder sb = new StringBuilder();
-        sb.append(sysno).append(", ").append(barcode).append("<br>");
+        sb.append(sysno).append(", ").append(barcode).append("\n");
         for (String string : tifNames) {
-            sb.append("\n   obrazek: ").append(string).append("<br>");
+            sb.append("\n   obrazek: ").append(string).append("\n");
         }
         for (RecordRelation rr : getSupplements()) {
-            sb.append("\n   privazek: ").append(rr.getSysno()).append(", ").append(rr.getSupplementName()).append("<br>");
+            sb.append("\n   privazek: ").append(rr.getSysno()).append(", ").append(rr.getSupplementName()).append("\n");
         }
         return sb.toString();
     }

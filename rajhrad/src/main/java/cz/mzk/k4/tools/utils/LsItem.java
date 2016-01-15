@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.utils.domain;
+package cz.mzk.k4.tools.utils;
 
 /**
  * Created by rumanekm on 2.5.14.

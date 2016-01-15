@@ -4,6 +4,10 @@
  */
 package cz.mzk.k4.tools.domain.aleph;
 
+
+
+import cz.mzk.k4.tools.utils.Configuration;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,9 +20,11 @@ public class RecordHolder {
     private List<RecordRelation> recordRelations;
     private List<String> barcodes;
 
+    private Configuration configuration = new Configuration();
+
     public static final String IMAGESERVER_DATA_PREFIX = "/data/georef/mzk03/";
     public static final String IMAGESERVER_PREFIX = "http://imageserver.mzk.cz/mzk03/";
-    public static final String JP2_PREFIX = "/data/rumanekm/rajhrad/ST/D/";
+    public final String JP2_PREFIX = configuration.getJP2Prefix();
 
 
     public RecordHolder(List<String> tifNames) {
@@ -213,7 +219,7 @@ public class RecordHolder {
         for (RecordRelation rr : getRecordRelations()) {
             if (rr.isOk()) {
                 list.addAll(getImageserverLinkSingleList(rr));
-                writeSingleImageserverScript(rr);
+                //writeSingleImageserverScript(rr);
                 for (RecordRelation sup : rr.getSupplements()) {
                     list.addAll(getImageserverLinkSingleList(sup));
                 }

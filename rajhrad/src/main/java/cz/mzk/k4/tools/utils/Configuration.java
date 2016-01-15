@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.configuration;
+package cz.mzk.k4.tools.utils;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -15,8 +15,7 @@ public class Configuration {
 
     public Configuration() {
         try {
-            configuration = new PropertiesConfiguration("k4_tools_config.properties");
-            libraryPrefix = configuration.getString("knihovna");
+            configuration = new PropertiesConfiguration("rajhrad.properties");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         }
@@ -33,7 +32,7 @@ public class Configuration {
 
     //marc export
     public String getSshUserMarcExport() {
-        return configuration.getString("marcExportUser");
+            return configuration.getString("marcExportUser");
     }
 
     public String getSshHostMarcExport() {
