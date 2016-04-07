@@ -1,34 +1,7 @@
 package cz.mzk.k4.tools;
 
 import cz.mzk.k4.tools.convertor.ConvertDJvuToJp2;
-import cz.mzk.k4.tools.scripts.AddOcr;
-import cz.mzk.k4.tools.scripts.AttachPeriodicalsNDK;
-import cz.mzk.k4.tools.scripts.CheckLogs;
-import cz.mzk.k4.tools.scripts.DeletedDocuments;
-import cz.mzk.k4.tools.scripts.DownloadImages;
-import cz.mzk.k4.tools.scripts.ExportFromFile;
-import cz.mzk.k4.tools.scripts.FindAllDocumentsByModel;
-import cz.mzk.k4.tools.scripts.FindBadCharacterInOcr;
-import cz.mzk.k4.tools.scripts.FindLonelyMonographs;
-import cz.mzk.k4.tools.scripts.GetUuidFromMetsPackages;
-import cz.mzk.k4.tools.scripts.GetWholeBookOCR;
-import cz.mzk.k4.tools.scripts.ImportCollection;
-import cz.mzk.k4.tools.scripts.IndexList;
-import cz.mzk.k4.tools.scripts.MissingPolicyUuid;
-import cz.mzk.k4.tools.scripts.RajhradValidate;
-import cz.mzk.k4.tools.scripts.RegenerateAudioServer;
-import cz.mzk.k4.tools.scripts.RegenerateThumbnailPdf;
-import cz.mzk.k4.tools.scripts.RepairImgRels;
-import cz.mzk.k4.tools.scripts.RepairLinksForReplication;
-import cz.mzk.k4.tools.scripts.RepairTrees;
-import cz.mzk.k4.tools.scripts.SolrDotaz;
-import cz.mzk.k4.tools.scripts.StehovaniHades;
-import cz.mzk.k4.tools.scripts.TestScript;
-import cz.mzk.k4.tools.scripts.UnindexedFedoraModels;
-import cz.mzk.k4.tools.scripts.WtfSearch;
-import cz.mzk.k4.tools.scripts.XMLStarlet;
-import cz.mzk.k4.tools.scripts.lidovky.LnKonverze;
-import cz.mzk.k4.tools.scripts.lidovky.LnPresunImg;
+import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 
@@ -61,19 +34,23 @@ public class Tools {
         runner.register("regenerateAudioServer", new RegenerateAudioServer());
         runner.register("exportZeSouboru", new ExportFromFile());
         runner.register("stazeniObrazku", new DownloadImages());
-        runner.register("indexaceZeSeznamu", new IndexList());
         runner.register("importKolekce", new ImportCollection());
         runner.register("getBookOCR", new GetWholeBookOCR());
         runner.register("articleRepair", new OdpojeniVadnychClanku());
         runner.register("solr", new SolrDotaz());
         runner.register("xmlstarlet", new XMLStarlet());
         runner.register("pripojeniPeriodik", new AttachPeriodicalsNDK());
-        runner.register("lidovky", new LnPresunImg());
+//        runner.register("lidovky", new LnPresunImg());
         runner.register("soundunits", new RepairImgRels());
         runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
         runner.register("hades", new StehovaniHades());
         runner.register("opravitDostupnost", new RepairTrees());
-        runner.register("lidovky2", new LnKonverze());
+//        runner.register("lidovky2", new LnKonverze());
+        runner.register("djvu", new DjvuKonverze());
+        runner.register("roots", new GetRoots());
+        runner.register("rovnost", new SwitchImages());
+        runner.register("batch", new BatchK5Process());
+        runner.register("vymenaObrazku", new DjvuVymena());
         runner.register("test", new TestScript());
 
 

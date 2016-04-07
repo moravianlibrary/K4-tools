@@ -1,7 +1,5 @@
 package cz.mzk.k4.tools.domain;
 
-import cz.mzk.k4.tools.domain.Page;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

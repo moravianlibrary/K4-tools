@@ -3,8 +3,6 @@ package cz.mzk.k4.tools.scripts;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
-import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -13,7 +11,7 @@ import java.util.List;
  * Created by hradskam on 29.7.14.
  */
 public class ImportCollection implements Script {
-    private static final Logger LOGGER = Logger.getLogger(IndexList.class);
+    private static final Logger LOGGER = Logger.getLogger(ImportCollection.class);
     private AccessProvider accessProvider = AccessProvider.getInstance();
 //    private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
 //            accessProvider.getKrameriusHost(),

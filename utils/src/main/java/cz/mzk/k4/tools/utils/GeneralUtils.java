@@ -37,8 +37,12 @@ public class GeneralUtils {
 
             //Parse file by line
             while ((uuid = reader.readLine()) != null) {
-                uuid = uuid.substring(uuid.indexOf("uuid:"));
-                uuidList.add(uuid);
+                if (!uuid.contains("uuid")) {
+                    LOGGER.warn("Not a valid pid: " + uuid);
+                } else {
+                    uuid = uuid.substring(uuid.indexOf("uuid:"));
+                    uuidList.add(uuid);
+                }
             }
         } catch (FileNotFoundException e) {
             LOGGER.error("Chyba při otvírání souboru: " + filePath + ".");

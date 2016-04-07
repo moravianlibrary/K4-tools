@@ -52,9 +52,9 @@ public class PollingProcessor implements ItemProcessor<Img, Ocr> {
         while (poll) {
                 result = abbyApi.pollOcrState(image.getMd5());
                 poll = result.getState().equals(QueuedImage.STATE_PROCESSING);
-                LOGGER.debug(result.getMessage() + "\"" +
-                        "polling " + image.getPagePid() + image.getMd5());
-                Thread.sleep(100);
+                LOGGER.debug(result.getMessage() + "\n" +
+                        "polling " + image.getPagePid() + " " + image.getMd5());
+                Thread.sleep(5000);
         }
         LOGGER.debug(result.getMessage());
         return result;

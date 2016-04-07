@@ -8,6 +8,10 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.util.DCContentUtils;
 import cz.mzk.k4.tools.workers.ImageUrlWorker;
 import cz.mzk.k4.tools.workers.PresunImgWorker;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
+import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import javax.ws.rs.core.MediaType;
@@ -22,25 +26,30 @@ import java.util.Map;
 /**
  * Created by holmanj on 3/19/14.
  */
-public class FsvPresunImg implements Script {
+public class ChangeImgs implements Script {
+    private static final Logger LOGGER = Logger.getLogger(ChangeImgs.class);
+    private static final AccessProvider accessProvider = AccessProvider.getInstance();
+    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private static final ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private static final ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private PresunImgWorker stehovak;
+    private ImageUrlWorker prepisovakUrl;
+
+    boolean isMonograph;
+    String imageserverFolderPath;
+    String topUuid;
+
     private static final String ROCNIK = "1956";
     //    private static String ROCNIK;
     private static final int LAST_ITEM = 0;
     private static final String PERIODIKUM = "ss";
-    private static final Logger LOGGER = Logger.getLogger(FindLonelyMonographs.class);
-    private PresunImgWorker stehovak;
-    private ImageUrlWorker prepisovakUrl;
-    private AccessProvider accessProvider;
-    private FedoraUtils fedoraUtils;
 
     @Override
     public void run(List<String> args) {
-        accessProvider = new AccessProvider();
-        fedoraUtils = new FedoraUtils(accessProvider);
         stehovak = new PresunImgWorker(args.contains("writeEnabled"), accessProvider, fedoraUtils);
         prepisovakUrl = new ImageUrlWorker(args.contains("writeEnabled"), accessProvider, fedoraUtils);
 
-        String topUuid = args.get(0);
+        topUuid = args.get(0);
 
         // Katalog
 //        String topUuid = "uuid:accc7e4e-9c97-4b25-aae7-a09c90e7b528"; ROCNIK = "1986";
@@ -67,15 +76,14 @@ public class FsvPresunImg implements Script {
             prepisovakUrl.run(topUuid);
         }
 
-
-
-
         LOGGER.info("Konec");
     }
 
     @Override
     public String getUsage() {
-        return "pomocný skript na doplnění chybějících obrázků do imageserveru.\n" +
+        return "Výměna djvu za jp2 - nahrazení linků ve fedoře za nové" +
+                "\n\n" +
+                "pomocný skript na doplnění chybějících obrázků do imageserveru.\n" +
                 "kroky obnovy: \n" +
                 "výpis cest do imageserveru - seznam obrázků + cest\n" +
                 "ruční úprava souboru na uspořádaný seznam umístění\n" +

@@ -92,8 +92,8 @@ public class ProcessRemoteApi {
         return api.stopProcess(processUuid, new Parameters(""));
     }
 
-    public void deleteProcess(String processUuid) throws K5ApiException {
-        api.deleteProcess(processUuid);
+    public void deleteProcessLog(String processUuid) throws K5ApiException {
+        api.deleteProcessLog(processUuid);
     }
 
     public ReplicatedObject getReplicatedObjectInfo(String processPid) throws K5ApiException {

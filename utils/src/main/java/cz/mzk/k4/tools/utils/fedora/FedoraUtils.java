@@ -40,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,7 +227,7 @@ public class FedoraUtils {
      * @return
      * @throws IOException
      */
-    public void checkChildrenExistance(String uuid) {
+    public void checkChildrenExistence(String uuid) {
         try {
             getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
             LOGGER.debug(uuid + " existuje");
@@ -239,7 +240,7 @@ public class FedoraUtils {
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
         if (children != null) {
             for (ArrayList<String> child : children) {
-                checkChildrenExistance(child.get(0));
+                checkChildrenExistence(child.get(0));
             }
         }
     }
@@ -251,7 +252,7 @@ public class FedoraUtils {
      * @return
      * @throws IOException
      */
-    public Boolean checkChildrenAndOcrExistance(String uuid) {
+    public Boolean checkChildrenAndOcrExistence(String uuid) {
         Boolean containsOcr = null;
         DigitalObjectModel model = null;
         try {
@@ -272,7 +273,7 @@ public class FedoraUtils {
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
         if (children != null) {
             for (ArrayList<String> child : children) {
-                Boolean childResult = checkChildrenAndOcrExistance(child.get(0));
+                Boolean childResult = checkChildrenAndOcrExistence(child.get(0));
                 if (childResult != null && containsOcr != null) {
                     if (!containsOcr.equals(childResult)) {
                         LOGGER.error("OCR problém " + uuid);
@@ -360,7 +361,7 @@ public class FedoraUtils {
     // chro vraci cely resource jako string
     public String getAllRelationships(String uuid) {  // plain string returned from risearch
         String query = "%3Cinfo:fedora/" + uuid + "%3E%20*%20*";
-        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         String result = resource.get(String.class);
         return result;
@@ -368,7 +369,7 @@ public class FedoraUtils {
 
     public List<String> getParentUuids(String childUuid) {
         String query = "*%20*%20%3Cinfo:fedora/" + childUuid + "%3E";
-        WebResource resource = accessProvider.getFedoraWebResource("risearch?type=triples&lang=spo&format=N-Triples&query="
+        WebResource resource = accessProvider.getFedoraWebResource("/risearch?type=triples&lang=spo&format=N-Triples&query="
                 + query);
         List<String> parents = new ArrayList<>();
         String[] result = resource.get(String.class).split("\n");

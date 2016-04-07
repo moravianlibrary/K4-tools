@@ -1,6 +1,10 @@
+/*
 package cz.mzk.k4.tools.scripts.lidovky;
 
 import com.google.common.base.CharMatcher;
+import cz.mzk.k4.tools.domain.Issue;
+import cz.mzk.k4.tools.domain.Page;
+import cz.mzk.k4.tools.domain.Volume;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
@@ -31,9 +35,11 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+*/
 /**
  * Created by holmanj on 20.3.15.
- */
+ *//*
+
 public class LnKonverze implements Script {
     public static final Logger LOGGER = Logger.getLogger(LnKonverze.class);
     AccessProvider accessProvider = AccessProvider.getInstance();
@@ -43,7 +49,7 @@ public class LnKonverze implements Script {
     @Override
     public void run(List<String> args) {
 
-        // odkomentovat kód podle fáze
+        // odkomentovat kód podle fáze (1. fáze odkomentovaná, pak buď 2. nebo 3. - radši postupně)
 
         // fáze 1: načíst a serializovat data z K5 (děje se vždycky)
 
@@ -69,12 +75,11 @@ public class LnKonverze implements Script {
 
         // fáze 2: přesun do imageserveru (případně konverze do jp2)
         // nově: stahovat obrázky z fedory, konvertovat, ukládat do imageserveru
-        // pravděpodobně rovnou doplňovat nové vazby
-        try {
-            copyImages(lidovky);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            copyImages(lidovky);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         // fáze 3: doplnění vazeb do fedory
 //        try {
@@ -87,15 +92,12 @@ public class LnKonverze implements Script {
 //            e.printStackTrace();
 //        }
 
-        // fáze 4: (možná) čištění starých djvu - není potřeba, fedora maže nepotřebné datastreamy sama
+        // fáze 4: čištění starých djvu - není potřeba, fedora maže nepotřebné datastreamy sama
 
     }
 
     private void addDatastreams(List<Volume> lidovky) throws CreateObjectException, TransformerException, IOException {
         for (Volume volume : lidovky) {
-//            for (int i = 35; i < lidovky.size(); i++) {
-//            Volume volume = lidovky.get(i);
-
             for (Issue issue : volume.getIssues()) {
                 for (Page page : issue.getPages()) {
                     // datastreamy
@@ -302,19 +304,26 @@ public class LnKonverze implements Script {
 
     private List<Volume> fillSecondStage() {
         List<Volume> lidovky = new ArrayList<>();
-        lidovky.add(new Volume("1933", "uuid:5c39cf90-dfa6-11dc-9c02-000d606f5dc6"));
-        lidovky.add(new Volume("1934", "uuid:e0dfa5f0-0fba-11dd-9f3d-000d606f5dc6"));
-        lidovky.add(new Volume("1935", "uuid:3024eee0-1baa-11dd-895a-000d606f5dc6"));
-        lidovky.add(new Volume("1936", "uuid:8ae68730-25cd-11dd-8afc-000d606f5dc6"));
-        lidovky.add(new Volume("1937", "uuid:2e856c90-2bf9-11dd-aaa1-000d606f5dc6"));
-        lidovky.add(new Volume("1938", "uuid:926698b0-37f7-11dd-8e35-000d606f5dc6"));
-        lidovky.add(new Volume("1939", "uuid:23e87270-4ebb-11dd-a91e-000d606f5dc6"));
-        lidovky.add(new Volume("1940", "uuid:e62aac60-5323-11dd-9471-000d606f5dc6"));
-        lidovky.add(new Volume("1941", "uuid:3ad7f270-484f-11dd-b012-000d606f5dc6"));
-        lidovky.add(new Volume("1942", "uuid:0226fbd0-6eb8-11dd-9de7-000d606f5dc6"));
-        lidovky.add(new Volume("1943", "uuid:047b0c30-6b0e-11dd-b545-000d606f5dc6"));
-        lidovky.add(new Volume("1944", "uuid:2ec8bbf0-63c4-11dd-afa8-000d606f5dc6"));
-        lidovky.add(new Volume("1945", "uuid:04281a60-6330-11dd-ab5f-000d606f5dc6"));
+        // u LN se konvertovaly jen ročníky 1933-1945, ne celé periodikum -> takhle se načítá jen potřebná část
+//        lidovky.add(new Volume("1933", "uuid:5c39cf90-dfa6-11dc-9c02-000d606f5dc6"));
+//        lidovky.add(new Volume("1934", "uuid:e0dfa5f0-0fba-11dd-9f3d-000d606f5dc6"));
+//        lidovky.add(new Volume("1935", "uuid:3024eee0-1baa-11dd-895a-000d606f5dc6"));
+//        lidovky.add(new Volume("1936", "uuid:8ae68730-25cd-11dd-8afc-000d606f5dc6"));
+//        lidovky.add(new Volume("1937", "uuid:2e856c90-2bf9-11dd-aaa1-000d606f5dc6"));
+//        lidovky.add(new Volume("1938", "uuid:926698b0-37f7-11dd-8e35-000d606f5dc6"));
+//        lidovky.add(new Volume("1939", "uuid:23e87270-4ebb-11dd-a91e-000d606f5dc6"));
+//        lidovky.add(new Volume("1940", "uuid:e62aac60-5323-11dd-9471-000d606f5dc6"));
+//        lidovky.add(new Volume("1941", "uuid:3ad7f270-484f-11dd-b012-000d606f5dc6"));
+//        lidovky.add(new Volume("1942", "uuid:0226fbd0-6eb8-11dd-9de7-000d606f5dc6"));
+//        lidovky.add(new Volume("1943", "uuid:047b0c30-6b0e-11dd-b545-000d606f5dc6"));
+//        lidovky.add(new Volume("1944", "uuid:2ec8bbf0-63c4-11dd-afa8-000d606f5dc6"));
+//        lidovky.add(new Volume("1945", "uuid:04281a60-6330-11dd-ab5f-000d606f5dc6"));
+
+        lidovky.add(new Volume("1948", "uuid:182d2130-783a-11dd-88df-000d606f5dc6"));
+        lidovky.add(new Volume("1949", "uuid:f9dedcb0-7d79-11dd-9bfe-000d606f5dc6"));
+        lidovky.add(new Volume("1950", "uuid:e512bd10-7eaf-11dd-8fcc-000d606f5dc6"));
+        lidovky.add(new Volume("1951", "uuid:64f672b0-7e4c-11dd-b89d-000d606f5dc6"));
+        lidovky.add(new Volume("1952", "uuid:30b93080-7f7f-11dd-b82a-000d606f5dc6"));
 
         return lidovky;
     }
@@ -325,3 +334,4 @@ public class LnKonverze implements Script {
                 "(jednorázový skript)";
     }
 }
+*/

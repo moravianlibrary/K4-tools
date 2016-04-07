@@ -5,6 +5,7 @@ import cz.mzk.k4.tools.ocr.domain.Img;
 import cz.mzk.k4.tools.ocr.domain.QueuedImage;
 import cz.mzk.k4.tools.ocr.exceptions.ConflictException;
 import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
+import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.FileUtils;
@@ -24,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,38 +46,40 @@ public class ImgReader implements ItemReader<Img> {
     private AbbyRestApi abbyApi;
     private boolean overwrite;
     private List<String> pagePids;
-//    private List<String> kopie; // zničit (jen pro LN)
+    private List<String> kopie; // zničit (jen pro LN)
 
     public ImgReader(FedoraUtils fedoraUtils, AbbyRestApi abbyApi, String rootPid, boolean overwrite) {
         this.fedoraUtils = fedoraUtils;
         this.abbyApi = abbyApi;
         this.overwrite = overwrite;
         LOGGER.info("Spuštěno OCR na dokumentu " + rootPid);
-        if (new File(rootPid + ".ser").exists()) {
-            try {
-                pagePids = deserialize(rootPid + ".ser");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            pagePids = fedoraUtils.getChildrenUuids(rootPid, DigitalObjectModel.PAGE);
-            pagePids = makeUnique(pagePids);
-            serialize(pagePids, rootPid + ".ser");
-        }
+//        if (new File(rootPid + ".ser").exists()) {
+//            try {
+//                pagePids = deserialize(rootPid + ".ser");
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            pagePids = fedoraUtils.getChildrenUuids(rootPid, DigitalObjectModel.PAGE);
+//            pagePids = makeUnique(pagePids);
+//            serialize(pagePids, rootPid + ".ser");
+//        }
 
         // odsud po LOGGER jen pro LN
-//        serialize(pagePids, rootPid + ".ser");
-//        try {
-//            pagePids = deserialize("LN-na-OCR");
+        serialize(pagePids, rootPid + ".ser");
+        try {
+            pagePids = deserialize("LN-na-OCR");
+            pagePids = makeUnique(pagePids);
 //            pagePids = deserialize(rootPid + ".ser"); // pro další periodika (ne jen LN)
-//            pagePids.remove("uuid:a2e3ff50-ec1d-11dc-a58b-000d606f5dc6");
-//            pagePids.remove("uuid:52095459-435f-11dd-b505-00145e5790ea");
-//            pagePids.remove("uuid:51eb1e3c-435f-11dd-b505-00145e5790ea");
-//            pagePids.remove("uuid:2c2968f0-2d5e-11dd-bc0a-000d606f5dc6");
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        kopie = new ArrayList(pagePids);
+            List<String> skip = GeneralUtils.loadUuidsFromFile("LN-skip");
+            for (String skipPage : skip) {
+                pagePids.remove(skipPage);
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        kopie = new ArrayList(pagePids);
 
         LOGGER.info("Načteno " + pagePids.size() + " stran");
     }
@@ -90,28 +95,38 @@ public class ImgReader implements ItemReader<Img> {
         }
 
         LOGGER.debug("Reading item " + pagePid);
-        if (fedoraUtils.getOcr(pagePid) != null && fedoraUtils.getAlto(pagePid) != null && !overwrite) {
-            // odstranit ze seznamu
-//            kopie.remove(pagePid);
-            // serializace
-//            serialize(kopie, "LN-na-OCR");
-            return new Img(pagePid, null); // strana už má OCR i ALTO (filter - strana se dál nezpracovává)
-        }
+            if (fedoraUtils.getOcr(pagePid) != null && fedoraUtils.getAlto(pagePid) != null && !overwrite) {
+                // odstranit ze seznamu
+                kopie.remove(pagePid);
+                // serializace
+                serialize(kopie, "LN-na-OCR");
+                return new Img(pagePid, null); // strana už má OCR i ALTO (filter - strana se dál nezpracovává)
+            }
+
+
+//        if (pagePid.equals("uuid:46642e0f-435e-11dd-b505-00145e5790ea") || // výjimka
+//            pagePid.equals("uuid:45a571e3-435e-11dd-b505-00145e5790ea")) { // výjimka, adfb156b62fc1975145dddd923a58424
+//            LOGGER.warn("Přeskočení strany " + pagePid); // strana padá do výjimky na ocr serveru
+//            return new Img(pagePid, null);
+//        }
 
         String mimetype;
         InputStream imgStream;
 
-        try {
-            mimetype = JPEG2000_MIMETYPE;
-            imgStream = fedoraUtils.getImgJp2(pagePid);
-        } catch (NullPointerException ex) {
+//        try {
+//            mimetype = JPEG2000_MIMETYPE;
+//            LOGGER.debug("Trying to get JP2 of " + pagePid);
+//            imgStream = fedoraUtils.getImgJp2(pagePid);
+//        } catch (NullPointerException ex) {
             // stahuje IMG_FULL datastream -> jpeg a menší kvalita, než jpeg2000 na imageserveru
             mimetype = JPEG_MIMETYPE;
+            LOGGER.debug("Trying to get JPG of " + pagePid);
             imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
-        }
+//        }
 
         String md5 = null;
         try {
+            LOGGER.debug("Trying to send " + pagePid + " to OCR server");
             md5 = sendImageToOcrEngine(imgStream, pagePid, mimetype);
         } catch (NullPointerException ex) {
             LOGGER.error("Nepodařilo se odeslat stranu " + pagePid);
@@ -151,14 +166,6 @@ public class ImgReader implements ItemReader<Img> {
         Set<String> hashSet = new HashSet<>(pagePids);
         pagePids.clear();
         pagePids.addAll(hashSet);
-
-//        pagePids.remove("uuid:ec509a60-6574-11dd-89e1-000d606f5dc6"); // problémová stránka LN - prověřit
-//        pagePids.remove("uuid:6f4ec4a0-82ef-11dc-bb19-000d606f5dc6"); // problémová stránka LN - prověřit
-//        pagePids.remove("uuid:a2e3ff50-ec1d-11dc-a58b-000d606f5dc6"); // problémová stránka LN - prověřit
-//        pagePids.remove("uuid:52095459-435f-11dd-b505-00145e5790ea"); // problémová stránka LN - prověřit
-//        pagePids.remove("uuid:51eb1e3c-435f-11dd-b505-00145e5790ea"); // problémová stránka LN - prověřit
-//        pagePids.remove("uuid:2c2968f0-2d5e-11dd-bc0a-000d606f5dc6"); // problémová stránka LN - prověřit
-
         return pagePids;
     }
 

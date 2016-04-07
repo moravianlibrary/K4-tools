@@ -4,9 +4,17 @@ import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.client.domain.Streams;
 import cz.mzk.k5.api.common.K5ApiException;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import retrofit.RetrofitError;
-
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +23,6 @@ import java.util.Map;
  * Posílá dotaz dál podle očekávaného typu dat (různá deserializase jsonu, stringu a xml)
  */
 public class ClientRemoteApi {
-
     private final String DC = "DC";
     private final String BIBLIO_MODS = "BIBLIO_MODS";
     private final String TEI_P5 = "TEI_P5";
@@ -73,7 +80,42 @@ public class ClientRemoteApi {
     }
 
     // TODO: solr simple search (vrátí seznam uuid)
-    // spec. na hledání podle modelu?
+    public List<String> solrSimpleSearch(Map<String, String> queryMap) throws K5ApiException {
+        // solr chce query parametry ve tvaru key:value místo standardního key=value
+        String query = "?q=";
+        for(Map.Entry<String, String> entry : queryMap.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            query += key + ":" + value;
+        }
+        query += "&fl=PID";
+        try {
+            return parseUuids(apiXML.solrSearch(query));
+        // TODO: log
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<String> parseUuids(Document result) throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+//        final String pXML = "<root><x>1</x><x>2</x><x>3</x><x>4</x></root>";
+//        final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(pXML.getBytes()));
+        // //str[@name='PID']/text()
+        final XPathExpression xPathExpression = XPathFactory.newInstance().newXPath().compile("//str[@name='PID']/text()");
+        final NodeList nodeList = (NodeList) xPathExpression.evaluate(result, XPathConstants.NODESET);
+        final List<String> values = new LinkedList<>();
+        for (int i = 0; i < nodeList.getLength(); ++i) {
+            values.add(nodeList.item(i).getNodeValue());
+        }
+        return values;
+    }
 
     public Streams listStreams(String pid) throws K5ApiException {
         return apiJSON.listStreams(pid);

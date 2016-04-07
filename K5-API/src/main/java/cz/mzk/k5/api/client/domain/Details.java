@@ -6,7 +6,7 @@ package cz.mzk.k5.api.client.domain;
 public class Details {
 
     // page
-    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+//    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
     private String type;
 
     // periodical item:
@@ -16,13 +16,13 @@ public class Details {
     private String year;
 //    private String volumeNumber;  // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
 
-    public String getPagenumber() {
-        return pagenumber;
-    }
-
-    public void setPagenumber(String pagenumber) {
-        this.pagenumber = pagenumber;
-    }
+//    public String getPagenumber() {
+//        return pagenumber;
+//    }
+//
+//    public void setPagenumber(String pagenumber) {
+//        this.pagenumber = pagenumber;
+//    }
 
     public String getType() {
         return type;

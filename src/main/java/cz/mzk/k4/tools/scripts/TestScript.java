@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
@@ -9,7 +10,6 @@ import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import javax.xml.transform.TransformerException;
@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -38,22 +37,51 @@ public class TestScript implements Script {
 
     @Override
     public void run(List<String> args) {
+//        String filename = "child-count";
+//        List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
+//        delete();
+//        fedoraUtils.getAllChildren("uuid:4eac74b0-e92c-11dc-9fa1-000d606f5dc7");
+        List<String> parents = fedoraUtils.getParentUuids("uuid:8f3de2b0-e92d-11dc-a565-000d606f5dc6");
+        parents.forEach(System.out::println);
+//        System.out.println();
+//        fedoraUtils.purgeObject("uuid:4eac74b0-e92c-11dc-9fa1-000d606f5dc6");
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        parents = fedoraUtils.getParentUuids("uuid:8f3de2b0-e92d-11dc-a565-000d606f5dc6");
+//        parents.forEach(System.out::println);
 
-        try {
-//            InputStream raw = clientApi.getRecordingMp3("uuid:cfe2b585-7c3d-4ef0-8694-85150fb23065");
-            InputStream mp3 = clientApi.getRecordingMp3("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
-            FileUtils.copyInputStreamToFile(mp3, new File("sound.mp3"));
-            System.out.println(mp3.available());
-            InputStream wav = clientApi.getRecordingWav("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
-            FileUtils.copyInputStreamToFile(wav, new File("sound.wav"));
-            InputStream ogg = clientApi.getRecordingOgg("uuid:e51422f1-da82-4ebb-908b-b4435d2c537b");
-            FileUtils.copyInputStreamToFile(ogg, new File("sound.ogg"));
-        } catch (K5ApiException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+//        for (String uuid : uuids) {
+//            try {
+////                Item item = clientApi.getItem(uuid);
+////                item.getContext().
+//                if (clientApi.getItem(uuid) != null) {
+//                    ArrayList<ArrayList<String>> children = fedoraUtils.getAllChildren(uuid);
+//                    int totalCount = 0;
+//                    for (ArrayList<String> child : children) {
+//                        if (child != null) {
+//                            totalCount += child.size();
+//                        }
+//                    }
+//                    System.out.println(uuid + " " + totalCount);
+//                }
+//            } catch (K5ApiException e) {
+//                e.printStackTrace();
+//            }
+//        }
+    }
+
+    public void delete() {
+        List<String> uuids = GeneralUtils.loadUuidsFromFile("to-remove");
+        for (String uuid : uuids) {
+            try {
+                remoteApi.deleteObject(uuid);
+            } catch (K5ApiException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     @Override

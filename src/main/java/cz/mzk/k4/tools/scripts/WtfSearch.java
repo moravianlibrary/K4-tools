@@ -8,8 +8,6 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.ValidateWorker;
-import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
-import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -74,7 +72,7 @@ public class WtfSearch implements Script {
 
                 // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
                 // + kontrola konzistence ORC
-                fedoraUtils.checkChildrenAndOcrExistance(uuid);
+                fedoraUtils.checkChildrenAndOcrExistence(uuid);
             }
 
         } else {
@@ -113,7 +111,7 @@ public class WtfSearch implements Script {
                     worker.run(uuid);
 
                     // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
-                    fedoraUtils.checkChildrenExistance(uuid);
+                    fedoraUtils.checkChildrenExistence(uuid);
 
                     try {
                         if (fedoraUtils.getModel(uuid).equals(DigitalObjectModel.PAGE)) {

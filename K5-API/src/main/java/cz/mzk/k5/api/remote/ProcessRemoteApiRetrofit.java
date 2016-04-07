@@ -38,7 +38,7 @@ public interface ProcessRemoteApiRetrofit {
     Process stopProcess(@Path("uuid") String uuid, @Body Parameters fakeBody) throws K5ApiException;
 
     @DELETE("/processes/{uuid}")
-    JsonObject deleteProcess(@Path("uuid") String uuid) throws K5ApiException;
+    JsonObject deleteProcessLog(@Path("uuid") String uuid) throws K5ApiException;
 
     @GET("/replication/{pid}")
     ReplicatedObject getReplicatedObjectInfo(@Path("pid") String pid) throws K5ApiException;

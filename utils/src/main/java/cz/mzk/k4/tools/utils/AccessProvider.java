@@ -17,6 +17,7 @@ import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -83,6 +84,8 @@ public class AccessProvider {
         solrHost = properties.getProperty(libraryPrefix + ".solr.host");
 
         client = Client.create();
+        client.setConnectTimeout(600000);
+        client.setReadTimeout(600000);
     }
 
     public static AccessProvider getInstance() {
@@ -132,6 +135,7 @@ public class AccessProvider {
         String url = "http://" + fedoraHost + query;
 //        LOGGER.debug("Fedora url: " + url);
         WebResource resource = client.resource(url);
+        Map<String, Object> properties = client.getProperties();
         BasicAuthenticationFilter credentials = new BasicAuthenticationFilter(fedoraUser, fedoraPassword);
         resource.addFilter(credentials);
         return resource;
