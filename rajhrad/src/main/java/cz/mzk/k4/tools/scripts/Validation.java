@@ -2,8 +2,6 @@ package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.domain.aleph.RecordHolder;
 import cz.mzk.k4.tools.domain.aleph.RecordRelation;
-import cz.mzk.k4.tools.scripts.RajhradValidate;
-import cz.mzk.k4.tools.configuration.Configuration;
 import org.marc4j.MarcException;
 import org.marc4j.MarcPermissiveStreamReader;
 import org.marc4j.MarcReader;
@@ -23,8 +21,6 @@ import java.util.logging.Logger;
  * @version: 11/13/13
  */
 public class Validation {
-
-    Configuration configuration = new Configuration();
 
 
     public void validate(RecordHolder holder, String path) {
@@ -96,48 +92,48 @@ public class Validation {
         int c = 0;
 
 
-        System.out.println("<h2>Varovani: Prebyvaji privazky</h2>");
+        System.out.println("##Varovani: Prebyvaji privazky");
         for (RecordRelation rr : holder.getRecordRelations()) {
             if (!rr.isOk() && rr.getConflictType() == RecordRelation.SUPPLEMENT_NUMBER_CONFLICT &&
                     rr.getNumberOfExcpectedSupplements() < rr.getSupplements().size()) {
                 c++;
-                System.out.println("<h3>Varovani: ocekavany pocet privazku: <b>" + rr.getNumberOfExcpectedSupplements()
-                        + "</b> skutecny pocet privazku: <b>" + rr.getSupplements().size() + "</b></h3><p>" + rr.toHtml() + "</p>");
+                System.out.println("###Varovani: ocekavany pocet privazku: *" + rr.getNumberOfExcpectedSupplements()
+                        + "skutecny pocet privazku: **" + rr.getSupplements().size() + "**" + rr.toHtml());
             }
         }
 
-        System.out.println("Celkem: " + c + "<br/>");
+        System.out.println("Celkem: " + c);
         c = 0;
-        System.out.println("<h2>Chyby: Chybi privazky</h2>");
+        System.out.println("##Chyby: Chybi privazky");
         for (RecordRelation rr : holder.getRecordRelations()) {
             if (!rr.isOk() && rr.getConflictType() == RecordRelation.SUPPLEMENT_NUMBER_CONFLICT &&
                     rr.getNumberOfExcpectedSupplements() > rr.getSupplements().size()) {
                 c++;
-                System.out.println("<h3>Chyba: ocekavany pocet privazku: <b>" + rr.getNumberOfExcpectedSupplements()
-                        + "</b> skutecny pocet privazku: <b>" + rr.getSupplements().size() + "</b></h3><p>" + rr.toHtml() + "</p>");
+                System.out.println("###Chyba: ocekavany pocet privazku: **" + rr.getNumberOfExcpectedSupplements()
+                        + "** skutecny pocet privazku: **" + rr.getSupplements().size() + "**" + rr.toHtml());
             }
         }
-        System.out.println("Celkem: " + c + "<br/>");
+        System.out.println("Celkem: " + c);
 
 
-        System.out.println("<h2>Chyby v nazvech privazku</h2>");
+        System.out.println("##Chyby v nazvech privazku");
         c = 0;
         for (RecordRelation rr : holder.getRecordRelations()) {
             if (!rr.isOk() && rr.getConflictType() == RecordRelation.SUPPLEMENT_NAME_CONFLICT) {
                 c++;
-                System.out.println(rr.getSysno() + "<br/>");
+                System.out.println(rr.getSysno());
             }
         }
-        System.out.println("Celkem: " + c + "<br/>");
+        System.out.println("Celkem: " + c );
         c = 0;
-        System.out.println("<h2>Nezname chyby</h2>");
+        System.out.println("##Nezname chyby");
         for (RecordRelation rr : holder.getRecordRelations()) {
             if (!rr.isOk() && rr.getConflictType() == RecordRelation.UNKNOWN_CONFLICT) {
                 c++;
-                System.out.println(rr.getSysno() + "<br/>");
+                System.out.println(rr.getSysno());
             }
         }
-        System.out.println("Celkem: " + c + "<br/>");
+        System.out.println("Celkem: " + c);
 
 
 //        System.out.println("-----------------------------------------------");

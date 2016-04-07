@@ -1,14 +1,9 @@
 package cz.mzk.k4.tools.utils;
 
 import com.jcraft.jsch.*;
-import cz.mzk.k4.tools.configuration.Configuration;
-import cz.mzk.k4.tools.utils.domain.LsItem;
 import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,35 +47,35 @@ public class ImageserverUtils {
 
     }
 
-    public void uploadToImageserver(String path) throws JSchException, SftpException, IOException {
-        List<LsItem> list = getFilenames(path);
-
-        ChannelSftp workspaceChannel = getSftpConnection(configuration.getSshUserWorkspace(),
-                configuration.getSshHostWorkspace(), null);
-
-        for (LsItem item : list) {
-            BufferedWriter writer = null;
-            File originalImage = File.createTempFile("rajhrad_tool", "image");
-            File convertedImage = File.createTempFile("rajhrad_tool", ".jp2");
-            FileUtils.copyInputStreamToFile(workspaceChannel.get(path + "/" + item), originalImage);
-
-
-            List<String> command = new ArrayList<String>();
-            command.add("/home/rumanekm/.meditor/bin/compress.sh");
-            command.add("/home/rumanekm/.meditor/djatoka/");
-            command.add(originalImage.getAbsolutePath());
-            command.add(convertedImage.getAbsolutePath());
-            ProcessBuilder processBuilder = new ProcessBuilder(command);
-            processBuilder.start();
-
-
-            originalImage.delete();
-            convertedImage.delete();
-
-        }
-        workspaceChannel.disconnect();
-
-    }
+//    public void uploadToImageserver(String path) throws JSchException, SftpException, IOException {
+//        List<LsItem> list = getFilenames(path);
+//
+//        ChannelSftp workspaceChannel = getSftpConnection(configuration.getSshUserWorkspace(),
+//                configuration.getSshHostWorkspace(), null);
+//
+//        for (LsItem item : list) {
+//            BufferedWriter writer = null;
+//            File originalImage = File.createTempFile("rajhrad_tool", "image");
+//            File convertedImage = File.createTempFile("rajhrad_tool", ".jp2");
+//            FileUtils.copyInputStreamToFile(workspaceChannel.get(path + "/" + item), originalImage);
+//
+//
+//            List<String> command = new ArrayList<String>();
+//            command.add("/home/rumanekm/.meditor/bin/compress.sh");
+//            command.add("/home/rumanekm/.meditor/djatoka/");
+//            command.add(originalImage.getAbsolutePath());
+//            command.add(convertedImage.getAbsolutePath());
+//            ProcessBuilder processBuilder = new ProcessBuilder(command);
+//            processBuilder.start();
+//
+//
+//            originalImage.delete();
+//            convertedImage.delete();
+//
+//        }
+//        workspaceChannel.disconnect();
+//
+//    }
 
     /**
      * Method uploading image input stream to image server. Name of uploaded image on image
@@ -93,27 +88,27 @@ public class ImageserverUtils {
      * @throws JSchException If the connection to image server was unsuccessful
      * @throws SftpException If the upload to image server was unsuccessful
      */
-    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws IOException {
-        try {
-            AccessProvider accessProvider = AccessProvider.getInstance();
-            ChannelSftp imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
-                    accessProvider.getImageserverHost(), accessProvider.getImageserverPassword(), true);
-
-            try {
-                //Upload File
-                String imgServerUrl = accessProvider.getImageserverPath();
-                imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
-            } catch (SftpException e) {
-                throw new IOException("Upload to imageserver has failed: " + e.getMessage());
-            } finally {
-                //Disconnect from server
-                imgServerChannel.disconnect();
-            }
-
-        }  catch (JSchException e) {
-            throw new IOException("Connecting to imageserver has failed: " + e.getMessage());
-        }
-    }
+//    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws IOException {
+//        try {
+//            AccessProvider accessProvider = AccessProvider.getInstance();
+//            ChannelSftp imgServerChannel = getSftpConnection(accessProvider.getImageserverUser(),
+//                    accessProvider.getImageserverHost(), accessProvider.getImageserverPassword(), true);
+//
+//            try {
+//                //Upload File
+//                String imgServerUrl = accessProvider.getImageserverPath();
+//                imgServerChannel.put(jp2InputStream, imgServerUrl + uuid.substring("uuid:".length()) + ".jp2");
+//            } catch (SftpException e) {
+//                throw new IOException("Upload to imageserver has failed: " + e.getMessage());
+//            } finally {
+//                //Disconnect from server
+//                imgServerChannel.disconnect();
+//            }
+//
+//        }  catch (JSchException e) {
+//            throw new IOException("Connecting to imageserver has failed: " + e.getMessage());
+//        }
+//    }
 
     private ChannelSftp getSftpConnection(String user, String host, String password) throws JSchException {
         return getSftpConnection(user, host, password, false);

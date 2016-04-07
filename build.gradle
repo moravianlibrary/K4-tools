@@ -29,7 +29,6 @@ repositories {
 
 
 dependencies {
-    compile project(':rajhrad')
     compile project(':uploader')
     compile project(':utils')
     compile project(':convertor')

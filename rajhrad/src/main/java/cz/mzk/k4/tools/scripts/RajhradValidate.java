@@ -1,10 +1,10 @@
 package cz.mzk.k4.tools.scripts;
 
 import com.jcraft.jsch.*;
-import cz.mzk.k4.tools.configuration.*;
-import cz.mzk.k4.tools.domain.aleph.*;
-import cz.mzk.k4.tools.utils.*;
-import cz.mzk.k4.tools.utils.domain.*;
+import cz.mzk.k4.tools.domain.aleph.RecordHolder;
+import cz.mzk.k4.tools.utils.Configuration;
+import cz.mzk.k4.tools.utils.ImageserverUtils;
+import cz.mzk.k4.tools.utils.LsItem;
 import org.apache.commons.io.*;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.joda.time.*;
@@ -16,9 +16,9 @@ import java.io.*;
 import java.util.*;
 
 /**
-* Created by rumanekm on 27.3.14.
-*/
-public class RajhradValidate implements Script {
+ * Created by rumanekm on 27.3.14.
+ */
+public class RajhradValidate {
 
     private static final String EXPORT_PATH = System.getProperty("user.home") + "/mzk03.m21";
 
@@ -27,13 +27,13 @@ public class RajhradValidate implements Script {
 
     private ImageserverUtils imageserverUtils = new ImageserverUtils();
 
-    @Override
-    public void run(List<String> args) {
-        String path = args.get(0);
-        run(path);
+    public static void main(String[] args) {
+        RajhradValidate validator = new RajhradValidate();
+        validator.run(args[1]);
     }
 
-    protected void run (String path) {
+
+    protected void run(String path) {
         List<LsItem> lsList = null;
 
         try {
@@ -51,10 +51,10 @@ public class RajhradValidate implements Script {
             if (item.isDirectory()) {
                 run(path + "/" + item.getFilename());
             } else {
-               list.add(item.getFilename());
+                list.add(item.getFilename());
             }
         }
-        System.out.println("Kontrola " + path);
+        System.out.println("##Kontrola adresáře " + path);
         RecordHolder holder = new RecordHolder(list);
 
         try {
@@ -70,23 +70,27 @@ public class RajhradValidate implements Script {
         Validation validation = new Validation();
         validation.validate(holder, EXPORT_PATH);
         System.out.println("------------------------------");
-        holder.writeImageserverScript();
+        //holder.writeImageserverScript();
         System.out.println("------------------------------");
-        holder.writeAlephScript();
-
+        //holder.writeAlephScript();
+        Map<Integer, Integer> imageStatusCounter = new HashMap<Integer, Integer>();
         for (String url : holder.getImageserverLinkList()) {
             Client client = new ResteasyClientBuilder().build();
-            WebTarget webTarget = client.target(url + "/preview.jpg");
-            Response response = webTarget.request().get();
-            if (response.getStatus() != Response.Status.OK.getStatusCode()) {
-                System.err.println(url + " returned status code " + response.getStatus());
-            } else {
-                System.out.println(url + " is ok");
+            try {
+                WebTarget webTarget = client.target(url + "/preview.jpg");
+                Response response = webTarget.request().get();
+                if (imageStatusCounter.containsKey(new Integer(response.getStatus()))) {
+                    Integer counter = imageStatusCounter.get(new Integer(response.getStatus()));
+                    counter++;
+                } else {
+                    imageStatusCounter.put(response.getStatus(), 1);
+                }
+                client.close();
+            } catch (IllegalArgumentException e) {
+                // TODO
             }
-            client.close();
         }
-
-        System.out.println("DONE");
+        //System.out.println("Kontrola imageserveru dobehla");
     }
 
     //ensure that base is updated
@@ -96,7 +100,7 @@ public class RajhradValidate implements Script {
 
         if (file.exists()) {
             DateTime modifiedDate = new DateTime(file.lastModified());
-            if (modifiedDate.withTimeAtStartOfDay().isAfter(new DateTime().minusDays(1).withTimeAtStartOfDay())) {
+            if (file.length() > 0 && modifiedDate.withTimeAtStartOfDay().isAfter(new DateTime().minusDays(1).withTimeAtStartOfDay())) {
                 //base on export path is already updated
                 return;
             }
@@ -125,12 +129,5 @@ public class RajhradValidate implements Script {
         try (FileOutputStream out = new FileOutputStream(EXPORT_PATH)) {
             IOUtils.copy(is, out);
         }
-    }
-
-
-
-    @Override
-    public String getUsage() {
-        return "rajhradKontrola";
     }
 }
