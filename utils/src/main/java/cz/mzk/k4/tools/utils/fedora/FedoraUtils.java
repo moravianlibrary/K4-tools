@@ -109,6 +109,8 @@ public class FedoraUtils {
                 worker.run(queue.take());
             } catch (InterruptedException e) {
                 LOGGER.error("K4 tools was interrupted");
+            } catch (FileNotFoundException e) {
+                LOGGER.error(e.getMessage());
             }
         }
     }
@@ -136,7 +138,11 @@ public class FedoraUtils {
                             new Thread() {
                                 public void run() {
                                     LOGGER.debug("Worker is running on " + childUuid);
-                                    worker.run(childUuid);
+                                    try {
+                                        worker.run(childUuid);
+                                    } catch (FileNotFoundException e) {
+                                        LOGGER.error(e.getMessage());
+                                    }
                                     semaphore.release();
                                 }
                             }.start();

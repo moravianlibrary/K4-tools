@@ -4,7 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
-
+import org.apache.log4j.Logger;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -13,8 +14,7 @@ import java.util.List;
  */
 public class DeletedDocuments implements Script {
 
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-    public static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(DeletedDocuments.class);
+    public static final Logger LOGGER = Logger.getLogger(DeletedDocuments.class);
 
     @Override
     /**
@@ -22,7 +22,8 @@ public class DeletedDocuments implements Script {
      * @param writeEnabled - pokud je false, pouze vypíše uuid dokumentů se stavem DELETED
      *                     - pokud je true, DELETED dokumenty trvale odstraní
      */
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
+        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
         // TODO: chyba při nulovém výsledku v risearch
         fedoraUtils.applyToAllUuidOfStateDeleted(new UuidWorker(args.contains("writeEnabled")) {
             @Override
@@ -30,9 +31,9 @@ public class DeletedDocuments implements Script {
                 if (isWriteEnabled()) {
                     try {
                         fedoraUtils.purgeObject(uuid);
-                        LOGGER.info("Deleted: " + uuid + " from fedora NDK");
+                        LOGGER.info("Deleted: " + uuid + " from fedora");
                     } catch (RuntimeException e) {
-                        LOGGER.error("NDK: " + e.getMessage());
+                        LOGGER.error("Mazání \"deleted\" dokůmentů: " + e.getMessage());
                     }
                 } else {
                     System.out.println(uuid);

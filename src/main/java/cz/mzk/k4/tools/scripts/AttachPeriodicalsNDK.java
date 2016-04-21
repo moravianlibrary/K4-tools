@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 
 import javax.xml.transform.TransformerException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -34,13 +35,16 @@ import java.util.Set;
  */
 public class AttachPeriodicalsNDK implements Script {
     private static final Logger LOGGER = Logger.getLogger(AttachPeriodicalsNDK.class);
-    private static AccessProvider accessProvider = AccessProvider.getInstance();
-    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+    private  AccessProvider accessProvider = AccessProvider.getInstance();
+    private  ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
             accessProvider.getKrameriusHost(),
             accessProvider.getKrameriusUser(),
             accessProvider.getKrameriusPassword());
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private  FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
 //    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
+
+    public AttachPeriodicalsNDK() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {  // periodicalitem, periodicalvolume, volume (?), supplement, page (?), monographunit

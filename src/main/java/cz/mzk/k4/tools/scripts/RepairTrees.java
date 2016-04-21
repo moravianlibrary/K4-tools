@@ -14,6 +14,7 @@ import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -22,16 +23,19 @@ import java.util.List;
  */
 public class RepairTrees implements Script {
 
-    private static AccessProvider accessProvider = AccessProvider.getInstance();
-    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+    private  AccessProvider accessProvider = AccessProvider.getInstance();
+    private  ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
                         accessProvider.getKrameriusHost(),
                         accessProvider.getKrameriusUser(),
                         accessProvider.getKrameriusPassword());
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
-    private static SolrUtils solr = new SolrUtils(accessProvider);
-    private static ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private  FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private  KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
+    private  SolrUtils solr = new SolrUtils(accessProvider);
+    private  ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     public static final Logger LOGGER = Logger.getLogger(RepairTrees.class);
+
+    public RepairTrees() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {
@@ -61,6 +65,8 @@ public class RepairTrees implements Script {
         } catch (K5ApiException e) {
             LOGGER.error("Selhalo plánování reindexace dokumentu");
             LOGGER.error(e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

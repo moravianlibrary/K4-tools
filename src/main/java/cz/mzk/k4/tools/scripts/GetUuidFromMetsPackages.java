@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.scripts;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,9 @@ public class GetUuidFromMetsPackages implements Script {
                                                 accessProvider.getKrameriusHost(),
                                                 accessProvider.getKrameriusUser(),
                                                 accessProvider.getKrameriusPassword());
+
+    public GetUuidFromMetsPackages() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

@@ -11,6 +11,7 @@ import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ import java.util.List;
 public class BatchK5Process implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(BatchK5Process.class);
-    private static FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
+    private FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
@@ -27,6 +28,9 @@ public class BatchK5Process implements Script {
     private final static int MAKE_PUBLIC = 1;
     private final static int MAKE_PRIVATE = 2;
     private final static int REINDEX = 3;
+
+    public BatchK5Process() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

@@ -4,6 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.log4j.Logger;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -16,7 +18,7 @@ public class ChildrenUuid implements Provider {
     private static final Logger LOGGER = Logger.getLogger(ChildrenUuid.class);
     private final ArrayBlockingQueue<String> queue = new ArrayBlockingQueue<String>(1000);
 
-    public ChildrenUuid(final String parent, final DigitalObjectModel model) {
+    public ChildrenUuid(final String parent, final DigitalObjectModel model) throws FileNotFoundException {
 
         new Thread(new Runnable() {
 

@@ -10,10 +10,7 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.domain.Item;
 import org.apache.log4j.Logger;
 import javax.xml.transform.TransformerException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +19,14 @@ import java.util.Map;
  * Created by holmanj on 7.5.15.
  */
 public class StehovaniHades implements Script {
-    private static AccessProvider accessProvider = AccessProvider.getInstance();
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+    private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
 //    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
-    private static ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     public static final Logger LOGGER = Logger.getLogger(StehovaniHades.class);
+
+    public StehovaniHades() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

@@ -1,5 +1,7 @@
-#!/bin/bash  
-# usage find . -type f -exec /path/imageserverreplace.sh {}
+#!/bin/bash
+# změny linků z foxml do imageserveru
+# usage find /fedora/data/objects -type f -exec /path/imageserverreplace.sh {} \;
+# funguje se starletem od verze 1.0.2
 TILES=`xmlstarlet sel -N kramerius4="http://www.nsdl.org/ontologies/relationships#" -t -v "//kramerius4:tiles-url" $1`
 if [ ! -n "$TILES" ]; then
   echo $1";nopage"

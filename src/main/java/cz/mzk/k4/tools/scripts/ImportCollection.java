@@ -5,6 +5,7 @@ import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -17,6 +18,9 @@ public class ImportCollection implements Script {
 //            accessProvider.getKrameriusHost(),
 //            accessProvider.getKrameriusUser(),
 //            accessProvider.getKrameriusPassword());
+
+    public ImportCollection() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

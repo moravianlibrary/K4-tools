@@ -8,6 +8,7 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -17,7 +18,6 @@ import java.util.List;
 public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
     private boolean repair;
 
     public FindBadCharacterInOcr(boolean writeEnabled) {
@@ -83,7 +83,8 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     /**
      * @param uuid
      */
-    public void run(String uuid) {
+    public void run(String uuid) throws FileNotFoundException {
+        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
         if (isWriteEnabled()) {
             repair = true;
         }
@@ -111,7 +112,7 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     /**
      * @param args
      */
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
         run(args.get(0));
         //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
         //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();

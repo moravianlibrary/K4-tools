@@ -4,6 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Jan Holman
@@ -16,7 +18,7 @@ public class RelationshipCounterWorker extends UuidWorker {
     private FedoraUtils fedoraUtils;
     private int counter;
 
-    public RelationshipCounterWorker(boolean writeEnabled) {
+    public RelationshipCounterWorker(boolean writeEnabled) throws FileNotFoundException {
         super(writeEnabled);
         fedoraUtils = new FedoraUtils(new AccessProvider());
         counter = 0;

@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,15 +36,20 @@ import java.util.List;
  */
 public class DjvuVymena implements Script {
     private static final Logger LOGGER = Logger.getLogger(ChangeImgs.class);
-    private static final AccessProvider accessProvider = AccessProvider.getInstance();
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static final ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
-    private static final ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+    private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     private ImageUrlWorker prepisovakUrl;
 
     boolean isMonograph = true;
     String imageserverFolderPath = "mzk01/000/936/117";
     String topUuid = "uuid:6d962368-9ce3-11e0-9ad4-0050569d679d";
+
+    public DjvuVymena() throws FileNotFoundException {
+    }
+
+    // zatím funguje pro monografii - záleží na struktuře obrázků na imageserveru
 
     @Override
     public void run(List<String> args) {
@@ -146,6 +152,71 @@ public class DjvuVymena implements Script {
             }
         }
     }
+
+    // oprava obrázků u ročníků periodika Železničář
+    // všechny obrázky jsou ve stejné podsložce (rok 2015, měsíc 12)
+    // struktura pro konkrétní čísla se nemění
+    public void runTest(List<String> args) {
+        // Oprava obrázků z NDK dokumentů (pro MZK změnit cestu na imageserveru)
+        boolean writeEnabled = true;
+        String rootUuid = "uuid:b458ab10-55f0-11e5-81eb-001018b5eb5c";
+        String year = "2015"; // TODO: nebude fungovat pro větší celky (vyřešit líp umístění na imageserveru)
+        String month = "12";
+        Item root = null;
+        try {
+            root = clientApi.getItem(rootUuid);
+            List<Item> parentItems = new ArrayList<>();
+            ;
+
+            if (root.getModel().equals("monograph") || root.getModel().equals("periodicalitem")) {
+                LOGGER.info("Oprava stránek čísla nebo monografie " + rootUuid);
+                parentItems.add(root);
+            } else if (root.getModel().equals("periodicalvolume")) {
+                LOGGER.info("Oprava stránek ročníku " + rootUuid);
+                parentItems = clientApi.getChildren(rootUuid);
+            } else if (root.getModel().equals("periodical")) {
+                LOGGER.info("Oprava stránek periodika " + rootUuid);
+                List<Item> volumes = clientApi.getChildren(rootUuid);
+                for (Item volume : volumes) {
+                    parentItems.addAll(clientApi.getChildren(volume.getPid()));
+                }
+            } else {
+                LOGGER.error("Špatný root model: " + root.getModel());
+            }
+
+            for (Item parent : parentItems) {
+                String parentUuid = parent.getPid();
+                List<Item> pages = clientApi.getChildren(parentUuid);
+                parentUuid = parentUuid.replace("uuid:", "");
+
+                for (int i = 0; i < pages.size(); i++) {
+                    String number = String.format("%04d", i + 1); // obrázky začínají od 0001 - někdy možná od 0000
+                    String uuid = pages.get(i).getPid();
+
+                    LOGGER.info("Oprava obrázků u strany " + uuid);
+                    String fileLocation = "http://imageserver.mzk.cz/NDK/" + year + "/" + month + "/" + parentUuid + "/UC_" + parentUuid + "_" + number;
+
+                    System.out.println(fileLocation);
+                    if (writeEnabled) {
+                        // datastreamy
+                        fedoraUtils.setImgFullFromExternal(uuid, fileLocation + "/big.jpg");
+                        fedoraUtils.setImgPreviewFromExternal(uuid, fileLocation + "/preview.jpg");
+                        fedoraUtils.setImgThumbnailFromExternal(uuid, fileLocation + "/thumb.jpg");
+                        fedoraUtils.repairImageserverTilesRelation(uuid);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CreateObjectException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (K5ApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private List<File> getListOfImages(String imageserverFolderPath) {
         File imageserverFolder = new File("/mnt/imageserver/" + imageserverFolderPath);

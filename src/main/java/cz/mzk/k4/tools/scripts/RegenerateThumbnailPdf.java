@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class RegenerateThumbnailPdf implements Script {
      * @param args - uuid PDF dokumentu (1. argument)
      */
     @Override
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
 
         FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
         String uuid;

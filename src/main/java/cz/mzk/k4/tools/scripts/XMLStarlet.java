@@ -7,6 +7,7 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.XMLStarletWorker;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -16,6 +17,9 @@ public class XMLStarlet implements Script {
 
     private AccessProvider accessProvider = new AccessProvider();
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+
+    public XMLStarlet() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

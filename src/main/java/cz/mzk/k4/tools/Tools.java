@@ -1,10 +1,11 @@
 package cz.mzk.k4.tools;
 
-import cz.mzk.k4.tools.convertor.ConvertDJvuToJp2;
 import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
+import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,45 +15,51 @@ import java.util.List;
  * @version 30.7.13
  */
 public class Tools {
+    private static final Logger LOGGER = Logger.getLogger(Tools.class);
+
 
     // TODO: defaultní konfigurák
     public static void main(String[] args) {
         ScriptRunner runner = new ScriptRunner();
-        runner.register("checkLogs", new CheckLogs());
-        runner.register("uuidBezDostupnosti", new MissingPolicyUuid());
-        runner.register("spatneZnakyOCR", new FindBadCharacterInOcr(true));
-        runner.register("opraveniOdkazuProReplikaci", new RepairLinksForReplication());
-        runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
-        runner.register("vypisSmutneMonografie", new FindLonelyMonographs());
-        runner.register("stavDeleted", new DeletedDocuments());
-        runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
-        runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
-        runner.register("pridatOCR", new AddOcr());
-        runner.register("hledaniHaluzi", new WtfSearch());
-        runner.register("kontrolaRajhradu", new RajhradValidate());
-        runner.register("djvuNaJp2", new ConvertDJvuToJp2());
-        runner.register("regenerateAudioServer", new RegenerateAudioServer());
-        runner.register("exportZeSouboru", new ExportFromFile());
-        runner.register("stazeniObrazku", new DownloadImages());
-        runner.register("importKolekce", new ImportCollection());
-        runner.register("getBookOCR", new GetWholeBookOCR());
-        runner.register("articleRepair", new OdpojeniVadnychClanku());
-        runner.register("solr", new SolrDotaz());
-        runner.register("xmlstarlet", new XMLStarlet());
-        runner.register("pripojeniPeriodik", new AttachPeriodicalsNDK());
-//        runner.register("lidovky", new LnPresunImg());
-        runner.register("soundunits", new RepairImgRels());
-        runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
-        runner.register("hades", new StehovaniHades());
-        runner.register("opravitDostupnost", new RepairTrees());
-//        runner.register("lidovky2", new LnKonverze());
-        runner.register("djvu", new DjvuKonverze());
-        runner.register("roots", new GetRoots());
-        runner.register("rovnost", new SwitchImages());
-        runner.register("batch", new BatchK5Process());
-        runner.register("vymenaObrazku", new DjvuVymena());
-        runner.register("test", new TestScript());
 
+        try {
+            runner.register("checkLogs", new CheckLogs());
+            runner.register("uuidBezDostupnosti", new MissingPolicyUuid());
+            runner.register("spatneZnakyOCR", new FindBadCharacterInOcr(true));
+            runner.register("opraveniOdkazuProReplikaci", new RepairLinksForReplication());
+            runner.register("vypisVsechnaUuuidModelu", new FindAllDocumentsByModel());
+            runner.register("vypisSmutneMonografie", new FindLonelyMonographs());
+            runner.register("stavDeleted", new DeletedDocuments());
+            runner.register("opravaNahleduPdf", new RegenerateThumbnailPdf());
+            runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
+            runner.register("pridatOCR", new AddOcr());
+            runner.register("hledaniHaluzi", new WtfSearch());
+//        runner.register("kontrolaRajhradu", new RajhradValidate());
+//        runner.register("djvuNaJp2", new ConvertDJvuToJp2());
+            runner.register("regenerateAudioServer", new RegenerateAudioServer());
+            runner.register("stazeniObrazku", new DownloadImages());
+            runner.register("importKolekce", new ImportCollection());
+            runner.register("getBookOCR", new GetWholeBookOCR());
+            runner.register("articleRepair", new OdpojeniVadnychClanku());
+            runner.register("solr", new SolrDotaz());
+            runner.register("xmlstarlet", new XMLStarlet());
+            runner.register("pripojeniPeriodik", new AttachPeriodicalsNDK());
+//        runner.register("lidovky", new LnPresunImg());
+            runner.register("soundunits", new RepairImgRels());
+            runner.register("unindexedFedoraModels", new UnindexedFedoraModels());
+            runner.register("hades", new StehovaniHades());
+            runner.register("opravitDostupnost", new RepairTrees());
+//        runner.register("lidovky2", new LnKonverze());
+            runner.register("djvu", new DjvuKonverze());
+            runner.register("roots", new GetRoots());
+            runner.register("rovnost", new SwitchImages());
+            runner.register("batch", new BatchK5Process());
+            runner.register("vymenaObrazku", new DjvuVymena());
+            runner.register("test", new TestScript());
+        } catch (FileNotFoundException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
 
         if (args.length < 1 || args[0] == null) {
             printUsage(runner);
@@ -61,7 +68,12 @@ public class Tools {
             String scriptName = args[0];
             List<String> params = new ArrayList<String>(Arrays.asList(args));
             params.remove(scriptName);
-            runner.run(scriptName, params);
+            try {
+                runner.run(scriptName, params);
+            } catch (FileNotFoundException e) {
+                LOGGER.error(e.getMessage());
+                return;
+            }
         }
     }
 
@@ -74,5 +86,4 @@ public class Tools {
             System.out.println(name);
         }
     }
-
 }

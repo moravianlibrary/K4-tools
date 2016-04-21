@@ -10,6 +10,7 @@ import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.ValidateWorker;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +20,14 @@ import java.util.List;
  */
 public class WtfSearch implements Script {
     private static final Logger LOGGER = Logger.getLogger(WtfSearch.class);
-    private static UuidWorker worker = new RelationshipCounterWorker(false);
+    private UuidWorker worker = new RelationshipCounterWorker(false);
     private AccessProvider accessProvider;
     private KrameriusUtils krameriusUtils;
 //    private ProcessRemoteApi krameriusApi;
     private FedoraUtils fedoraUtils;
+
+    public WtfSearch() throws FileNotFoundException {
+    }
 
     /**
      * Spustí RelationshipCounterWorker nad všemi monografiemi
@@ -31,7 +35,7 @@ public class WtfSearch implements Script {
      * @param args - nebere argument
      */
     @Override
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
         accessProvider = AccessProvider.getInstance();
 //        krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
 //                accessProvider.getKrameriusHost(),

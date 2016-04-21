@@ -9,10 +9,7 @@ import cz.mzk.k5.api.remote.domain.Process;
 import cz.mzk.k5.api.remote.domain.ProcessLog;
 import org.apache.log4j.Logger;
 import javax.ws.rs.core.MultivaluedMap;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -32,7 +29,7 @@ public class CheckLogs implements Script {
      * 		logs/{uuid}.txt s chybovým výstupem procesu
      * @param args - nebere parametry
      */
-	public void run(List<String> args) {
+	public void run(List<String> args) throws FileNotFoundException {
 
         accessProvider = AccessProvider.getInstance();
 		krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(

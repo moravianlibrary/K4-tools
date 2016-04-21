@@ -77,17 +77,17 @@ public class ImageserverUtils {
 //
 //    }
 
-    /**
-     * Method uploading image input stream to image server. Name of uploaded image on image
-     * server is its uuid without the "uuid:" part
-     * Connection settings are stored in rajhard.properties file
-     * Path on imageserver is stored in constant IMAGE_SERVER_PATH
-     *
-     * @param jp2InputStream Image stream to be uploaded
-     * @param uuid           Uuid of image
-     * @throws JSchException If the connection to image server was unsuccessful
-     * @throws SftpException If the upload to image server was unsuccessful
-     */
+//    /**
+//     * Method uploading image input stream to image server. Name of uploaded image on image
+//     * server is its uuid without the "uuid:" part
+//     * Connection settings are stored in rajhard.properties file
+//     * Path on imageserver is stored in constant IMAGE_SERVER_PATH
+//     *
+//     * @param jp2InputStream Image stream to be uploaded
+//     * @param uuid           Uuid of image
+//     * @throws JSchException If the connection to image server was unsuccessful
+//     * @throws SftpException If the upload to image server was unsuccessful
+//     */
 //    public void uploadJp2ToImageserver(InputStream jp2InputStream, String uuid) throws IOException {
 //        try {
 //            AccessProvider accessProvider = AccessProvider.getInstance();

@@ -34,6 +34,9 @@ public class OdpojeniVadnychClanku implements Script {
     private final AccessProvider accessProvider = new AccessProvider();
 //    private ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
 
+    public OdpojeniVadnychClanku() throws FileNotFoundException {
+    }
+
     @Override
     public void run(List<String> args) {
         LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix());

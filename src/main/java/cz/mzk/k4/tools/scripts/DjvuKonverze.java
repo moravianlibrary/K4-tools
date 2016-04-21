@@ -43,6 +43,9 @@ public class DjvuKonverze implements Script {
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
 
+    public DjvuKonverze() throws FileNotFoundException {
+    }
+
     @Override
     public void run(List<String> args) {
         // TODO: spouštět až po upgrade krameria (oprava API)

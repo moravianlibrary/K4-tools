@@ -6,6 +6,7 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.log4j.Logger;
 
 import javax.xml.transform.TransformerException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -17,7 +18,7 @@ public class RepairImgRelsWorker extends UuidWorker  {
     private FedoraUtils fedoraUtils;
     int counter;
 
-    public RepairImgRelsWorker(boolean writeEnabled) {
+    public RepairImgRelsWorker(boolean writeEnabled) throws FileNotFoundException {
         super(writeEnabled);
         fedoraUtils = new FedoraUtils(new AccessProvider());
     }

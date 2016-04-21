@@ -9,6 +9,7 @@ import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -21,15 +22,18 @@ public class FindLonelyMonographs implements Script {
 
     private AccessProvider accessProvider;
     private KrameriusUtils krameriusUtils;
-    private static UuidWorker worker = new RelationshipCounterWorker(false);
+    private UuidWorker worker = new RelationshipCounterWorker(false);
     private static final Logger LOGGER = Logger.getLogger(FindLonelyMonographs.class);
+
+    public FindLonelyMonographs() throws FileNotFoundException {
+    }
 
     /**
      * Spustí RelationshipCounterWorker nad všemi monografiemi
      * @param args - nebere argument
      */
     @Override
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
         accessProvider = new AccessProvider();
         krameriusUtils = new KrameriusUtils(accessProvider);
 

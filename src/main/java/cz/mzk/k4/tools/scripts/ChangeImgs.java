@@ -28,10 +28,10 @@ import java.util.Map;
  */
 public class ChangeImgs implements Script {
     private static final Logger LOGGER = Logger.getLogger(ChangeImgs.class);
-    private static final AccessProvider accessProvider = AccessProvider.getInstance();
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static final ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
-    private static final ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+    private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    private ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     private PresunImgWorker stehovak;
     private ImageUrlWorker prepisovakUrl;
 
@@ -43,6 +43,9 @@ public class ChangeImgs implements Script {
     //    private static String ROCNIK;
     private static final int LAST_ITEM = 0;
     private static final String PERIODIKUM = "ss";
+
+    public ChangeImgs() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

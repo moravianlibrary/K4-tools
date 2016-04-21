@@ -9,6 +9,7 @@ import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.MediaType;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class MissingPolicyUuid implements Script {
      *
      * @param args
      */
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
         LOGGER.info("Searching for uuids");
         AccessProvider accessProvider = new AccessProvider();
         Client client = new Client();

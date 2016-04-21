@@ -8,6 +8,7 @@ import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -17,8 +18,6 @@ import java.io.InputStream;
  * @version: 11/26/13
  */
 public class AddOcrWorker extends UuidWorker {
-    private FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-    private AbbyUtils abbyUtils = new AbbyUtils();
     private static final Logger LOGGER = Logger.getLogger(AddOcrWorker.class);
 
     public AddOcrWorker(boolean writeEnabled) {
@@ -26,7 +25,9 @@ public class AddOcrWorker extends UuidWorker {
     }
 
     @Override
-    public void run(String uuid) {
+    public void run(String uuid) throws FileNotFoundException {
+        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+        AbbyUtils abbyUtils = new AbbyUtils();
         try {
             String mimetype = fedoraUtils.getMimeTypeForStream(uuid, Constants.DATASTREAM_ID.IMG_FULL.getValue());
             InputStream rawInputStream = fedoraUtils.getImgFull(uuid, mimetype);

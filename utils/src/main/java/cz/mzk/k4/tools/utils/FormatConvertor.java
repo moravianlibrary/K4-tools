@@ -14,7 +14,6 @@ import java.util.List;
  */
 public class FormatConvertor {
 
-
     public static InputStream convertDjvuToJpg(InputStream djvu) throws IOException {
         File djvuFile = File.createTempFile("convert", ".djvu");
         File jpgFile = File.createTempFile("convert", ".jpg");

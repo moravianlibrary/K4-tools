@@ -10,6 +10,7 @@ import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.XMLStarletWorker;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -20,6 +21,9 @@ public class UnindexedFedoraModels implements Script {
     private AccessProvider accessProvider = new AccessProvider();
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     public static final Logger LOGGER = Logger.getLogger(UnindexedFedoraModels.class);
+
+    public UnindexedFedoraModels() throws FileNotFoundException {
+    }
 
     @Override
     public void run(List<String> args) {

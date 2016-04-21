@@ -6,6 +6,7 @@ import cz.mzk.k4.tools.utils.SolrUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
@@ -21,7 +22,7 @@ public class SolrDotaz implements Script {
     private static final Logger LOGGER = Logger.getLogger(SolrDotaz.class);
 
     @Override
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
         SolrUtils solr = new SolrUtils(new AccessProvider());
 
         String query = args.get(0);
@@ -37,7 +38,7 @@ public class SolrDotaz implements Script {
             e.printStackTrace();
         }
 
-        Path resultFile = Paths.get("IO/roots-with-ocr");
+        Path resultFile = Paths.get("IO/roots-without-ocr");
         try {
             Files.write(resultFile, pidList, Charset.forName("UTF-8"));
         } catch (IOException e) {

@@ -18,7 +18,7 @@ public class GetWholeBookOCR implements Script {
     private ClientRemoteApi api;
     private static final Logger LOGGER = Logger.getLogger(GetWholeBookOCR.class);
 
-    public GetWholeBookOCR() {
+    public GetWholeBookOCR() throws FileNotFoundException {
         AccessProvider accessProvider = new AccessProvider();
         api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     }

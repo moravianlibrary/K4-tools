@@ -5,6 +5,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -13,13 +15,12 @@ import java.util.List;
  */
 public class FindAllDocumentsByModel implements Script {
 
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
-
     /**
      *
      * @param model
      */
-    public static void run(DigitalObjectModel model) {
+    public static void run(DigitalObjectModel model) throws FileNotFoundException {
+        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
         fedoraUtils.applyToAllUuidOfModel(model, new UuidWorker(false) {
             @Override
             public void run(String uuid) {

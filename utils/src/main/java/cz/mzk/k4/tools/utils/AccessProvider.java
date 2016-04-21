@@ -9,14 +9,14 @@ import org.fedora.api.FedoraAPIM;
 import org.fedora.api.FedoraAPIMService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
@@ -52,10 +52,20 @@ public class AccessProvider {
     private static Logger LOGGER = Logger.getLogger(AccessProvider.class);
     public static String K4_REMOTE_API_PATH = "/search/api/v4.6/processes";
 
-    public AccessProvider() {
+    public AccessProvider() throws FileNotFoundException {
         // get properties file (/home/{user}/{confFileName})
         String home = System.getProperty("user.home");
-        File f = new File(home + File.separatorChar + confFileName);
+        String configFullPath = home + File.separatorChar + confFileName;
+        File f = new File(configFullPath);
+        if (!f.exists()) {
+            try {
+                copyDefaultConfigFile(configFullPath);
+            } catch (IOException e) {
+                LOGGER.error("Error while trying to create default config file in " + configFullPath);
+                return;
+            }
+            throw new FileNotFoundException("Config " + confFileName + " file not found in user's home folder. Created default config file, please change the values.");
+        }
         properties = new Properties();
         InputStream inputStream;
         try {
@@ -88,11 +98,19 @@ public class AccessProvider {
         client.setReadTimeout(600000);
     }
 
-    public static AccessProvider getInstance() {
+    public static AccessProvider getInstance() throws FileNotFoundException {
         if(accessProvider == null) {
             accessProvider = new AccessProvider();
         }
         return accessProvider;
+    }
+
+    private void copyDefaultConfigFile(String configPath) throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File defaultConfig = new File(classLoader.getResource("default-config.properties").getFile());
+//        Path defaultConfig = Paths.get("default-config.properties");
+        Path realConfig = Paths.get(configPath);
+        Files.copy(defaultConfig.toPath(), realConfig);
     }
 
 

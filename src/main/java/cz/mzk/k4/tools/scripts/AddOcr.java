@@ -8,6 +8,7 @@ import cz.mzk.k4.tools.workers.AddOcrWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -15,12 +16,12 @@ import java.util.List;
  * @version: 11/26/13
  */
 public class AddOcr implements Script {
-    private static FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
     private static final Logger LOGGER = Logger.getLogger(AddOcr.class);
 
 
     @Override
-    public void run(List<String> args) {
+    public void run(List<String> args) throws FileNotFoundException {
+        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
         UuidWorker addOcr = new AddOcrWorker(true);
         String uuid = args.get(0);
 
