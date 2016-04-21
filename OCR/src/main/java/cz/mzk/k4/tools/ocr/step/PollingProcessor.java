@@ -9,6 +9,7 @@ import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
 import cz.mzk.k4.tools.ocr.exceptions.ItemNotFoundException;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
+
 import java.io.IOException;
 
 /**
@@ -50,13 +51,15 @@ public class PollingProcessor implements ItemProcessor<Img, Ocr> {
         boolean poll = true;
         QueuedImage result = null;
         while (poll) {
-                result = abbyApi.pollOcrState(image.getMd5());
-                poll = result.getState().equals(QueuedImage.STATE_PROCESSING);
-                LOGGER.debug(result.getMessage() + "\n" +
-                        "polling " + image.getPagePid() + " " + image.getMd5());
+            LOGGER.debug("polling " + image.getPagePid() + " " + image.getMd5());
+            result = abbyApi.pollOcrState(image.getMd5());
+            poll = result.getState().equals(QueuedImage.STATE_PROCESSING);
+            LOGGER.debug(result.getMessage());
+            if (poll) {
                 Thread.sleep(5000);
+            }
         }
-        LOGGER.debug(result.getMessage());
+//        LOGGER.debug(result.getMessage());
         return result;
     }
 }

@@ -39,6 +39,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import retrofit.converter.ConversionException;
 
+import java.io.FileNotFoundException;
+
 /**
  * Created by holmanj on 12.6.15.
  */
@@ -47,13 +49,13 @@ import retrofit.converter.ConversionException;
 public class BatchConfiguration {
 
     // TODO Autowired?
-    private static AccessProvider accessProvider = AccessProvider.getInstance();
-    private static ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+    private AccessProvider accessProvider = AccessProvider.getInstance();
+    private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
             accessProvider.getKrameriusHost(),
             accessProvider.getKrameriusUser(),
             accessProvider.getKrameriusPassword());
-    private static FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
-    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
+    private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    private AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
 //    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
@@ -66,6 +68,9 @@ public class BatchConfiguration {
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private StepBuilderFactory steps;
+
+    public BatchConfiguration() throws FileNotFoundException {
+    }
 
     @Bean
     @StepScope
