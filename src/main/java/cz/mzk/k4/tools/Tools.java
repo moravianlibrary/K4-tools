@@ -55,6 +55,7 @@ public class Tools {
             runner.register("rovnost", new SwitchImages());
             runner.register("batch", new BatchK5Process());
             runner.register("vymenaObrazku", new DjvuVymena());
+            runner.register("metadata", new ZmenaMetadat());
             runner.register("test", new TestScript());
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage());

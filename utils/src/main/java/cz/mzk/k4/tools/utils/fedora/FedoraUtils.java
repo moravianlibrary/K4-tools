@@ -937,6 +937,30 @@ public class FedoraUtils {
     }
 
     /**
+     * Methods replaces DC file
+     *
+     * @param uuid Uuid of file to be changed
+     * @param path Path to new DC file
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setDCStream(String uuid, String path) throws CreateObjectException {
+        return insertXDataStream(Constants.DATASTREAM_ID.DC, uuid, path, true, "text/xml");
+    }
+
+    /**
+     * Methods replaces MODS file
+     *
+     * @param uuid Uuid of file to be changed
+     * @param path Path to new MODS file
+     * @return True if successful
+     * @throws CreateObjectException
+     */
+    public boolean setModsStream(String uuid, String path) throws CreateObjectException {
+        return insertXDataStream(Constants.DATASTREAM_ID.BIBLIO_MODS, uuid, path, true, "text/xml");
+    }
+
+    /**
      * Ocr.
      *
      * @param uuid the uuid
