@@ -109,18 +109,3 @@ String fixMzkUrl(url) {
     }
 
 }
-
-/*
-RiSearch riSearch = new RiSearch('<info:fedora/uuid:16dbc04a-3884-4385-9820-8ab4d2cca497> <http://www.nsdl.org/ontologies/relationships#hasPage> *')
-riSearch.type('triples')
-riSearch.lang('spo')
-riSearch.format('N-Triples')
-riSearch.limit(1000)
-riSearch.distinct(true)
-riSearch.template('')
-RiSearchResponse riSearchResponse = riSearch.execute()
-def l = riSearchResponse.getEntity(String.class)
-l.eachLine { line ->
-    println(line)
-}
-*/
