@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by holmanj on 11.3.15.
@@ -33,15 +35,16 @@ public class GeneralUtils {
         try {
             //Open file and load content
             reader = new BufferedReader(new FileReader(inputFile));
-            String uuid = null;
+            String uuid;
+            Pattern p = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}");
 
             //Parse file by line
             while ((uuid = reader.readLine()) != null) {
-                if (!uuid.contains("uuid")) {
-                    LOGGER.warn("Not a valid pid: " + uuid);
+                Matcher m = p.matcher(uuid);
+                if (m.find()) {
+                    uuidList.add("uuid:" + m.group());
                 } else {
-                    uuid = uuid.substring(uuid.indexOf("uuid:"));
-                    uuidList.add(uuid);
+                    LOGGER.warn("Not a valid pid: " + uuid);
                 }
             }
         } catch (FileNotFoundException e) {
