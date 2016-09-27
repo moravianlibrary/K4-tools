@@ -37,3 +37,7 @@ deployments/
 
 # Generated sources
 utils/generatedsources/
+
+# IO files
+IO/
+rels-zalohy/

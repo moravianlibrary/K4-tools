@@ -52,6 +52,16 @@ public class ProcessRemoteApi {
         return api.planProcess("reindex", new Parameters("fromKrameriusModel", pid_path, pid_path));
     }
 
+    // indexuje rekursivně dokument, který před tím nesmaže rekursivně z indexu
+    public Process reindexWithoutRemoving(String pid_path) throws K5ApiException {
+        return api.planProcess("reindex", new Parameters("fromKrameriusModelNoCheck", pid_path, pid_path));
+    }
+
+    // indexuje jen jednu úroveň dokumentu
+    public Process reindexNonRecursive(String pid_path) throws K5ApiException {
+        return api.planProcess("reindex", new Parameters("fromPid", pid_path, pid_path));
+    }
+
     public Process reindexNewBranches(String pid_path) throws K5ApiException {
         return api.planProcess("reindex", new Parameters("reindexDoc", pid_path));
     }

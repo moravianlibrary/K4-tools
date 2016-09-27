@@ -23,13 +23,13 @@ import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -48,7 +48,6 @@ import java.io.FileNotFoundException;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
-    // TODO Autowired?
     private AccessProvider accessProvider = AccessProvider.getInstance();
     private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
             accessProvider.getKrameriusHost(),
@@ -77,16 +76,19 @@ public class BatchConfiguration {
     public ItemReader<Img> reader(@Value("#{jobParameters[rootPid]}") String rootPid, @Value("#{jobParameters[overwrite]}") String overwrite) {
         boolean overwriteOcr = "overwrite".equals(overwrite);
         return new ImgReader(fedoraUtils, abbyApi, rootPid, overwriteOcr);
+//        return new MockReader(rootPid);
     }
 
     @Bean
     public ItemProcessor<Img, Ocr> processor() {
         return new PollingProcessor(abbyApi);
+//        return new MockProcessor();
     }
 
     @Bean
     public ItemWriter<Ocr> writer() {
         return new OcrWriter(fedoraUtils);
+//        return new MockWriter();
     }
 
     @Bean
@@ -110,9 +112,14 @@ public class BatchConfiguration {
     }
 
     @Bean
+    public JobParametersIncrementer jobIncrementer() {
+        return new UuidIncrementer();
+    }
+
+    @Bean
     public Step step() {
         return steps.get("step")
-                .<Img, Ocr>chunk(50) // počet najednou zpracovávaných stran
+                .<Img, Ocr>chunk(1) // počet najednou zpracovávaných stran
                 .reader(reader(NAHRAZENO_V_KONSTRUKTORU, NAHRAZENO_V_KONSTRUKTORU))
                 .processor(processor())
                 .writer(writer())
@@ -135,8 +142,8 @@ public class BatchConfiguration {
     @Bean
     public Job job(Step step) throws Exception {
         return jobs.get("job")
-                .incrementer(new RunIdIncrementer())
                 .listener(jobCompletionListener())
+                .incrementer(jobIncrementer())
                 .flow(step)
                 .end()
                 .build();

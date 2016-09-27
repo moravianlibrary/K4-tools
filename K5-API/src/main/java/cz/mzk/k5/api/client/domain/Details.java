@@ -6,23 +6,23 @@ package cz.mzk.k5.api.client.domain;
 public class Details {
 
     // page
-//    private String pagenumber; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+    private String pagenumber;
     private String type;
 
     // periodical item:
     private String issueNumber; // používá se?
-//    private String date;  // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+    private String date;
     private String partNumber; // aspoň u Lidovek je číslo tady
     private String year;
-//    private String volumeNumber;  // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+    private String volumeNumber;
 
-//    public String getPagenumber() {
-//        return pagenumber;
-//    }
-//
-//    public void setPagenumber(String pagenumber) {
-//        this.pagenumber = pagenumber;
-//    }
+    public String getPagenumber() {
+        return pagenumber;
+    }
+
+    public void setPagenumber(String pagenumber) {
+        this.pagenumber = pagenumber;
+    }
 
     public String getType() {
         return type;
@@ -40,13 +40,13 @@ public class Details {
         this.issueNumber = issueNumber;
     }
 
-//    public String getDate() {
-//        return date;
-//    }
-//
-//    public void setDate(String date) {
-//        this.date = date;
-//    }
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 
     public String getPartNumber() {
         return partNumber;
@@ -64,11 +64,11 @@ public class Details {
         this.year = year;
     }
 
-//    public String getVolumeNumber() {
-//        return volumeNumber;
-//    }
-//
-//    public void setVolumeNumber(String volumeNumber) {
-//        this.volumeNumber = volumeNumber;
-//    }
+    public String getVolumeNumber() {
+        return volumeNumber;
+    }
+
+    public void setVolumeNumber(String volumeNumber) {
+        this.volumeNumber = volumeNumber;
+    }
 }

@@ -20,12 +20,11 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 @EnableAutoConfiguration
 public class OcrMain {
-    // spouštění s 1 povinným parametrem: uuid dokumentu/stromu a 1 volitelným: "overwrite" pro nepřeskakování stran s OCR a dělání všeho znova
+    // spouštění bez parametru, v souboru IO/ocr-list musí být seznam root UUID, volitelně "overwrite" pro nepřeskakování stran s OCR a dělání všeho znova
     public static void main(String[] args) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-        jobParametersBuilder.addString("rootPid", args[0]);
-        if (args.length >= 2) {
-            jobParametersBuilder.addString("overwrite", args[1]);
+        if (args.length > 0) {
+            jobParametersBuilder.addString("overwrite", args[0]);
         }
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
 
@@ -33,8 +32,14 @@ public class OcrMain {
         app.setWebEnvironment(false);
         ConfigurableApplicationContext ctx = app.run(args);
         JobLauncher jobLauncher = ctx.getBean(JobLauncher.class);
-        jobLauncher.run(ctx.getBean("job", Job.class), jobParameters);
-
-        System.exit(0);
+        Job job = ctx.getBean("job", Job.class);
+        while (true) { // každý krok odebírá root uuid ze seznamu
+            jobParameters = job.getJobParametersIncrementer().getNext(jobParameters);
+            if (jobParameters == null) {
+                System.out.println("konec");
+                System.exit(0);
+            }
+            jobLauncher.run(ctx.getBean("job", Job.class), jobParameters);
+        }
     }
 }

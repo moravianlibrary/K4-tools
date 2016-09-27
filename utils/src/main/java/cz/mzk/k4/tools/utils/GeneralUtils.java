@@ -60,7 +60,7 @@ public class GeneralUtils {
             }
         }
 
-        LOGGER.info("Loaded " + uuidList.size() + " uuids from file " + filePath);
+        LOGGER.debug("Loaded " + uuidList.size() + " uuids from file " + filePath);
         return uuidList;
     }
 

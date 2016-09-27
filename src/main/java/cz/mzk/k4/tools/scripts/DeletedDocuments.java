@@ -33,7 +33,7 @@ public class DeletedDocuments implements Script {
                         fedoraUtils.purgeObject(uuid);
                         LOGGER.info("Deleted: " + uuid + " from fedora");
                     } catch (RuntimeException e) {
-                        LOGGER.error("Mazání \"deleted\" dokůmentů: " + e.getMessage());
+                        LOGGER.error("Mazání \"deleted\" dokumentů: " + e.getMessage());
                     }
                 } else {
                     System.out.println(uuid);

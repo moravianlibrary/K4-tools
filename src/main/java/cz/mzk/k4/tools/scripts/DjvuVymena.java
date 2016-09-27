@@ -3,6 +3,7 @@ package cz.mzk.k4.tools.scripts;
 import cz.mzk.k4.tools.exceptions.ControlCheckException;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.ImageUrlWorker;
@@ -15,13 +16,16 @@ import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import javax.xml.transform.TransformerConfigurationException;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +33,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jan on 25.3.16.
@@ -43,184 +50,253 @@ public class DjvuVymena implements Script {
     private ImageUrlWorker prepisovakUrl;
 
     boolean isMonograph = true;
-    String imageserverFolderPath = "mzk01/000/936/117";
-    String topUuid = "uuid:6d962368-9ce3-11e0-9ad4-0050569d679d";
+    String imageserverFolderPath = "mzk01/000/206/586";
+    String topUuid = "uuid:ae876087-435d-11dd-b505-00145e5790ea";
+    String subFolderName = "";
+    String year = "";
 
     public DjvuVymena() throws FileNotFoundException {
     }
 
-    // zatím funguje pro monografii - záleží na struktuře obrázků na imageserveru
-
     @Override
     public void run(List<String> args) {
         // sshfs holmanj@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
-        // nejdřív pro monografii
+
+        DigitalObjectModel topModel = null;
+        boolean writeEnabled = args.contains("writeEnabled");
+        try {
+            topModel = fedoraUtils.getModel(topUuid);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+        }
+
+        if (topModel.equals(DigitalObjectModel.MONOGRAPH)) {
+            try {
+                swapImagesMonograph(topUuid, writeEnabled);
+            } catch (TransformerException e) {
+                LOGGER.error(e.getMessage());
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+            } catch (CreateObjectException e) {
+                LOGGER.error(e.getMessage());
+            } catch (ControlCheckException e) {
+                LOGGER.error(e.getMessage());
+            }
+        } else if (topModel.equals(DigitalObjectModel.PERIODICAL)) {
+            try {
+                List<Item> volumes = clientApi.getChildren(topUuid);
+                Map<String, File> yearSubfolderMap = fillSubfolderMap();
+                for (Item volume : volumes) {
+                    year = volume.getDetails().getYear();
+                    File subfolder = yearSubfolderMap.get(year);
+                    subFolderName = subfolder.getName();
+//                    if (year.equals("1898 - 1899")) {
+                        swapImagesVolume(volume.getPid(), subfolder, writeEnabled);
+//                    }
+                }
+            } catch (K5ApiException e) {
+                LOGGER.error(e.getMessage());
+            } catch (ParserConfigurationException e) {
+                LOGGER.error(e.getMessage());
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+            } catch (SAXException e) {
+                LOGGER.error(e.getMessage());
+            } catch (ControlCheckException e) {
+                LOGGER.error(e.getMessage());
+            } catch (TransformerException e) {
+                LOGGER.error(e.getMessage());
+            } catch (CreateObjectException e) {
+                LOGGER.error(e.getMessage());
+            }
+        }
+    }
+
+    private void swapImagesVolume(String volumeUuid, File volumeImgSubfolder, boolean writeEnabled) throws IOException, SAXException, ParserConfigurationException, ControlCheckException, CreateObjectException, TransformerException {
+        List<Item> pages = new ArrayList<>(); // složka může obsahovat i OCR - ignorovat bez ALTO?
+        List<File> files;
+        List<String> filesFromXml;
+        String indexFileName = volumeImgSubfolder.getName() + ".xml";
+        Map<String, String> checkMap = fillTitleImgMap(volumeImgSubfolder.getAbsolutePath() + "/" + indexFileName);
+        try {
+            List<Item> children = clientApi.getChildren(volumeUuid); // get list of pages
+            // nejdřív stránky přímo pod ročníkem
+            pages.addAll(children.stream().filter(child -> child.getModel().equals("page")).collect(Collectors.toList()));
+            for (Item child : children) {
+                if (child.getModel().equals("periodicalitem")) {
+                    // potom stránky v číslech
+                    pages.addAll(clientApi.getChildren(child.getPid()));
+                }
+            }
+        } catch (K5ApiException e) {
+            LOGGER.error(e.getMessage());
+        }
+        files = getFolderContentList(imageserverFolderPath + "/" + volumeImgSubfolder.getName(), ".jp2"); // get list of files
+        filesFromXml = loadFilesFromXml(volumeImgSubfolder.getAbsolutePath() + "/" + indexFileName);
+//        swapImages(pages, files, writeEnabled, checkMap);
+        swapImages(pages, files, writeEnabled, checkMap, filesFromXml);
+    }
+
+    private List<String> loadFilesFromXml(String indexFilePath) throws ParserConfigurationException, IOException, SAXException {
+        List<String> fileList = new ArrayList<>();
+        File fXmlFile = new File(indexFilePath);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(fXmlFile);
+        // varování: i ročník může mít strany (obsah, titulní strana ročníku,..)
+        NodeList fileNames = doc.getElementsByTagName("PageImage");
+        for (int i = 0; i < fileNames.getLength(); i++) {
+            fileList.add(fileNames.item(i).getAttributes().getNamedItem("href").getTextContent());
+        }
+        return fileList;
+    }
+
+    private void swapImagesMonograph(String topUuid, boolean writeEnabled) throws TransformerException, IOException, CreateObjectException, ControlCheckException {
         List<Item> pages = null;
         List<File> files = null;
-        Path pairsFile = Paths.get("IO/page-image-list"); // TODO: připojit root uuid, vytvořit nový soubor
         try {
             pages = clientApi.getChildren(topUuid); // get list of pages
-            files = getListOfImages(imageserverFolderPath); // get list of files
-            if (pages.size() != files.size()) {
-                // compare sizes
-                throw new ControlCheckException("Počty stran v dokumentu " + topUuid + " a obrázků v " + imageserverFolderPath + " nesedí.");
-            }
-
-            if (!args.contains("writeEnabled")) {
-                for (int i = 0; i < pages.size(); i++) {
-                    String pair = pages.get(i).getPid() + " - " + files.get(i) + "\n";
-                    Files.write(pairsFile, pair.getBytes(), StandardOpenOption.APPEND);
-                }
-            } else {
-                for (int i = 0; i < pages.size(); i++) {
-                    LOGGER.info("Výměna obrázků u strany " + i + " z " + pages.size());
-                    String fileLocation = "http://imageserver.mzk.cz/" + imageserverFolderPath + "/" + files.get(i).getName().replace(".jp2", "");
-                    Item page = pages.get(i);
-                    fedoraUtils.setImgFullFromExternal(page.getPid(), fileLocation);
-
-                    // datastreamy
-                    fedoraUtils.setImgFullFromExternal(page.getPid(), fileLocation + "/big.jpg");
-                    fedoraUtils.setImgPreviewFromExternal(page.getPid(), fileLocation + "/preview.jpg");
-                    fedoraUtils.setImgThumbnailFromExternal(page.getPid(), fileLocation + "/thumb.jpg");
-
-                    // vazba na dlaždice
-                    changeRelsExt(page.getPid(), fileLocation);
-                    fedoraUtils.repairImageserverTilesRelation(page.getPid());
-                }
-                LOGGER.info("Odkaz na obrázky dokumentu " + topUuid + " byly doplněny do fedory.");
-            }
+            files = getFolderContentList(imageserverFolderPath); // get list of files
         } catch (K5ApiException e) {
             LOGGER.error(e.getMessage());
-            e.printStackTrace();
-        } catch (ControlCheckException e) {
             LOGGER.error(e.getMessage());
-        } catch (TransformerException e) {
-            LOGGER.error(e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            e.printStackTrace();
-        } catch (CreateObjectException e) {
-            LOGGER.error(e.getMessage());
-            e.printStackTrace();
         }
+        swapImages(pages, files, writeEnabled);
     }
 
-
-    private void changeRelsExt(String uuid, String imagePath) throws CreateObjectException, TransformerException, IOException {
-        File tempDom = null;
-        try {
-            Document dom = fedoraUtils.getRelsExt(uuid);
-            Element rdf = (Element) dom.getElementsByTagName("rdf:RDF").item(0);
-            if (!rdf.hasAttribute("xmlns:kramerius")) {
-                rdf.setAttribute("xmlns:kramerius", "http://www.nsdl.org/ontologies/relationships#");
-            }
-            Element djvu;
-            if ((djvu = (Element) dom.getElementsByTagName("kramerius:file").item(0)) != null) {
-                if (djvu.getTextContent().contains("djvu"))
-                    djvu.getParentNode().removeChild(djvu);
-            }
-            if (dom.getChildNodes().getLength() == 0) {
-                dom.appendChild(dom.createElement("rdf:Description"));
-            }
-            Element currentElement = (Element) dom.getElementsByTagName("rdf:Description").item(0);
-            //Check if kramerius:tiles-url element exist
-            if (currentElement.getElementsByTagName("kramerius:tiles-url").getLength() == 0) {
-
-                //Add element kramerius:tiles-url
-                Element tiles = dom.createElement("kramerius:tiles-url");
-                tiles.setTextContent(imagePath);
-                currentElement.appendChild(tiles);
-
-                //save XML file temporary
-                tempDom = File.createTempFile("relsExt", ".rdf");
-                TransformerFactory.newInstance().newTransformer().transform(new DOMSource(dom), new StreamResult(tempDom));
-                //Copy temporary file to document
-                fedoraUtils.setRelsExt(uuid, tempDom.getAbsolutePath());
-            }
-        } catch (CreateObjectException e) {
-            throw new CreateObjectException("Chyba při změně XML: " + e.getMessage());
-        } catch (TransformerConfigurationException e) {
-            throw new TransformerConfigurationException("Chyba při změně XML: " + e.getMessage());
-        } catch (TransformerException e) {
-            throw new TransformerException("Chyba při změně XML: " + e.getMessage());
-        } catch (IOException e) {
-            throw new IOException("Chyba při změně XML: " + e.getMessage());
-        } finally {
-            if (tempDom != null) {
-                tempDom.delete();
-            }
-        }
+    private void swapImages(List<Item> pages, List<File> files, boolean writeEnabled) throws TransformerException, IOException, CreateObjectException, ControlCheckException {
+        swapImages(pages, files, writeEnabled, null);
     }
 
-    // oprava obrázků u ročníků periodika Železničář
-    // všechny obrázky jsou ve stejné podsložce (rok 2015, měsíc 12)
-    // struktura pro konkrétní čísla se nemění
-    public void runTest(List<String> args) {
-        // Oprava obrázků z NDK dokumentů (pro MZK změnit cestu na imageserveru)
-        boolean writeEnabled = true;
-        String rootUuid = "uuid:b458ab10-55f0-11e5-81eb-001018b5eb5c";
-        String year = "2015"; // TODO: nebude fungovat pro větší celky (vyřešit líp umístění na imageserveru)
-        String month = "12";
-        Item root = null;
-        try {
-            root = clientApi.getItem(rootUuid);
-            List<Item> parentItems = new ArrayList<>();
-            ;
+    // pro obrázky z budějovic, načtení souborů ze složky může mít jiné pořadí než stránky v K5 / xml souboru
+    private void swapImages(List<Item> pages, List<File> files, boolean writeEnabled, Map<String, String> checkMap, List<String> filesFromXml) throws IOException, CreateObjectException, TransformerException, ControlCheckException {
+        Path pairsFile = Paths.get("IO/page-image-list");
 
-            if (root.getModel().equals("monograph") || root.getModel().equals("periodicalitem")) {
-                LOGGER.info("Oprava stránek čísla nebo monografie " + rootUuid);
-                parentItems.add(root);
-            } else if (root.getModel().equals("periodicalvolume")) {
-                LOGGER.info("Oprava stránek ročníku " + rootUuid);
-                parentItems = clientApi.getChildren(rootUuid);
-            } else if (root.getModel().equals("periodical")) {
-                LOGGER.info("Oprava stránek periodika " + rootUuid);
-                List<Item> volumes = clientApi.getChildren(rootUuid);
-                for (Item volume : volumes) {
-                    parentItems.addAll(clientApi.getChildren(volume.getPid()));
-                }
-            } else {
-                LOGGER.error("Špatný root model: " + root.getModel());
-            }
+        if (pages.size() != files.size()) {
+            // compare sizes
+            throw new ControlCheckException("Počty stran v ročníku " + year + " a obrázků v " + imageserverFolderPath + "/" + subFolderName + " nesedí.");
+        }
 
-            for (Item parent : parentItems) {
-                String parentUuid = parent.getPid();
-                List<Item> pages = clientApi.getChildren(parentUuid);
-                parentUuid = parentUuid.replace("uuid:", "");
-
-                for (int i = 0; i < pages.size(); i++) {
-                    String number = String.format("%04d", i + 1); // obrázky začínají od 0001 - někdy možná od 0000
-                    String uuid = pages.get(i).getPid();
-
-                    LOGGER.info("Oprava obrázků u strany " + uuid);
-                    String fileLocation = "http://imageserver.mzk.cz/NDK/" + year + "/" + month + "/" + parentUuid + "/UC_" + parentUuid + "_" + number;
-
-                    System.out.println(fileLocation);
-                    if (writeEnabled) {
-                        // datastreamy
-                        fedoraUtils.setImgFullFromExternal(uuid, fileLocation + "/big.jpg");
-                        fedoraUtils.setImgPreviewFromExternal(uuid, fileLocation + "/preview.jpg");
-                        fedoraUtils.setImgThumbnailFromExternal(uuid, fileLocation + "/thumb.jpg");
-                        fedoraUtils.repairImageserverTilesRelation(uuid);
+        if (!writeEnabled) {
+            for (int i = 0; i < pages.size(); i++) {
+                if (checkMap != null) {
+                    Item page = pages.get(i);
+                    String k5Title = page.getDetails().getPagenumber();
+                    k5Title = k5Title.replace('\u00A0', ' ').trim(); // trim including non-breaking space
+                    String checkTitle = checkMap.get(filesFromXml.get(i));
+                    if (!k5Title.equals(checkTitle)) {
+                        LOGGER.warn("Page titles do not match (" + page.getPid() + ": " + k5Title + " vs. " + checkTitle + ") - year "
+                                + year);
                     }
                 }
+                String pair = pages.get(i).getPid() + " - " + filesFromXml.get(i) + "\n";
+                Files.write(pairsFile, pair.getBytes(), StandardOpenOption.APPEND);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CreateObjectException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (K5ApiException e) {
-            e.printStackTrace();
+        } else {
+            swapImages(pages, files, writeEnabled, checkMap);
         }
     }
 
+    private void swapImages(List<Item> pages, List<File> files, boolean writeEnabled, Map<String, String> checkMap) throws IOException, CreateObjectException, TransformerException, ControlCheckException {
+        Path pairsFile = Paths.get("IO/page-image-list"); // TODO: připojit root uuid, vytvořit nový soubor
 
-    private List<File> getListOfImages(String imageserverFolderPath) {
+        if (pages.size() != files.size()) {
+            // compare sizes
+            throw new ControlCheckException("Počty stran v ročníku " + year + " a obrázků v " + imageserverFolderPath + "/" + subFolderName + " nesedí.");
+        }
+
+        if (!writeEnabled) {
+            for (int i = 0; i < pages.size(); i++) {
+                if (checkMap != null) {
+                    Item page = pages.get(i);
+//                    String k5Title = page.getPageTitle();
+                    String k5Title = page.getDetails().getPagenumber();
+                    k5Title = k5Title.replace('\u00A0', ' ').trim(); // trim including non-breaking space
+                    String checkTitle = checkMap.get(files.get(i).getName());
+                    if (!k5Title.equals(checkTitle)) {
+                        LOGGER.warn("Page titles do not match (" + page.getPid() + ": " + k5Title + " vs. " + checkTitle + ") - year "
+                                + year);
+                    }
+                }
+                String pair = pages.get(i).getPid() + " - " + files.get(i) + "\n";
+                Files.write(pairsFile, pair.getBytes(), StandardOpenOption.APPEND);
+            }
+        } else {
+            for (int i = 0; i < pages.size(); i++) {
+                LOGGER.debug("Výměna obrázků u strany " + i + " z " + pages.size());
+                String fileLocation = "http://imageserver.mzk.cz/" + imageserverFolderPath + "/" + subFolderName + "/" + files.get(i).getName().replace(".jp2", "");
+                Item page = pages.get(i);
+                fedoraUtils.setImgFullFromExternal(page.getPid(), fileLocation);
+
+                // datastreamy
+                fedoraUtils.setImgFullFromExternal(page.getPid(), fileLocation + "/big.jpg");
+                fedoraUtils.setImgPreviewFromExternal(page.getPid(), fileLocation + "/preview.jpg");
+                fedoraUtils.setImgThumbnailFromExternal(page.getPid(), fileLocation + "/thumb.jpg");
+
+                // vazba na dlaždice
+//                changeRelsExt(page.getPid(), fileLocation);
+                fedoraUtils.repairImageserverTilesRelation(page.getPid());
+            }
+            LOGGER.info("Odkazy na obrázky ročníku " + year + " byly doplněny do fedory.");
+        }
+    }
+
+    private Map<String, File> fillSubfolderMap() {
+        // různé názvy složek - buď přejmenovat na imageserveru na rok, nebo naplnit mapu
+
+        Map<String, String> folderYearMap = getFolderYearMap(); // pro Rudé právo
+
+
+        Map<String, File> map = new HashMap<>();
+        List<File> files = getFolderContentList(imageserverFolderPath);
+        for (File file : files) {
+            if (file.isDirectory()) {
+                // TODO: upravit podle potřeby
+                String folderName = file.getName();
+                String year = folderYearMap.get(folderName);
+                map.put(year, file);
+            }
+        }
+        return map;
+    }
+
+    // mapa page title - img filename (pro kontrolu s title z krameria)
+    // někdy je u ročníku XML s párováním (přejmenovat na index.xml)
+    private Map<String, String> fillTitleImgMap(String indexFileName) throws ParserConfigurationException, IOException, SAXException {
+        Map<String, String> map = new HashMap<>();
+        File fXmlFile = new File(indexFileName);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(fXmlFile);
+        // varování: i ročník může mít strany (obsah, titulní strana ročníku,..)
+        NodeList pages = doc.getElementsByTagName("PeriodicalPage");
+        for (int i = 0; i < pages.getLength(); i++) {
+            Element page = (Element) pages.item(i);
+            String pageNumber = page.getElementsByTagName("PageNumber").item(0).getTextContent();
+            String imgFilename = page.getElementsByTagName("PageImage").item(0).getAttributes().getNamedItem("href").getTextContent();
+            map.put(imgFilename, pageNumber);
+        }
+        return map;
+    }
+
+    private List<File> getFolderContentList(String imageserverFolderPath) {
+        return getFolderContentList(imageserverFolderPath, null);
+    }
+
+    private List<File> getFolderContentList(String imageserverFolderPath, String extension) {
         File imageserverFolder = new File("/mnt/imageserver/" + imageserverFolderPath);
-        File[] fileList = imageserverFolder.listFiles();
+        File[] fileList;
+        if (extension == null) {
+            // get all files
+            fileList = imageserverFolder.listFiles();
+        } else {
+            // get files with specific extension
+            fileList = imageserverFolder.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String filename) {
+                    return filename.endsWith(extension);
+                }
+            });
+        }
         Arrays.sort(fileList);
         return new ArrayList(Arrays.asList(fileList));
     }
@@ -228,5 +304,14 @@ public class DjvuVymena implements Script {
     @Override
     public String getUsage() {
         return "Náhrada djvu za odkazy na existující JPEG2000 na imageserveru";
+    }
+
+    public Map<String, String> getFolderYearMap() {
+        // speciálně pro Rudé právo (složky s obrázky nejsou pojmenované podle roku)
+        Map<String, String> yearSubfolderMap = new HashMap<>();
+        yearSubfolderMap.put("21690", "1860");
+        yearSubfolderMap.put("18330", "1858");
+        yearSubfolderMap.put("21691", "1861");
+        return yearSubfolderMap;
     }
 }

@@ -41,7 +41,7 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
         if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
             String rootPid = jobExecution.getJobParameters().getString("rootPid");
             try {
-                krameriusApi.reindex(rootPid);
+                krameriusApi.reindexWithoutRemoving(rootPid);
             } catch (K5ApiException e) {
                 LOGGER.error("Selhalo plánování reindexace dokumentu " + rootPid);
                 LOGGER.error(e.getMessage());

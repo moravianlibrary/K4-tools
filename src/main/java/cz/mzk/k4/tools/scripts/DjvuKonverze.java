@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import com.google.common.base.CharMatcher;
 import cz.mzk.k4.tools.domain.Issue;
 import cz.mzk.k4.tools.domain.Page;
 import cz.mzk.k4.tools.domain.Volume;
@@ -43,25 +44,27 @@ public class DjvuKonverze implements Script {
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
 
+    // TODO: měnit podle potřeby (dohledat sysno)
+    private static final String IMAGESERVER_PATH = "mzk01/000/163/400/";
+
     public DjvuKonverze() throws FileNotFoundException {
     }
 
     @Override
     public void run(List<String> args) {
-        // TODO: spouštět až po upgrade krameria (oprava API)
         String rootUuid = args.get(0);
         String title = null;
         try {
             title = k5Api.getItem(rootUuid).getRoot_title();
         } catch (K5ApiException e) {
-            // continue
+            LOGGER.error(e.getMessage());
         }
-        LOGGER.info("Spuštěna konverze z djvu do jp2 na periodiku " + rootUuid + " " + title);
+        LOGGER.info("Spuštěna konverze z djvu (nebo jpg) do jp2 na periodiku " + rootUuid + " " + title);
         // odkomentovat kód podle fáze (1. fáze odkomentovaná, pak buď 2. nebo 3. - radši postupně)
 
         // fáze 1: načíst a serializovat data z K5 (děje se vždycky)
         List<Volume> periodikum = null;
-        String serializedDataName = rootUuid + ".ser";
+        String serializedDataName = "IO/" + rootUuid + ".ser";
         if (new File(serializedDataName).exists()) {
             try {
                 periodikum = deserialize(serializedDataName);
@@ -83,7 +86,7 @@ public class DjvuKonverze implements Script {
         // fáze 2: přesun do imageserveru (případně konverze do jp2)
         // nově: stahovat obrázky z fedory, konvertovat, ukládat do imageserveru
 //        try {
-//            copyImages(periodikum);
+//            copyImages(periodikum, serializedDataName);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
@@ -100,13 +103,18 @@ public class DjvuKonverze implements Script {
 //        }
 
         // fáze 4: čištění starých djvu - není potřeba, fedora maže nepotřebné datastreamy sama
-
     }
 
-    private void addDatastreams(List<Volume> lidovky) throws CreateObjectException, TransformerException, IOException {
-        for (Volume volume : lidovky) {
+    private void addDatastreams(List<Volume> periodikum) throws CreateObjectException, TransformerException, IOException {
+        List<String> toSkip = skipVolumes();
+        for (Volume volume : periodikum) {
+            if (toSkip.contains(volume.getPid())) { // # TODO change
+                LOGGER.debug("Skipping volume " + volume.getYear() + " " + volume.getPid());
+                continue;
+            }
             for (Issue issue : volume.getIssues()) {
                 for (Page page : issue.getPages()) {
+                    page.setImageserverImgLocation(page.getImageserverImgLocation().replaceAll(" ", ""));
                     // datastreamy
                     fedoraUtils.setImgFullFromExternal(page.getPid(), page.getImageserverImgLocation() + "/big.jpg");
                     fedoraUtils.setImgPreviewFromExternal(page.getPid(), page.getImageserverImgLocation() + "/preview.jpg");
@@ -166,9 +174,14 @@ public class DjvuKonverze implements Script {
         }
     }
 
-    private void copyImages(List<Volume> lidovky) throws IOException {
+    private void copyImages(List<Volume> periodikum, String serializedDataName) throws IOException {
         // sshfs root@editor.staff.mzk.cz:/mnt/imageserver/ /mnt/imageserver -o follow_symlinks
-        for (Volume volume : lidovky) {
+//        List<String> toSkip = skipVolumes();
+        for (Volume volume : periodikum) {
+//            if (!toSkip.contains(volume.getPid())) { // # TODO change
+//                LOGGER.debug("Skipping volume " + volume.getYear() + " " + volume.getPid());
+//                continue;
+//            }
             LOGGER.info("Converting " + getTotalPageNumber(volume) + " pages of volume " + volume.getYear());
             for (Issue issue : volume.getIssues()) {
                 for (Page page : issue.getPages()) {
@@ -177,8 +190,8 @@ public class DjvuKonverze implements Script {
                         djvuName = fedoraUtils.getDjVuImgName(page.getPid());
                         page.setDjvuImgName(djvuName); // name
                     }
-                    String imageserverPath = "/mnt/imageserver/mzk01/000/244/261/" + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()) + ".jp2";
-                    page.setImageserverImgLocation("http://imageserver.mzk.cz/mzk01/000/244/261/" + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()));
+                    String imageserverPath = "/mnt/imageserver/" + IMAGESERVER_PATH + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()) + ".jp2";
+                    page.setImageserverImgLocation("http://imageserver.mzk.cz/" + IMAGESERVER_PATH + volume.getYear() + "/" + FilenameUtils.removeExtension(page.getDjvuImgName()));
                     File tempDjvuImage = new File(page.getDjvuImgName());
                     try {
                         FileUtils.copyInputStreamToFile(fedoraUtils.getImgFull(page.getPid(), "image/djvu"), tempDjvuImage);
@@ -196,7 +209,14 @@ public class DjvuKonverze implements Script {
                     }
 
                     try {
-                        InputStream jp2Stream = FormatConvertor.convertDjvuToJp2(tempDjvuImage);
+                        InputStream jp2Stream = null;
+                        if (tempDjvuImage.getName().contains("jpg")) {
+                            LOGGER.debug("Converting page " + page.getPid() + ". Input format: JPG (" + tempDjvuImage.getName() + ")");
+                            jp2Stream = FormatConvertor.convertJpgToJp2(tempDjvuImage);
+                        } else {
+                            LOGGER.debug("Converting page " + page.getPid() + ". Input format: DjVu (" + tempDjvuImage.getName() + ")");
+                            jp2Stream = FormatConvertor.convertDjvuToJp2(tempDjvuImage);
+                        }
                         FileUtils.copyInputStreamToFile(jp2Stream, imageserverFile);
                         tempDjvuImage.delete();
                     } catch (IOException e) {
@@ -206,9 +226,39 @@ public class DjvuKonverze implements Script {
                 }
             }
             LOGGER.info("Obrázky z ročníku " + volume.getYear() + " jsou zkonvertovány.");
-            serialize(lidovky, "lidovky-converted.ser");
+            serialize(periodikum, "IO/temp-periodikum-converted.ser");
         }
+        serialize(periodikum, serializedDataName);
         LOGGER.info("Obrázky jsou přesunuty");
+    }
+
+    private List<String> skipVolumes() {
+        List<String> toSkip = new ArrayList<>();
+        toSkip.add("uuid:afe0fd7d-435d-11dd-b505-00145e5790ea");
+        toSkip.add("uuid:afe172ae-435d-11dd-b505-00145e5790ea");
+        toSkip.add("uuid:b0746363-435d-11dd-b505-00145e5790ea");
+        toSkip.add("uuid:b074b184-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0754dc5-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0754dc6-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:afbc0ff9-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:afbdbdaa-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:afbe0bcb-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b013a5d0-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0149031-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0152c72-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0152c74-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b0163de5-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:aff76be6-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:aff8cb77-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:aff940a8-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:aff9b5d9-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:aff9dcea-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:affa03fb-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b068ca8b-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b06966cc-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b069dbfd-435d-11dd-b505-00145e5790ea");
+//        toSkip.add("uuid:b069dbfe-435d-11dd-b505-00145e5790ea");
+        return toSkip;
     }
 
     private int getTotalPageNumber(Volume volume) {
@@ -246,10 +296,9 @@ public class DjvuKonverze implements Script {
                 for (int j = 0; j < pageItems.size(); j++) {
                     Page page = new Page();
                     Item pageItem = pageItems.get(j);
-                    // TODO: odblokovat
-//                    String itemTitle = pageItem.getDetails().getPagenumber();
-//                    itemTitle = CharMatcher.WHITESPACE.trimFrom(itemTitle); // trim() nezvládá non-breaking space
-//                    page.setTitle(itemTitle);
+                    String itemTitle = pageItem.getDetails().getPagenumber();
+                    itemTitle = CharMatcher.WHITESPACE.trimFrom(itemTitle); // trim() nezvládá non-breaking space
+                    page.setTitle(itemTitle);
                     page.setPid(pageItem.getPid());
                     issue.getPages().add(page);
                 }
@@ -267,13 +316,13 @@ public class DjvuKonverze implements Script {
         return periodikum;
     }
 
-    private void serialize(List<Volume> lidovky, String filename) {
+    private void serialize(List<Volume> periodikum, String filename) {
         FileOutputStream fileOut = null;
         ObjectOutputStream out = null;
         try {
             fileOut = new FileOutputStream(filename);
             out = new ObjectOutputStream(fileOut);
-            out.writeObject(lidovky);
+            out.writeObject(periodikum);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -291,11 +340,11 @@ public class DjvuKonverze implements Script {
     private List<Volume> deserialize(String filename) throws FileNotFoundException {
         FileInputStream fileIn = null;
         ObjectInputStream in = null;
-        List<Volume> lidovky = null;
+        List<Volume> periodikum = null;
         try {
             fileIn = new FileInputStream(filename);
             in = new ObjectInputStream(fileIn);
-            lidovky = (List<Volume>) in.readObject();
+            periodikum = (List<Volume>) in.readObject();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new FileNotFoundException();
@@ -311,7 +360,7 @@ public class DjvuKonverze implements Script {
                 e.printStackTrace();
             }
         }
-        return lidovky;
+        return periodikum;
     }
 
     @Override

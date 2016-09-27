@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,11 +39,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -55,6 +54,11 @@ public class FedoraUtils {
 
     private static final Logger LOGGER = Logger.getLogger(FedoraUtils.class);
     private AccessProvider accessProvider;
+
+    public static final String MZK = "MZK";
+    public static final String NDK = "NDK";
+    public static final String OTHER = "OTHER";
+    public static final String UNKNOWN = "UNKNOWN";
 
     public FedoraUtils(AccessProvider accessProvider) {
         this.accessProvider = accessProvider;
@@ -238,9 +242,7 @@ public class FedoraUtils {
             getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
             LOGGER.debug(uuid + " existuje");
         } catch (IOException e) {
-            // TODO: ?
-            // objekt není ve fedoře, ale už je zalogování z nižší úrovně
-            // zapsat i nadřazené uuid?   - dá se najít přes risearch
+            // objekt není ve fedoře, ale už je zalogování z nižší úrovně (getModel)
         }
 
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
@@ -260,20 +262,15 @@ public class FedoraUtils {
      */
     public Boolean checkChildrenAndOcrExistence(String uuid) {
         Boolean containsOcr = null;
-        DigitalObjectModel model = null;
+        DigitalObjectModel model;
         try {
             model = getModel(uuid); // vytáhnutí čehokoliv z fedory - ověří existenci
             LOGGER.debug(uuid + " existuje");
+            if (model.equals(DigitalObjectModel.PAGE)) {
+                containsOcr = (getOcr(uuid) != null);
+            }
         } catch (IOException e) {
-            // TODO: ?
-            // objekt není ve fedoře, ale už je zalogování z nižší úrovně
-            // zapsat i nadřazené uuid?   - dá se najít přes risearch
-        }
-
-        if (model.equals(DigitalObjectModel.PAGE)) {
-            containsOcr = (getOcr(uuid) != null);
-        } else {
-            // TODO: může mít OCR jen model PAGE?
+            // objekt není ve fedoře, ale už je zalogování z nižší úrovně (getModel)
         }
 
         ArrayList<ArrayList<String>> children = getAllChildren(uuid);
@@ -288,9 +285,10 @@ public class FedoraUtils {
                     containsOcr = childResult;
                 }
             }
-            if (model.equals(DigitalObjectModel.PERIODICALVOLUME)) {
-                LOGGER.info("Prohledán ročník " + accessProvider.getFedoraAPIA().getObjectProfile(uuid, null).getObjLabel());
-            }
+//            if (model.equals(DigitalObjectModel.PERIODICALVOLUME)) {
+//                LOGGER.info("Prohledán ročník " + accessProvider.getFedoraAPIA().getObjectProfile(uuid, null).getObjLabel());
+//                // TODO: ročník + rok a uuid, ne číslo ročníku (K4 api?)
+//            }
             return containsOcr;
         }
         // pro vyšší úrovně bez dětí (return false)
@@ -422,7 +420,9 @@ public class FedoraUtils {
                 tokensCorrected[2] = rest[1];   // subjekt "..."
                 tokens = tokensCorrected;
             }
-            tokens[2] = tokens[2].substring(0, tokens[2].length() - 2); // odstranění " ." z konce
+            if (tokens.length >= 3) {
+                tokens[2] = tokens[2].substring(0, tokens[2].length() - 2); // odstranění " ." z konce
+            }
 
             if (tokens.length < 3) continue;
             try {
@@ -669,6 +669,7 @@ public class FedoraUtils {
     public InputStream getImgFull(String uuid, String mimetype) throws IOException {
         return getImgFull(uuid, mimetype, 1);
     }
+
     /**
      * @param uuid
      * @return
@@ -680,9 +681,9 @@ public class FedoraUtils {
                         .accept(mimetype).get(ClientResponse.class);
         if (response.getStatus() != 200) {
             if (attempt <= 5) {
-            LOGGER.warn("Attempt " + attempt + " to get IMG_FULL stream of " + uuid + " failed. HTTP error code: "
-                    + response.getStatus() + "\n"
-                    + "Trying again.");
+                LOGGER.warn("Attempt " + attempt + " to get IMG_FULL stream of " + uuid + " failed. HTTP error code: "
+                        + response.getStatus() + "\n"
+                        + "Trying again.");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -703,8 +704,7 @@ public class FedoraUtils {
     /**
      * @param uuid
      * @return
-     * @throws IOException
-     *         NullPointerException if image url not found
+     * @throws IOException NullPointerException if image url not found
      */
     public InputStream getImgJp2(String uuid) throws IOException {
         String imageUrl = getTilesLocation(uuid);
@@ -728,6 +728,10 @@ public class FedoraUtils {
         Document rdf = getRelsExt(uuid);
         NodeList fileList = rdf.getElementsByTagNameNS("http://www.nsdl.org/ontologies/relationships#", "file");
         Node file = fileList.item(0);
+        if (file == null) {
+            LOGGER.warn("Nenalezen obrázek u " + uuid);
+            return null;
+        }
         String imgName = file.getTextContent();
         return imgName;
     }
@@ -755,6 +759,7 @@ public class FedoraUtils {
         String base64login = new String(Base64.encodeBase64(login.getBytes()));
         org.jsoup.nodes.Document html = Jsoup.connect("http://" + accessProvider.getFedoraHost() + query)
                 .header("Authorization", "Basic " + base64login)
+                .timeout(10 * 6000)
                 .get();
         // http://jsoup.org/apidocs/org/jsoup/select/Selector.html
         // http://try.jsoup.org/
@@ -772,13 +777,12 @@ public class FedoraUtils {
      * najde umístění obrázku v imageserveru (z tiles-url v RELS-EXT)
      *
      * @param uuid
-     * @throws NullPointerException if img not in imageserver (no tiles-url element in RELS-EXT)
      * @return
+     * @throws NullPointerException if img not in imageserver (no tiles-url element in RELS-EXT)
      */
     public String getTilesLocation(String uuid) throws IOException {
-
         Document rels = getRelsExt(uuid);
-        String tilesUrl = rels.getElementsByTagName("tiles-url").item(0).getTextContent();
+        String tilesUrl = rels.getElementsByTagNameNS("*", "tiles-url").item(0).getTextContent();
         return tilesUrl + ".jp2";
     }
 
@@ -822,7 +826,7 @@ public class FedoraUtils {
      */
     public String getOcr(String uuid) {
         String ocrUrl = ocr(uuid);
-        LOGGER.debug("Reading OCR +" + ocrUrl);
+        LOGGER.debug("Reading OCR " + ocrUrl);
         try {
             String ocrOutput = accessProvider.getFedoraWebResource("/objects/" + uuid + "/datastreams/TEXT_OCR/content").get(String.class);
             return ocrOutput;
@@ -1057,7 +1061,7 @@ public class FedoraUtils {
 
         WebResource resource = accessProvider.getFedoraWebResource(query);
         ClientResponse response = null;
-        if (controlGroup == "R" || controlGroup == "E") {
+        if (Objects.equals(controlGroup, "R") || Objects.equals(controlGroup, "E")) {
             queryParams.add("dsLocation", filePathOrContent);
             resource.delete();
         }
@@ -1287,6 +1291,130 @@ public class FedoraUtils {
             if (tempDom != null) {
                 tempDom.delete();
             }
+        }
+    }
+
+    public String getOrigin(String uuid) throws IOException {
+        String pageUuid = getOneChildPageUuid(uuid);
+        String imgPath = null;
+        String djvuName;
+        if (pageUuid == null) {
+            return null; // top level co nemá potomky - zpracovat výš
+        }
+        try {
+            imgPath = getImgLocationFromHtml(pageUuid);
+        } catch (IOException e) {
+            // tohle nevadí, děje se u ne-imageserver dokumentů
+        }
+        if (imgPath == null || "".equals(imgPath)) {
+            djvuName = getDjVuImgName(pageUuid);
+            if (djvuName == null || "".equals(djvuName)) {
+                // haluz
+                LOGGER.warn(uuid + " asi nemá obrázky!");
+                return UNKNOWN;
+            } else {
+                // djvu/jpg -> TODO: MZK?
+                return OTHER;
+            }
+        } else if (imgPath.contains("NDK")) {
+            // NDK
+            return NDK;
+        } else if (imgPath.contains("mzk")) {
+            // MZK
+            return MZK;
+        } else {
+            // other
+            return OTHER;
+        }
+    }
+
+    public String getOneChildPageUuid(String uuid) throws IOException {
+        if (getModel(uuid).equals(DigitalObjectModel.PAGE)) {
+            return uuid;
+        }
+        List<ArrayList<String>> children = getAllChildren(uuid);
+        if (children.size() > 0) {
+            int childSelector = 0;
+            List<String> firstChild = children.get(childSelector);
+            while (getModel(firstChild.get(0)).equals(DigitalObjectModel.ARTICLE) || getModel(firstChild.get(0)).equals(DigitalObjectModel.INTERNALPART)) {
+                // články nemaj v dětech strany (isOnPage místo hasPage)
+                childSelector++;
+                if (childSelector == children.size()) {
+                    throw new IOException("Could not get page uuid of " + uuid + " - article hell");
+                }
+                firstChild = children.get(childSelector);
+            }
+            return getOneChildPageUuid(firstChild.get(0));
+        } else {
+            if (isTopLevel(uuid)) {
+                if (getImgFull(uuid, "application/pdf")!= null) { // PDF
+                    return uuid;
+                } else {
+                    LOGGER.warn("Top level object " + uuid + " has no children");
+                    return null; // top level co nemá potomky - zpracovat výš
+                }
+            }
+        }
+        throw new IOException("Could not get page uuid of " + uuid);
+    }
+
+//    private String getOneChildPageUuid(String uuid) throws IOException {
+//        if (getModel(uuid).equals(DigitalObjectModel.PAGE)) {
+//            return uuid;
+//        }
+//        List<ArrayList<String>> children = getAllChildren(uuid);
+//        if (children.size() > 0) {
+//            int childSelector = 0;
+//            List<String> firstChild = children.get(childSelector);
+//            while (getModel(firstChild.get(0)).equals(DigitalObjectModel.ARTICLE) || getModel(firstChild.get(0)).equals(DigitalObjectModel.INTERNALPART)) {
+//                // články nemaj v dětech strany (isOnPage místo hasPage)
+//                childSelector++;
+//                if (childSelector == children.size()) {
+//                    throw new IOException("Could not get page uuid of " + uuid + " - article hell");
+//                }
+//                firstChild = children.get(childSelector);
+//            }
+//            return getOneChildPageUuid(firstChild.get(0));
+//        } else {
+//            if (isTopLevel(uuid)) {
+//                LOGGER.warn("Top level object " + uuid + " has no children");
+//                return null; // top level co nemá potomky - zpracovat výš
+//            }
+//        }
+//        throw new IOException("Could not get page uuid of " + uuid);
+//    }
+
+    public boolean isTopLevel(String uuid) throws IOException {
+        DigitalObjectModel model = getModel(uuid);
+        return (model.equals(DigitalObjectModel.PERIODICAL)
+                || model.equals(DigitalObjectModel.MONOGRAPH)
+                || model.equals(DigitalObjectModel.MAP)
+                || model.equals(DigitalObjectModel.GRAPHIC)
+                || model.equals(DigitalObjectModel.SHEETMUSIC)
+                || model.equals(DigitalObjectModel.MANUSCRIPT));
+    }
+
+    public String getModsLocationElement(String uuid) throws IOException {
+        Document mods = getMODSStream(uuid);
+        try {
+            Node locationElement = mods.getElementsByTagName("physicalLocation").item(0);
+            if (locationElement == null) {
+                locationElement = mods.getElementsByTagName("recordContentSource").item(0);
+            }
+            if (locationElement == null) {
+                locationElement = mods.getElementsByTagNameNS(FedoraNamespaces.BIBILO_MODS_URI, "physicalLocation").item(0);
+            }
+            if (locationElement == null) {
+                locationElement = mods.getElementsByTagNameNS(FedoraNamespaces.BIBILO_MODS_URI, "recordContentSource").item(0);
+            }
+            if (locationElement != null) {
+                return locationElement.getTextContent();
+            } else
+//                throw new IllegalArgumentException("cannot find physicalLocation mods element of " + uuid);
+                return "";
+        } catch (DOMException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

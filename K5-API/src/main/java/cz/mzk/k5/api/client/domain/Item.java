@@ -11,7 +11,7 @@ public class Item {
     // model
     private String model;
     private Handle handle;
-//    private String title; // TODO zatím dělá problémy: https://github.com/ceskaexpedice/kramerius/issues/211
+    private String title;
     // titulek korenoveho periodika (pripadne monografie)
     private String root_title;
     // identifikator korenoveho periodika
@@ -118,13 +118,13 @@ public class Item {
         this.handle = handle;
     }
 
-//    public String getTitle() {
-//        return title;
-//    }
-//
-//    public void setTitle(String title) {
-//        this.title = title;
-//    }
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getRoot_title() {
         return root_title;

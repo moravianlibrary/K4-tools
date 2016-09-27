@@ -4,7 +4,6 @@ import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
 import org.apache.log4j.Logger;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +55,8 @@ public class Tools {
             runner.register("batch", new BatchK5Process());
             runner.register("vymenaObrazku", new DjvuVymena());
             runner.register("metadata", new ZmenaMetadat());
+            runner.register("ids", new IdentificatorSearch());
+            runner.register("sort", new Sorter());
             runner.register("test", new TestScript());
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage());

@@ -33,7 +33,6 @@ public class AbbyRestApiFactory {
         AbbyRestApiString apiString = builder.build().create(AbbyRestApiString.class);
 
 
-        AbbyRestApi api = new AbbyRestApi(apiJSON, apiString);
-        return api;
+        return new AbbyRestApi(apiJSON, apiString);
     }
 }

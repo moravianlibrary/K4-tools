@@ -28,6 +28,7 @@ public class BatchK5Process implements Script {
     private final static int MAKE_PUBLIC = 1;
     private final static int MAKE_PRIVATE = 2;
     private final static int REINDEX = 3;
+    private final static int EXPORT = 4;
 
     public BatchK5Process() throws FileNotFoundException {
     }
@@ -36,22 +37,25 @@ public class BatchK5Process implements Script {
     public void run(List<String> args) {
         // todo: parametry
         String filename = "IO/reindex";
-        int process = DELETE;
+        int process = REINDEX;
         List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
         for (String uuid : uuids) {
             try {
                 switch (process) {
                     case DELETE: remoteApi.deleteObject(uuid);
-                        LOGGER.debug("Process DELETE planned for " + uuid);
+                        LOGGER.info("Process DELETE planned for " + uuid);
                         break;
                     case MAKE_PUBLIC: remoteApi.setPublic(uuid);
-                        LOGGER.debug("Process SET PUBLIC planned for " + uuid);
+                        LOGGER.info("Process SET PUBLIC planned for " + uuid);
                         break;
                     case MAKE_PRIVATE: remoteApi.setPrivate(uuid);
-                        LOGGER.debug("Process SET PRIVATE planned for " + uuid);
+                        LOGGER.info("Process SET PRIVATE planned for " + uuid);
                         break;
                     case REINDEX: remoteApi.reindex(uuid);
-                        LOGGER.debug("Process REINDEX planned for " + uuid);
+                        LOGGER.info("Process REINDEX planned for " + uuid);
+                        break;
+                    case EXPORT: remoteApi.export(uuid);
+                        LOGGER.info("Process EXPORT planned for " + uuid);
                         break;
                 }
             } catch (K5ApiException e) {

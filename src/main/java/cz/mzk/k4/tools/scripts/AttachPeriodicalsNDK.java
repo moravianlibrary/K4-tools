@@ -1,14 +1,13 @@
 package cz.mzk.k4.tools.scripts;
 
-import cz.mzk.k5.api.client.ClientRemoteApi;
-import cz.mzk.k5.api.common.K5ApiException;
-import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
+import cz.mzk.k5.api.client.ClientRemoteApi;
+import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.client.domain.Context;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
@@ -49,7 +48,7 @@ public class AttachPeriodicalsNDK implements Script {
     @Override
     public void run(List<String> args) {  // periodicalitem, periodicalvolume, volume (?), supplement, page (?), monographunit
         // najde seznam všech nepřipojených urč. modelu
-        // http://krameriusndktest.mzk.cz/solr/select/?q=model_path%3Aperiodicalvolume*
+        // http://kramerius.mzk.cz/solr/select/?q=model_path%3Aperiodicalvolume*
         // narozdíl od document_type bere jen nejvyšší model ve stromu (připojené nevypíše)
         String model = args.get(0);
         model = model.replace("model:", ""); // parametr může být včetně model: i bez

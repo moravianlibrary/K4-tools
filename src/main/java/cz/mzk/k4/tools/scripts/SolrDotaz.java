@@ -13,7 +13,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by holmanj on 2.3.15.
@@ -38,22 +40,32 @@ public class SolrDotaz implements Script {
             e.printStackTrace();
         }
 
-        Path resultFile = Paths.get("IO/roots-without-ocr");
+        pidList = makeUnique(pidList);
+
+        Path resultFile = Paths.get("IO/solr-result");
         try {
+            assert pidList != null;
             Files.write(resultFile, pidList, Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        for (String pid : pidList) {
-            System.out.println(pid);
-        }
+        pidList.forEach(System.out::println);
+    }
+
+    private List<String>  makeUnique(List<String>  list) {
+        Set<String> set = new HashSet<>();
+        set.addAll(list);
+        list.clear();
+        list.addAll(set);
+        return list;
     }
 
     @Override
     public String getUsage() {
         return "solr\n" +
                 "Zavolá solr dotaz v parametru a vrátí seznam UUID vrácených sokumentů.\n" +
-                "Argumenty: solr dotaz, id vráceného pole (jen 1) - př: PID, root_pid,..";
+                "Argumenty: solr dotaz, id vráceného pole (jen 1) - př: PID, root_pid,..\n" +
+                "Nezapomenout na escape uvozovek v argumentu: \" ";
     }
 }

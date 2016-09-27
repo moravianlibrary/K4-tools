@@ -3,11 +3,10 @@ package cz.mzk.k4.tools.utils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
@@ -15,11 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by holmanj on 4.3.15.
@@ -86,14 +81,19 @@ public class SolrUtils {
         // dá se použít i List<Item> beans = rsp.getBeans(Item.class);
         SolrDocumentList results = response.getResults();
 
-        List<String> pidList = new ArrayList<>();
-        LOGGER.info("Response contains " + results.size() + " items");
+        List<String> resultList = new ArrayList<>();
+        LOGGER.debug("Response contains " + results.size() + " items");
         for (int i = 0; i < results.size(); ++i) {
-            pidList.add((String) results.get(i).get(returnField));
+            // TODO: vyměnit podle potřeby
+            resultList.add((String) results.get(i).get(returnField));
+//            if (results.get(0).size() == 0) {
+//                return null;
+//            }
+//            resultList.addAll((ArrayList) results.get(0).get(returnField));
         }
 
-        writeToFile(pidList);
-        return pidList;
+        writeToFile(resultList);
+        return resultList;
     }
 
     private void writeToFile(List pidList) {

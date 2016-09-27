@@ -40,6 +40,9 @@ public enum DigitalObjectModel
     /** The MONOGRAPH. */
     MONOGRAPH("monograph", "", TopLevelObjectModel.MONOGRAPH),
 
+    /** The SHEET MUSIC. */
+    SHEETMUSIC("sheetmusic", "", TopLevelObjectModel.MONOGRAPH), // TODO: je to správně?
+
     /**
      * The MONOGRAPHUNIT.
      */
@@ -56,21 +59,25 @@ public enum DigitalObjectModel
      * The PERIODICAL.
      */
     PERIODICAL("periodical", "", TopLevelObjectModel.PERIODICAL),
+    NDKPERIODICAL("ndkperiodical", "", TopLevelObjectModel.NDKPERIODICAL), // fsv proarc
 
     /**
      * The PERIODICALVOLUME.
      */
     PERIODICALVOLUME("periodicalvolume", ""),
+    NDKPERIODICALVOLUME("ndkperiodicalvolume", ""), // fsv proarc
 
     /**
      * The PERIODICALITEM.
      */
     PERIODICALITEM("periodicalitem", ""),
+    NDKPERIODICALISSUE("ndkperiodicalissue", ""),
 
     /**
      * The PAGE.
      */
     PAGE("page", ""),
+    NDKPAGE("ndkpage", ""),
 
     /** The INTERNALPART. */
     INTERNALPART("internalpart", ""), /*
@@ -113,7 +120,7 @@ public enum DigitalObjectModel
     ;
 
     public static enum TopLevelObjectModel {
-        MONOGRAPH, PERIODICAL;
+        MONOGRAPH, PERIODICAL, NDKPERIODICAL;
     }
 
     private DigitalObjectModel(String value, String icon) {

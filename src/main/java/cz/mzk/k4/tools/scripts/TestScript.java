@@ -7,11 +7,12 @@ import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
-import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import javax.xml.transform.TransformerException;
 import java.io.BufferedReader;
@@ -19,7 +20,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 /**
@@ -42,25 +46,24 @@ public class TestScript implements Script {
 
     @Override
     public void run(List<String> args) {
-        // kontrola modelů
-        List<String> uuids = GeneralUtils.loadUuidsFromFile("IO/podezrele");
-        for (String uuid : uuids) {
-            try {
-                String model = clientApi.getItem(uuid).getModel();
-                System.out.println(model + " - " + uuid);
-            } catch (K5ApiException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+        Path resultFile = Paths.get("IO/titles2");
+        String filename = "IO/sort/ndk";
+        List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
 
-    public void delete() {
-        List<String> uuids = GeneralUtils.loadUuidsFromFile("to-remove");
         for (String uuid : uuids) {
             try {
-                remoteApi.deleteObject(uuid);
+                String title = clientApi.getItem(uuid).getTitle();
+                String author = "";
+                Document dc = clientApi.getDublinCore(uuid);
+                NodeList authors = dc.getElementsByTagName("dc:creator");
+                if (authors.getLength() > 0) {
+                    author = authors.item(0).getTextContent();
+                }
+                Files.write(resultFile, (title + ";" + author + "\n").getBytes(), StandardOpenOption.APPEND);
             } catch (K5ApiException e) {
-                e.printStackTrace();
+                LOGGER.warn(e.getMessage());
+            } catch (IOException e) {
+                LOGGER.warn(e);
             }
         }
     }

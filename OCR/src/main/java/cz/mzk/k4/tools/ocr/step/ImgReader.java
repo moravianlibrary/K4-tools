@@ -5,7 +5,6 @@ import cz.mzk.k4.tools.ocr.domain.Img;
 import cz.mzk.k4.tools.ocr.domain.QueuedImage;
 import cz.mzk.k4.tools.ocr.exceptions.ConflictException;
 import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
-import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.FileUtils;
@@ -25,7 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.SocketTimeoutException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,47 +43,46 @@ public class ImgReader implements ItemReader<Img> {
     private static final Logger LOGGER = Logger.getLogger(ImgReader.class);
     private static final String JPEG_MIMETYPE = "image/jpeg";
     private static final String JPEG2000_MIMETYPE = "image/jp2";
-
     private FedoraUtils fedoraUtils;
     private AbbyRestApi abbyApi;
     private boolean overwrite;
     private List<String> pagePids;
-    private List<String> kopie; // zničit (jen pro LN)
+    private List<String> kopie; // pro mazání stran z OCR
+    private String rootPid; // pro mazání stran z OCR
 
     public ImgReader(FedoraUtils fedoraUtils, AbbyRestApi abbyApi, String rootPid, boolean overwrite) {
         this.fedoraUtils = fedoraUtils;
         this.abbyApi = abbyApi;
         this.overwrite = overwrite;
+        this.rootPid = rootPid;
         LOGGER.info("Spuštěno OCR na dokumentu " + rootPid);
-//        if (new File(rootPid + ".ser").exists()) {
-//            try {
-//                pagePids = deserialize(rootPid + ".ser");
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            pagePids = fedoraUtils.getChildrenUuids(rootPid, DigitalObjectModel.PAGE);
-//            pagePids = makeUnique(pagePids);
-//            serialize(pagePids, rootPid + ".ser");
-//        }
-
-        // odsud po LOGGER jen pro LN
-        serialize(pagePids, rootPid + ".ser");
         try {
-            pagePids = deserialize("LN-na-OCR");
-            pagePids = makeUnique(pagePids);
-//            pagePids = deserialize(rootPid + ".ser"); // pro další periodika (ne jen LN)
-            List<String> skip = GeneralUtils.loadUuidsFromFile("LN-skip");
-            for (String skipPage : skip) {
-                pagePids.remove(skipPage);
-            }
-
-        } catch (FileNotFoundException e) {
+            Path resultFile = Paths.get("IO/results");
+            Files.write(resultFile, ("Spuštěno OCR na dokumentu " + rootPid + "\n").getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        kopie = new ArrayList(pagePids);
+        String serializedFile = "IO/" + rootPid + ".ser";
+        if (new File(serializedFile).exists()) {
+            try {
+                pagePids = deserialize(serializedFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            pagePids = fedoraUtils.getChildrenUuids(rootPid, DigitalObjectModel.PAGE);
+            pagePids = makeUnique(pagePids);
+            serialize(pagePids, serializedFile);
+        }
 
+        kopie = new ArrayList(pagePids);
         LOGGER.info("Načteno " + pagePids.size() + " stran");
+        try {
+            Path resultFile = Paths.get("IO/results");
+            Files.write(resultFile, ("Načteno " + pagePids.size() + " stran\n").getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -99,16 +100,9 @@ public class ImgReader implements ItemReader<Img> {
                 // odstranit ze seznamu
                 kopie.remove(pagePid);
                 // serializace
-                serialize(kopie, "LN-na-OCR");
+                serialize(kopie, "IO/" + rootPid + ".ser");
                 return new Img(pagePid, null); // strana už má OCR i ALTO (filter - strana se dál nezpracovává)
             }
-
-
-//        if (pagePid.equals("uuid:46642e0f-435e-11dd-b505-00145e5790ea") || // výjimka
-//            pagePid.equals("uuid:45a571e3-435e-11dd-b505-00145e5790ea")) { // výjimka, adfb156b62fc1975145dddd923a58424
-//            LOGGER.warn("Přeskočení strany " + pagePid); // strana padá do výjimky na ocr serveru
-//            return new Img(pagePid, null);
-//        }
 
         String mimetype;
         InputStream imgStream;
@@ -118,13 +112,13 @@ public class ImgReader implements ItemReader<Img> {
 //            LOGGER.debug("Trying to get JP2 of " + pagePid);
 //            imgStream = fedoraUtils.getImgJp2(pagePid);
 //        } catch (NullPointerException ex) {
-            // stahuje IMG_FULL datastream -> jpeg a menší kvalita, než jpeg2000 na imageserveru
+            // stahuje IMG_FULL datastream -> jpeg a menší kvalita než jpeg2000 na imageserveru
             mimetype = JPEG_MIMETYPE;
             LOGGER.debug("Trying to get JPG of " + pagePid);
             imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
 //        }
 
-        String md5 = null;
+        String md5;
         try {
             LOGGER.debug("Trying to send " + pagePid + " to OCR server");
             md5 = sendImageToOcrEngine(imgStream, pagePid, mimetype);
