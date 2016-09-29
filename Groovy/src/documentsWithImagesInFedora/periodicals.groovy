@@ -40,6 +40,11 @@ def getRiSearchResponse = { String query ->
     return new XmlSlurper(false, true).parseText(response)
 }
 
+def dsDisseminationXml = { String uuid, String dataStream ->
+    def response = FedoraClient.getDatastreamDissemination(uuid, dataStream).execute().getEntity(String)
+    return new XmlSlurper(false, true).parseText(response)
+}
+
 def lineCount = 1
 def periodicalsXml = getRiSearchResponse("* <info:fedora/fedora-system:def/model#hasModel> <info:fedora/model:periodical>")
 println "Number of documents: ${periodicalsXml.Description.size()}"
@@ -69,11 +74,18 @@ periodicalsXml.Description.each { periodicalUuidNode ->
             def pagesXml = getRiSearchResponse("<$itemUuid> <http://www.nsdl.org/ontologies/relationships#hasPage> *")
             def pageUuid = pagesXml.Description.hasPage[0].'@rdf:resource'.toString()
             pageUuid = pageUuid.replace("info:fedora/", "")
-            def dsLocation = FedoraClient.getDatastream(pageUuid, "IMG_FULL").execute().getDatastreamProfile().getDsLocationType()
+            def imageDataStreamProfile = FedoraClient.getDatastream(pageUuid, "IMG_FULL").execute().getDatastreamProfile()
 //            println "page: $pageUuid$ln"
 
-            if (dsLocation.equals("INTERNAL_ID")) {
-                outputFile << "${periodicalUuid.replace("info:fedora/", "")}$ln"
+            if (imageDataStreamProfile && imageDataStreamProfile.getDsLocationType().equals("INTERNAL_ID")) {
+                periodicalUuid = periodicalUuid.replace("info:fedora/", "")
+                def modsNode = dsDisseminationXml(periodicalUuid, "BIBLIO_MODS").mods
+                outputFile << "${modsNode.titleInfo.title.toString()}$ln"
+                outputFile << "${imageDataStreamProfile.getDsMIME()}  $ln"
+                for (i = 0; i < modsNode.identifier."@type".size(); i++)
+                    outputFile << "${modsNode.identifier."@type"[i]}: ${modsNode.identifier[i].text()}$ln"
+                outputFile << "${periodicalUuid.replace("info:fedora/", "")} $ln"
+                outputFile << "http://kramerius.mzk.cz/search/i.jsp?pid=${periodicalUuid} $ln $ln"
             }
         }
     }

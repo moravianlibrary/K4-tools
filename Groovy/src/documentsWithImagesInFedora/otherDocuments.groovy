@@ -62,8 +62,6 @@ def dsDisseminationXml = { String uuid, String dataStream ->
             errorFile << "$documentUuid does not page $ln"
             errorFile << "http://kramerius.mzk.cz/search/handle/$documentUuid $ln"
             errorFile << "http://fedora.dk-back.infra.mzk.cz/fedora/get/$documentUuid $ln$ln"
-
-
         } else {
             def imageDataStreamProfile = null
             try {
@@ -77,10 +75,11 @@ http://fedora.dk-back.infra.mzk.cz/fedora/get/$documentUuid $ln
             }
             if (imageDataStreamProfile && imageDataStreamProfile.getDsLocationType().equals("INTERNAL_ID")) {
                 def modsNode = dsDisseminationXml(documentUuid, "BIBLIO_MODS").mods
-                outputFile << "${modsNode.titleInfo.title.toString()} | "
-                outputFile << "${imageDataStreamProfile.getDsMIME()} | "
-                outputFile << "${modsNode.identifier} | "
-                outputFile << "http://kramerius.mzk.cz/search/handle/$documentUuid $ln"
+                outputFile << "${modsNode.titleInfo.title.toString()}$ln"
+                outputFile << "${imageDataStreamProfile.getDsMIME()}$ln"
+                outputFile << "${modsNode.identifier}$ln"
+                outputFile << "http://kramerius.mzk.cz/search/handle/$documentUuid$ln"
+                outputFile << "pages: ${pagesXml.Description.hasPage.size()}$ln$ln"
             }
         }
     }
