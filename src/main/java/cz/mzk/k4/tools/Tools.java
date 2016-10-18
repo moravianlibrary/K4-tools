@@ -16,8 +16,6 @@ import java.util.List;
 public class Tools {
     private static final Logger LOGGER = Logger.getLogger(Tools.class);
 
-
-    // TODO: defaultní konfigurák
     public static void main(String[] args) {
         ScriptRunner runner = new ScriptRunner();
 
@@ -58,6 +56,7 @@ public class Tools {
             runner.register("ids", new IdentificatorSearch());
             runner.register("sort", new Sorter());
             runner.register("test", new TestScript());
+            runner.register("vcrepair", new VCGhosts());
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage());
             return;

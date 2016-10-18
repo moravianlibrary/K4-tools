@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class CheckLogs implements Script {
 
-//	private static K4ProcessManager pm;
 	private static ProcessRemoteApi krameriusApi;
 	private static Integer defSize; // default number of processes fetched from Kramerius
 	private static org.apache.log4j.Logger LOGGER = Logger.getLogger(CheckLogs.class);
@@ -37,7 +36,6 @@ public class CheckLogs implements Script {
 				accessProvider.getKrameriusUser(),
 				accessProvider.getKrameriusPassword());
 		defSize = Integer.parseInt(accessProvider.getProperties().getProperty("checkLogs.resultSize"));
-//		pm = new K4ProcessManager(accessProvider);
 
 		try {
 			// handle URL parameters
@@ -47,7 +45,6 @@ public class CheckLogs implements Script {
 			int resultSize = Integer.parseInt(defSize.toString());
 
 			// fetch processes
-//			List<KrameriusProcess> processes = pm.searchByParams(queryParams);
 			List<Process> processes = krameriusApi.filterProcesses(queryParams);
 
 			// specified resultSize can be bigger than the actual number of
@@ -60,7 +57,7 @@ public class CheckLogs implements Script {
 			int errorCount = 0;
 			int notFoundCount = 0;
 			BufferedWriter writer = null;
-			File file = null;
+			File file;
 			for (int i = 0; i < processes.size(); i++) {
 				count++;
 				Process process = processes.get(i);

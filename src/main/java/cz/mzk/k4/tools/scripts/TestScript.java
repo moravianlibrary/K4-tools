@@ -1,25 +1,21 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.fedoraApi.FedoraFactoryService;
+import cz.mzk.k4.tools.fedoraApi.RisearchService;
 import cz.mzk.k4.tools.utils.AccessProvider;
-import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
-import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-import javax.xml.transform.TransformerException;
+import retrofit.client.Response;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,31 +36,29 @@ public class TestScript implements Script {
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    RisearchService risearch = FedoraFactoryService.getService(accessProvider.getFedoraHost());
+
 
     public TestScript() throws FileNotFoundException {
     }
 
     @Override
     public void run(List<String> args) {
-        Path resultFile = Paths.get("IO/titles2");
-        String filename = "IO/sort/ndk";
-        List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
+        InputStream is;
+        BufferedReader br;
+        String query = "* <http://purl.org/dc/elements/1.1/rights> *";
+        Path resultFile = Paths.get("IO/risearch");
+        try {
+            Response result = risearch.queryStream(query);
+            is = result.getBody().in();
+            br = new BufferedReader(new InputStreamReader(is));
 
-        for (String uuid : uuids) {
-            try {
-                String title = clientApi.getItem(uuid).getTitle();
-                String author = "";
-                Document dc = clientApi.getDublinCore(uuid);
-                NodeList authors = dc.getElementsByTagName("dc:creator");
-                if (authors.getLength() > 0) {
-                    author = authors.item(0).getTextContent();
-                }
-                Files.write(resultFile, (title + ";" + author + "\n").getBytes(), StandardOpenOption.APPEND);
-            } catch (K5ApiException e) {
-                LOGGER.warn(e.getMessage());
-            } catch (IOException e) {
-                LOGGER.warn(e);
+            String line;
+            while ((line = br.readLine()) != null) {
+                Files.write(resultFile, (line + "\n").getBytes(), StandardOpenOption.APPEND);
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -73,55 +67,4 @@ public class TestScript implements Script {
         return null;
     }
 
-    private void repair(String filePath) {
-
-        LOGGER.debug("Otvírání souboru " + filePath);
-        File inputFile = new File(filePath);
-        BufferedReader reader = null;
-        int counter = 0;
-
-        try {
-            //Open file and load content
-            reader = new BufferedReader(new FileReader(inputFile));
-            String volume;
-            String issue;
-            String empty;
-
-            //Parse file by line
-            while ((issue = reader.readLine()) != null) {
-                issue = "uuid:" + issue;
-                volume = "uuid:" + reader.readLine();
-                empty = reader.readLine();
-                if (empty != null && !"".equals(empty)) {
-                    System.out.println("Chyba");
-                }
-                try {
-                    fedoraUtils.addChild(volume, issue);
-                } catch (CreateObjectException e) {
-                    e.printStackTrace();
-                } catch (TransformerException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                LOGGER.info("Číslo " + issue + " bylo zařazeno do ročníku " + volume + ".");
-                counter++;
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Chyba při otvírání souboru: " + filePath + ".");
-            e.printStackTrace();
-        } catch (IOException e) {
-            LOGGER.error("Chyba při čtení souboru: ");
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    LOGGER.error("Chyba při zavírání souboru: " + e.getStackTrace());
-                }
-            }
-        }
-        LOGGER.info("Zpracováno " + counter + " čísel.");
-    }
 }

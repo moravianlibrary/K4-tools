@@ -37,10 +37,10 @@ public class GeneralUtils {
 
             //Parse file by line
             while ((uuid = reader.readLine()) != null) {
-                if (!uuid.contains("uuid")) {
+                if (!uuid.contains("uuid:") && !uuid.contains("vc:")) {
                     LOGGER.warn("Not a valid pid: " + uuid);
                 } else {
-                    uuid = uuid.substring(uuid.indexOf("uuid:"));
+//                    uuid = uuid.substring(uuid.indexOf("uuid:"));
                     uuidList.add(uuid);
                 }
             }

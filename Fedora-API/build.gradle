@@ -1,6 +1,5 @@
 apply plugin: 'java'
 
-sourceCompatibility = 1.5
 version = '1.0'
 
 repositories {
@@ -12,6 +11,8 @@ dependencies {
 }
 
 dependencies {
-    compile group: 'com.squareup.retrofit', name: 'retrofit',   version: '1.9.0'
-    compile group: 'commons-io',            name: 'commons-io', version: '2.4'
+    compile group: 'com.squareup.retrofit',     name: 'retrofit',           version: '1.9.0'
+    compile group: 'commons-io',                name: 'commons-io',         version: '2.4'
+    compile group: 'org.apache.logging.log4j',  name: 'log4j-api',          version: '2.7'
+    compile group: 'org.apache.logging.log4j',  name: 'log4j-core',         version: '2.7'
 }

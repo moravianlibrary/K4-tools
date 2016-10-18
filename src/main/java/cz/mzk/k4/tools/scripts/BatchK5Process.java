@@ -24,11 +24,13 @@ public class BatchK5Process implements Script {
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+
     private final static int DELETE = 0;
     private final static int MAKE_PUBLIC = 1;
     private final static int MAKE_PRIVATE = 2;
     private final static int REINDEX = 3;
     private final static int EXPORT = 4;
+    private final static int REINDEX_VC = 5;
 
     public BatchK5Process() throws FileNotFoundException {
     }
@@ -42,19 +44,29 @@ public class BatchK5Process implements Script {
         for (String uuid : uuids) {
             try {
                 switch (process) {
-                    case DELETE: remoteApi.deleteObject(uuid);
+                    case DELETE:
+                        remoteApi.deleteObject(uuid);
                         LOGGER.info("Process DELETE planned for " + uuid);
                         break;
-                    case MAKE_PUBLIC: remoteApi.setPublic(uuid);
+                    case MAKE_PUBLIC:
+                        remoteApi.setPublic(uuid);
                         LOGGER.info("Process SET PUBLIC planned for " + uuid);
                         break;
-                    case MAKE_PRIVATE: remoteApi.setPrivate(uuid);
+                    case MAKE_PRIVATE:
+                        remoteApi.setPrivate(uuid);
                         LOGGER.info("Process SET PRIVATE planned for " + uuid);
                         break;
-                    case REINDEX: remoteApi.reindex(uuid);
+                    case REINDEX:
+                        remoteApi.reindex(uuid);
+//                    case REINDEX: remoteApi.reindexWithoutRemoving(uuid);
                         LOGGER.info("Process REINDEX planned for " + uuid);
                         break;
-                    case EXPORT: remoteApi.export(uuid);
+                    case EXPORT:
+                        remoteApi.export(uuid);
+                        LOGGER.info("Process EXPORT planned for " + uuid);
+                        break;
+                    case REINDEX_VC:
+                        remoteApi.reindexCollectionObjects(uuid);
                         LOGGER.info("Process EXPORT planned for " + uuid);
                         break;
                 }
