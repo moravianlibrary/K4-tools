@@ -1,14 +1,12 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
-import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
-import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
-
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -26,6 +24,8 @@ public class FindLonelyMonographs implements Script {
     private static final Logger LOGGER = Logger.getLogger(FindLonelyMonographs.class);
 
     public FindLonelyMonographs() throws FileNotFoundException {
+        accessProvider = AccessProvider.getInstance();
+        krameriusUtils = new KrameriusUtils(accessProvider);
     }
 
     /**
@@ -33,16 +33,17 @@ public class FindLonelyMonographs implements Script {
      * @param args - nebere argument
      */
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-        accessProvider = new AccessProvider();
-        krameriusUtils = new KrameriusUtils(accessProvider);
-
+    public void run(List<String> args) {
         String model = args.get(0);
         List<String> uuidList = krameriusUtils.getUuidsByModelSolr(model); // argument
 
         LOGGER.info("Running " + this.getClass() + " on " + accessProvider.getLibraryPrefix());
         for (String uuid : uuidList) {
-            worker.run(uuid);
+            try {
+                worker.run(uuid);
+            } catch (K4ToolsException e) {
+                e.printStackTrace();
+            }
         }
 
        // writeEnabled - mazat?

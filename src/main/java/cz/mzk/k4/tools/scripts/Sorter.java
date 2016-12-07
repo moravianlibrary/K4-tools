@@ -34,7 +34,7 @@ public class Sorter implements Script {
     }
 
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
+    public void run(List<String> args) {
         List<String> uuids = GeneralUtils.loadUuidsFromFile("IO/solr-result");
         List<String> copy = new ArrayList<>(uuids);
         Path working = Paths.get("IO/sort/working");

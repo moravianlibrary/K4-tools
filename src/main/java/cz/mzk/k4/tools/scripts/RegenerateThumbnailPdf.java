@@ -2,11 +2,10 @@ package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
-import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
+import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,6 +20,11 @@ import java.util.List;
 public class RegenerateThumbnailPdf implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(RegenerateThumbnailPdf.class);
+    FedoraUtils fedoraUtils;
+
+    public RegenerateThumbnailPdf() throws FileNotFoundException {
+        fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
+    }
 
     /**
      * Znovu vygeneruje náhled (thumbnail) PDF dokumentu a vloží ho do fedory.
@@ -28,9 +32,7 @@ public class RegenerateThumbnailPdf implements Script {
      * @param args - uuid PDF dokumentu (1. argument)
      */
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-
-        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+    public void run(List<String> args) {
         String uuid;
         try {
             if (args.size() > 0) {

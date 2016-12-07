@@ -1,6 +1,6 @@
 package cz.mzk.k4.tools.workers;
 
-import java.io.FileNotFoundException;
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 
 /**
  * @author: Martin Rumanek
@@ -23,5 +23,5 @@ public abstract class UuidWorker {
         this.writeEnabled = writeEnabled;
     }
 
-    public abstract void run(String uuid) throws FileNotFoundException;
+    public abstract void run(String uuid) throws K4ToolsException;
 }

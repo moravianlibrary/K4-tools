@@ -15,6 +15,11 @@ import java.util.List;
 public class DeletedDocuments implements Script {
 
     public static final Logger LOGGER = Logger.getLogger(DeletedDocuments.class);
+    FedoraUtils fedoraUtils;
+
+    public DeletedDocuments() throws FileNotFoundException {
+        fedoraUtils = new FedoraUtils(new AccessProvider());
+    }
 
     @Override
     /**
@@ -22,8 +27,7 @@ public class DeletedDocuments implements Script {
      * @param writeEnabled - pokud je false, pouze vypíše uuid dokumentů se stavem DELETED
      *                     - pokud je true, DELETED dokumenty trvale odstraní
      */
-    public void run(List<String> args) throws FileNotFoundException {
-        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+    public void run(List<String> args) {
         // TODO: chyba při nulovém výsledku v risearch
         fedoraUtils.applyToAllUuidOfStateDeleted(new UuidWorker(args.contains("writeEnabled")) {
             @Override

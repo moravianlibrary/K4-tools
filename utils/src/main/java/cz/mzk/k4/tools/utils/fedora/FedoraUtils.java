@@ -4,6 +4,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import cz.mzk.k4.tools.providers.Provider;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
@@ -113,7 +114,7 @@ public class FedoraUtils {
                 worker.run(queue.take());
             } catch (InterruptedException e) {
                 LOGGER.error("K4 tools was interrupted");
-            } catch (FileNotFoundException e) {
+            } catch (K4ToolsException e) {
                 LOGGER.error(e.getMessage());
             }
         }
@@ -144,7 +145,7 @@ public class FedoraUtils {
                                     LOGGER.debug("Worker is running on " + childUuid);
                                     try {
                                         worker.run(childUuid);
-                                    } catch (FileNotFoundException e) {
+                                    } catch (K4ToolsException e) {
                                         LOGGER.error(e.getMessage());
                                     }
                                     semaphore.release();
@@ -1347,7 +1348,7 @@ public class FedoraUtils {
             return getOneChildPageUuid(firstChild.get(0));
         } else {
             if (isTopLevel(uuid)) {
-                if (getImgFull(uuid, "application/pdf")!= null) { // PDF
+                if (getImgFull(uuid, "application/pdf") != null) { // PDF
                     return uuid;
                 } else {
                     LOGGER.warn("Top level object " + uuid + " has no children");

@@ -17,13 +17,14 @@ public class RepairImgRels implements Script {
     public static final Logger LOGGER = Logger.getLogger(RepairImgRels.class);
     AccessProvider accessProvider = AccessProvider.getInstance();
     FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
+    RepairImgRelsWorker worker;
 
     public RepairImgRels() throws FileNotFoundException {
+        worker = new RepairImgRelsWorker(true);
     }
 
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-        RepairImgRelsWorker worker = new RepairImgRelsWorker(true);
+    public void run(List<String> args)   {
         fedoraUtils.applyToAllUuidOfModel(DigitalObjectModel.SOUND_UNIT, worker);
 
     }

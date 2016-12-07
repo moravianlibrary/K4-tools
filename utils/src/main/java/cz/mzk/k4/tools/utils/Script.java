@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.utils;
 
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public interface Script {
 
-    public void run(List<String> args) throws FileNotFoundException;
+    public void run(List<String> args);
 
     public String getUsage();
 

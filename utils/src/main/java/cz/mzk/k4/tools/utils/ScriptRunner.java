@@ -1,7 +1,7 @@
 package cz.mzk.k4.tools.utils;
 
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;

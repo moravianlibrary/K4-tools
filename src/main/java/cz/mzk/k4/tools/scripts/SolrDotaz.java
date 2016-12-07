@@ -5,7 +5,6 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.SolrUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -22,11 +21,14 @@ import java.util.Set;
  */
 public class SolrDotaz implements Script {
     private static final Logger LOGGER = Logger.getLogger(SolrDotaz.class);
+    SolrUtils solr;
+
+    public SolrDotaz() throws FileNotFoundException {
+        solr = new SolrUtils(AccessProvider.getInstance());
+    }
 
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-        SolrUtils solr = new SolrUtils(new AccessProvider());
-
+    public void run(List<String> args) {
         String query = args.get(0);
         String returnField = args.get(1);
         List<String> pidList = null;

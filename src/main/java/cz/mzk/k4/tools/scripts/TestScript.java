@@ -3,23 +3,27 @@ package cz.mzk.k4.tools.scripts;
 import cz.mzk.k4.tools.fedoraApi.FedoraFactoryService;
 import cz.mzk.k4.tools.fedoraApi.RisearchService;
 import cz.mzk.k4.tools.utils.AccessProvider;
+import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.Script;
+import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
+import cz.mzk.k5.api.client.domain.Item;
+import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.log4j.Logger;
-import retrofit.client.Response;
-import java.io.BufferedReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 /**
@@ -44,20 +48,16 @@ public class TestScript implements Script {
 
     @Override
     public void run(List<String> args) {
-        InputStream is;
-        BufferedReader br;
-        String query = "* <http://purl.org/dc/elements/1.1/rights> *";
-        Path resultFile = Paths.get("IO/risearch");
+        String topUuid = "uuid:0bc12264-8b96-4ecb-bb20-8880f770fa1a";
         try {
-            Response result = risearch.queryStream(query);
-            is = result.getBody().in();
-            br = new BufferedReader(new InputStreamReader(is));
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                Files.write(resultFile, (line + "\n").getBytes(), StandardOpenOption.APPEND);
+            List<Item> volumes = clientApi.getChildren(topUuid);
+            for (Item volume : volumes) {
+                String year = volume.getDetails().getYear();
+                if (year.equals("1969")) {
+                    remoteApi.deleteObject(volume.getPid());
+                }
             }
-        } catch (IOException e) {
+        } catch (K5ApiException e) {
             e.printStackTrace();
         }
     }

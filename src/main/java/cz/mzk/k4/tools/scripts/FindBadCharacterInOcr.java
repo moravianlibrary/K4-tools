@@ -19,9 +19,11 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
     private boolean repair;
+    FedoraUtils fedoraUtils;
 
-    public FindBadCharacterInOcr(boolean writeEnabled) {
+    public FindBadCharacterInOcr(boolean writeEnabled) throws FileNotFoundException {
         super(writeEnabled);
+        fedoraUtils = new FedoraUtils(new AccessProvider());
     }
 
     /**
@@ -83,8 +85,8 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     /**
      * @param uuid
      */
-    public void run(String uuid) throws FileNotFoundException {
-        FedoraUtils fedoraUtils = new FedoraUtils(new AccessProvider());
+    public void run(String uuid)  {
+
         if (isWriteEnabled()) {
             repair = true;
         }
@@ -112,7 +114,7 @@ public class FindBadCharacterInOcr extends UuidWorker implements Script {
     /**
      * @param args
      */
-    public void run(List<String> args) throws FileNotFoundException {
+    public void run(List<String> args) {
         run(args.get(0));
         //fedoraUtils.applyToAllUuidFromModel(args[1], findBadCharacterInOcr);
         //                FindBadCharacterInOcr findBadCharacterInOcr = new FindBadCharacterInOcr();

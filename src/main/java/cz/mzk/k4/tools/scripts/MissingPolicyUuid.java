@@ -2,12 +2,12 @@ package cz.mzk.k4.tools.scripts;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.SetPolicyWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.log4j.Logger;
-
 import javax.ws.rs.core.MediaType;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -20,15 +20,18 @@ import java.util.List;
 public class MissingPolicyUuid implements Script {
 
     private static final Logger LOGGER = Logger.getLogger(MissingPolicyUuid.class);
+    private AccessProvider accessProvider;
+    public MissingPolicyUuid() throws FileNotFoundException {
+        accessProvider = AccessProvider.getInstance();
+    }
 
     /**
      * Vypíše uuid svazků s neznámou dostupností (public/private)
      *
      * @param args
      */
-    public void run(List<String> args) throws FileNotFoundException {
+    public void run(List<String> args) {
         LOGGER.info("Searching for uuids");
-        AccessProvider accessProvider = new AccessProvider();
         Client client = new Client();
         List<String> uuidList = new ArrayList<String>();
 
@@ -58,7 +61,11 @@ public class MissingPolicyUuid implements Script {
         if (args.contains("writeEnabled")) {
             UuidWorker worker = new SetPolicyWorker(true, accessProvider);
             for (String uuid : uuidList) {
-                worker.run(uuid);
+                try {
+                    worker.run(uuid);
+                } catch (K4ToolsException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

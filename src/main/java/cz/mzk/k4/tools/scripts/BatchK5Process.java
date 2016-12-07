@@ -57,8 +57,8 @@ public class BatchK5Process implements Script {
                         LOGGER.info("Process SET PRIVATE planned for " + uuid);
                         break;
                     case REINDEX:
-                        remoteApi.reindex(uuid);
-//                    case REINDEX: remoteApi.reindexWithoutRemoving(uuid);
+//                        remoteApi.reindex(uuid);
+                        remoteApi.reindexWithoutRemoving(uuid);
                         LOGGER.info("Process REINDEX planned for " + uuid);
                         break;
                     case EXPORT:

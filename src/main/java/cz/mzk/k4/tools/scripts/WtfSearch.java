@@ -1,5 +1,6 @@
 package cz.mzk.k4.tools.scripts;
 
+import cz.mzk.k4.tools.exceptions.K4ToolsException;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.GeneralUtils;
 import cz.mzk.k4.tools.utils.KrameriusUtils;
@@ -28,6 +29,13 @@ public class WtfSearch implements Script {
     private FedoraUtils fedoraUtils;
 
     public WtfSearch() throws FileNotFoundException {
+        accessProvider = AccessProvider.getInstance();
+//        krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+//                accessProvider.getKrameriusHost(),
+//                accessProvider.getKrameriusUser(),
+//                accessProvider.getKrameriusPassword());
+        krameriusUtils = new KrameriusUtils(accessProvider);
+        fedoraUtils = new FedoraUtils(accessProvider);
     }
 
     /**
@@ -36,15 +44,7 @@ public class WtfSearch implements Script {
      * @param args - nebere argument
      */
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-        accessProvider = AccessProvider.getInstance();
-//        krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
-//                accessProvider.getKrameriusHost(),
-//                accessProvider.getKrameriusUser(),
-//                accessProvider.getKrameriusPassword());
-        krameriusUtils = new KrameriusUtils(accessProvider);
-        fedoraUtils = new FedoraUtils(accessProvider);
-
+    public void run(List<String> args) {
         if (args.size() == 1) {
             // validuj konkrétní model
             if (args.get(0).startsWith("model:")) {
@@ -59,7 +59,11 @@ public class WtfSearch implements Script {
 
                 // porovnání s triplety
                 // není rekurzivní (každý model zvlášť)
-                worker.run(uuid);
+                try {
+                    worker.run(uuid);
+                } catch (K4ToolsException e) {
+                    e.printStackTrace();
+                }
 
                 // kontrola existence obrázků u stránek
 //                try {
@@ -121,7 +125,11 @@ public class WtfSearch implements Script {
                     // porovnání s triplety
                     // není rekurzivní (každý model zvlášť)
                     // časem spustit na stránkách
-                    worker.run(uuid);
+                    try {
+                        worker.run(uuid);
+                    } catch (K4ToolsException e) {
+                        e.printStackTrace();
+                    }
 
                     // kontrola závislostí ve fedoře (rekurzivní prohledání stromu)
                     fedoraUtils.checkChildrenExistence(uuid);

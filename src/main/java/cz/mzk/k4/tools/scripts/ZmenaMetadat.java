@@ -46,7 +46,7 @@ public class ZmenaMetadat implements Script {
     }
 
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
+    public void run(List<String> args) {
         // TODO: zvlášť metody na stažení - změnu - uložení do fedory
         // seznam uuid objektů na změnu metadat
         List<String> uuids = GeneralUtils.loadUuidsFromFile("IO/mezi-roots");

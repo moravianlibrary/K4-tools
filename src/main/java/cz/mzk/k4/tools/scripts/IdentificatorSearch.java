@@ -35,15 +35,14 @@ public class IdentificatorSearch implements Script {
     private FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
+    SolrUtils solr = new SolrUtils(accessProvider);
 
     public IdentificatorSearch() throws FileNotFoundException {
     }
 
 
     @Override
-    public void run(List<String> args) throws FileNotFoundException {
-        SolrUtils solr = new SolrUtils(new AccessProvider());
-
+    public void run(List<String> args) {
         String filename = args.get(0);
         List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
         Map<String, String> idMap = null;
