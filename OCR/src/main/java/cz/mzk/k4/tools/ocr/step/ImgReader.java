@@ -24,10 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,13 +51,13 @@ public class ImgReader implements ItemReader<Img> {
         this.abbyApi = abbyApi;
         this.overwrite = overwrite;
         this.rootPid = rootPid;
-        LOGGER.info("Spuštěno OCR na dokumentu " + rootPid);
-        try {
-            Path resultFile = Paths.get("IO/results");
-            Files.write(resultFile, ("Spuštěno OCR na dokumentu " + rootPid + "\n").getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        LOGGER.info("\nSpuštěno OCR na dokumentu " + rootPid);
+//        try {
+//            Path resultFile = Paths.get("IO/results");
+//            Files.write(resultFile, ("Spuštěno OCR na dokumentu " + rootPid + "\n").getBytes(), StandardOpenOption.APPEND);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         String serializedFile = "IO/" + rootPid + ".ser";
         if (new File(serializedFile).exists()) {
             try {
@@ -77,12 +73,12 @@ public class ImgReader implements ItemReader<Img> {
 
         kopie = new ArrayList(pagePids);
         LOGGER.info("Načteno " + pagePids.size() + " stran");
-        try {
-            Path resultFile = Paths.get("IO/results");
-            Files.write(resultFile, ("Načteno " + pagePids.size() + " stran\n").getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Path resultFile = Paths.get("IO/results");
+//            Files.write(resultFile, ("Načteno " + pagePids.size() + " stran\n").getBytes(), StandardOpenOption.APPEND);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -96,13 +92,13 @@ public class ImgReader implements ItemReader<Img> {
         }
 
         LOGGER.debug("Reading item " + pagePid);
-            if (fedoraUtils.getOcr(pagePid) != null && fedoraUtils.getAlto(pagePid) != null && !overwrite) {
-                // odstranit ze seznamu
-                kopie.remove(pagePid);
-                // serializace
-                serialize(kopie, "IO/" + rootPid + ".ser");
-                return new Img(pagePid, null); // strana už má OCR i ALTO (filter - strana se dál nezpracovává)
-            }
+        if (fedoraUtils.getOcr(pagePid) != null && fedoraUtils.getAlto(pagePid) != null && !overwrite) {
+            // odstranit ze seznamu
+            kopie.remove(pagePid);
+            // serializace
+            serialize(kopie, "IO/" + rootPid + ".ser");
+            return new Img(pagePid, null); // strana už má OCR i ALTO (filter - strana se dál nezpracovává)
+        }
 
         String mimetype;
         InputStream imgStream;
@@ -112,10 +108,10 @@ public class ImgReader implements ItemReader<Img> {
 //            LOGGER.debug("Trying to get JP2 of " + pagePid);
 //            imgStream = fedoraUtils.getImgJp2(pagePid);
 //        } catch (NullPointerException ex) {
-            // stahuje IMG_FULL datastream -> jpeg a menší kvalita než jpeg2000 na imageserveru
-            mimetype = JPEG_MIMETYPE;
-            LOGGER.debug("Trying to get JPG of " + pagePid);
-            imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
+        // stahuje IMG_FULL datastream -> jpeg a menší kvalita než jpeg2000 na imageserveru
+        mimetype = JPEG_MIMETYPE;
+        LOGGER.debug("Trying to get JPG of " + pagePid);
+        imgStream = fedoraUtils.getImgFull(pagePid, mimetype);
 //        }
 
         String md5;
@@ -124,7 +120,7 @@ public class ImgReader implements ItemReader<Img> {
             md5 = sendImageToOcrEngine(imgStream, pagePid, mimetype);
         } catch (NullPointerException ex) {
             LOGGER.error("Nepodařilo se odeslat stranu " + pagePid);
-            throw  ex;
+            throw ex;
         }
 
         LOGGER.debug(md5);

@@ -55,7 +55,6 @@ public class BatchConfiguration {
             accessProvider.getKrameriusPassword());
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:8085/AbbyyRest/ocr"); // s tunelem na docker
-//    private static AbbyRestApi abbyApi = AbbyRestApiFactory.getAbbyRestApi("localhost:9090/AbbyyRest/ocr"); // na localhostu
 
     // kvůli vstupu rootPid v readeru (konstruktor očekává string)
     public static final String NAHRAZENO_V_KONSTRUKTORU = "nahrazeno v konstruktoru";

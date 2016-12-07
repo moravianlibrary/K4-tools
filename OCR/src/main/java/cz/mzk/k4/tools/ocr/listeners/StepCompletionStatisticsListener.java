@@ -30,15 +30,16 @@ public class StepCompletionStatisticsListener extends StepExecutionListenerSuppo
         LOGGER.info("U " + stepExecution.getSkipCount() + " z nich došlo k chybě.");
         LOGGER.info(stepExecution.getFilterCount() + " stran bylo přeskočeno (už obsahují OCR i ALTO).");
 
-        try {
-            Path resultFile = Paths.get("IO/results");
-            Files.write(resultFile, "OCR dokončeno\n".getBytes(), StandardOpenOption.APPEND);
-            Files.write(resultFile, ("Bylo zpracováno celkem " + stepExecution.getReadCount() + " stran.\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(resultFile, ("U " + stepExecution.getSkipCount() + " z nich došlo k chybě.\n").getBytes(), StandardOpenOption.APPEND);
-            Files.write(resultFile, (stepExecution.getFilterCount() + " stran bylo přeskočeno (už obsahují OCR i ALTO).\n\n").getBytes(), StandardOpenOption.APPEND);
-        }catch (IOException e) {
-            //exception handling left as an exercise for the reader
-        }
+        // resi to logger
+//        try {
+//            Path resultFile = Paths.get("IO/results");
+//            Files.write(resultFile, "OCR dokončeno\n".getBytes(), StandardOpenOption.APPEND);
+//            Files.write(resultFile, ("Bylo zpracováno celkem " + stepExecution.getReadCount() + " stran.\n").getBytes(), StandardOpenOption.APPEND);
+//            Files.write(resultFile, ("U " + stepExecution.getSkipCount() + " z nich došlo k chybě.\n").getBytes(), StandardOpenOption.APPEND);
+//            Files.write(resultFile, (stepExecution.getFilterCount() + " stran bylo přeskočeno (už obsahují OCR i ALTO).\n\n").getBytes(), StandardOpenOption.APPEND);
+//        }catch (IOException e) {
+//            //exception handling left as an exercise for the reader
+//        }
 
         return stepExecution.getExitStatus();
     }
