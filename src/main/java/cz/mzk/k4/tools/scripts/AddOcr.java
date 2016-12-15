@@ -36,6 +36,7 @@ public class AddOcr implements Script {
     }
 
     private void processRoot(String rootPid) {
+        int existingOcrCounter = 0;
         List<String> pagePids;
         List<String> kopie;
         String serializedFile = "IO/" + rootPid + ".ser";
@@ -63,6 +64,7 @@ public class AddOcr implements Script {
                 addOcr.run(pagePid);
             } catch (K4ToolsException ocrExistsExeption) { // strana už má OCR
                 LOGGER.debug(ocrExistsExeption.getMessage());
+                existingOcrCounter++;
                 // odstranit z kopie seznamu
                 kopie.remove(pagePid);
                 // serializace kopie
@@ -74,6 +76,7 @@ public class AddOcr implements Script {
             }
         }
         LOGGER.info("Finished OCR of " + rootPid);
+        LOGGER.info(existingOcrCounter + " pages skipped (OCR already exist)");
     }
 
     @Override
