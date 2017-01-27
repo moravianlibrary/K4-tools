@@ -733,7 +733,8 @@ public class FedoraUtils {
             LOGGER.warn("Nenalezen obrázek u " + uuid);
             return null;
         }
-        String imgName = file.getTextContent();
+        String imgPath = file.getTextContent();
+        String imgName = imgPath.substring(imgPath.lastIndexOf("/") + 1 , imgPath.length());
         return imgName;
     }
 

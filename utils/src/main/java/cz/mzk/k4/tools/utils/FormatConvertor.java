@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,13 +30,15 @@ public class FormatConvertor {
         ProcessBuilder processBuilder = new ProcessBuilder(commandParams);
         Process process = processBuilder.start();
         try {
-            process.waitFor();
-            process.getErrorStream();
-            InputStream is = new FileInputStream(jpgFile);
+            String errorOutput = IOUtils.toString(process.getErrorStream());
 
-            return is;
+            if (process.waitFor() != 0 || jpgFile.length() == 0 || !errorOutput.equals("")){
+                throw new IOException("Chyba při převodu Djvu na jpg: " + errorOutput);
+            }
+
+            return new FileInputStream(jpgFile);
         } catch (InterruptedException e) {
-            throw new IOException();
+            throw new IOException("Chyba při převodu Djvu na jpg: " + e.getMessage());
         } finally {
             djvuFile.delete();
             jpgFile.delete();
@@ -67,8 +70,11 @@ public class FormatConvertor {
         Process process = new ProcessBuilder(cmdParams).start();
 
         try {
-            process.waitFor();
-            process.getErrorStream();
+            String errorOutput = IOUtils.toString(process.getErrorStream());
+
+            if (process.waitFor() != 0 || tiffFile.length() == 0 || !errorOutput.equals("")){
+                throw new IOException("Chyba při převodu Djvu na tiff: " + errorOutput);
+            }
 
             return tiffFile;
         } catch (InterruptedException e) {
@@ -102,8 +108,12 @@ public class FormatConvertor {
         Process process = new ProcessBuilder(cmdParams).start();
 
         try {
-            process.waitFor();
-            process.getErrorStream();
+            String errorOutput = IOUtils.toString(process.getErrorStream());
+
+            if (process.waitFor() != 0 || decompressedTiffFile.length() == 0 || !errorOutput.equals("")){
+                throw new IOException("Chyba při dekompresi tiffu: " + errorOutput);
+            }
+
             return decompressedTiffFile;
         } catch (InterruptedException e) {
             throw new IOException("Chyba při dekompresi tiffu: " + e.getMessage());
@@ -136,8 +146,11 @@ public class FormatConvertor {
         Process process = new ProcessBuilder(cmdParams).start();
 
         try {
-            process.waitFor();
-            process.getErrorStream();
+            String errorOutput = IOUtils.toString(process.getErrorStream());
+
+            if (process.waitFor() != 0 || jp2File.length() == 0 || !errorOutput.equals("")){
+                throw new IOException("Chyba konverzniho skriptu (compress.sh) při převodu tiffu na jp2: " + errorOutput);
+            }
 
             return new FileInputStream(jp2File);
         } catch (InterruptedException e) {
@@ -193,11 +206,15 @@ public class FormatConvertor {
         Process process = new ProcessBuilder(cmdParams).start();
 
         try {
-            process.waitFor();
-            process.getErrorStream();
+            String errorOutput = IOUtils.toString(process.getErrorStream());
+
+            if (process.waitFor() != 0 || tiffFile.length() == 0 || !errorOutput.equals("")){
+                throw new IOException("Chyba při převodu jpg na tiff: " + errorOutput);
+            }
+
             return tiffFile;
         } catch (InterruptedException e) {
-            throw new IOException("Chyba při převodu djvu na tiff: " + e.getMessage());
+            throw new IOException("Chyba při převodu jpg na tiff: " + e.getMessage());
         } finally {
             //Delete temporary files that are no longer needed
             jpgTempFile.delete();

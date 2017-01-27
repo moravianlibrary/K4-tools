@@ -47,6 +47,7 @@ public class Tools {
             runner.register("hades", new StehovaniHades());
             runner.register("opravitDostupnost", new RepairTrees());
 //        runner.register("lidovky2", new LnKonverze());
+            runner.register("djvuPeriodikum", new DjvuKonverzePeriodika());
             runner.register("djvu", new DjvuKonverze());
             runner.register("roots", new GetRoots());
             runner.register("rovnost", new SwitchImages());

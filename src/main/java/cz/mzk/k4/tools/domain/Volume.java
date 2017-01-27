@@ -12,12 +12,12 @@ public class Volume implements Serializable {
     String xmlFileName;
     String year;
     String pid;
-    List<Issue> issues; // title, issue
+    List<Page> pages; // title, issue
 
     public Volume(String year, String pid) {
         this.year = year;
         this.pid = pid;
-        this.issues = new ArrayList<>();
+        this.pages = new ArrayList<>();
     }
 
     public Volume() {
@@ -48,11 +48,11 @@ public class Volume implements Serializable {
         this.pid = pid;
     }
 
-    public List<Issue> getIssues() {
-        return issues;
+    public List<Page> getPages() {
+        return pages;
     }
 
-    public void setIssues(List<Issue> issues) {
-        this.issues = issues;
+    public void setPages(List<Issue> issues) {
+        this.pages = pages;
     }
 }

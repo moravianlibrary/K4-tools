@@ -66,12 +66,18 @@ INPUT_FILE=$(echo $2 | tr "[:upper:]" "[:lower:]")
 
 NO_PROBLEM=""
 #if [ "${INPUT_FILE:(-4)}x" != ".tifx" ] && [ "${INPUT_FILE:(-5)}x" != "tiffx" ] ; then
-# TIFF_TMP1=`tempfile -s ".tif"`;
-  TIFF_TMP2=`tempfile -s ".tif"`;
+# TIFF_TMP1=`mktemp --suffix ".tif"`;
+
+# this block can be commented out if input image is
+# allready decompresed tif to prevent double conversion
+#-------------------------------------------
+  TIFF_TMP2=`mktemp --suffix ".tif"`;
+
   echo "converting";
   convert -compress None $2 $TIFF_TMP2 && {
      NO_PROBLEM="ok";
   }
+#-------------------------------------------
   #&& tiffcp -c none $TIFF_TMP1 $TIFF_TMP2 && rm $TIFF_TMP1 && {
   #  NO_PROBLEM="ok";
   #}
