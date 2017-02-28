@@ -86,6 +86,10 @@ public class ProcessRemoteApi {
         return api.planProcess("reindex", new Parameters("reindexCollection", pid_path));
     }
 
+
+    public Process addToCollection(String uuid,String vc) throws K5ApiException {
+        return api.planProcess("virtualcollections",new Parameters("add",uuid,vc));
+    }
 //    public Process addToVirtualCollection(String object_pid, String vc_pid) throws K5ApiException {
 //        return api.planProcess("??", new Parameters(??));
 //    }
