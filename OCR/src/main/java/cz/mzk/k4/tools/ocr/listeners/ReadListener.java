@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.ocr.listeners;
 
 import cz.mzk.k4.tools.ocr.step.ImgReader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.annotation.OnReadError;
 
@@ -10,7 +11,7 @@ import org.springframework.batch.core.annotation.OnReadError;
  */
 public class ReadListener implements ItemReadListener {
 
-    private static final Logger LOGGER = Logger.getLogger(ImgReader.class);
+    private static final Logger LOGGER = LogManager.getLogger(ImgReader.class);
 
     @Override
     public void beforeRead() {

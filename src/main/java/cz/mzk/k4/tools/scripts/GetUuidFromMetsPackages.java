@@ -5,7 +5,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
@@ -19,7 +21,7 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 
 public class GetUuidFromMetsPackages implements Script {
-    private static final org.apache.log4j.Logger LOGGER = Logger.getLogger(GetUuidFromMetsPackages.class);
+    private static final Logger LOGGER = LogManager.getLogger(GetUuidFromMetsPackages.class);
     private ArrayList<String> uuidList = new ArrayList<String>();
     private AccessProvider accessProvider = AccessProvider.getInstance();
 //    private KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);

@@ -4,7 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,7 +30,7 @@ import java.util.List;
  * Created by holmanj on 12.2.15.
  */
 public class OdpojeniVadnychClanku implements Script {
-    private static final Logger LOGGER = Logger.getLogger(OdpojeniVadnychClanku.class);
+    private static final Logger LOGGER = LogManager.getLogger(OdpojeniVadnychClanku.class);
     private final FedoraUtils fedora = new FedoraUtils(new AccessProvider());
     private final AccessProvider accessProvider = new AccessProvider();
 //    private ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

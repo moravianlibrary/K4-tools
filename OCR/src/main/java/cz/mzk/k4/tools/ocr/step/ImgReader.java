@@ -8,7 +8,8 @@ import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -36,7 +37,7 @@ import java.util.Set;
 @Scope("Step")
 public class ImgReader implements ItemReader<Img> {
 
-    private static final Logger LOGGER = Logger.getLogger(ImgReader.class);
+    private static final Logger LOGGER = LogManager.getLogger(ImgReader.class);
     private static final String JPEG_MIMETYPE = "image/jpeg";
     private static final String JPEG2000_MIMETYPE = "image/jp2";
     private FedoraUtils fedoraUtils;

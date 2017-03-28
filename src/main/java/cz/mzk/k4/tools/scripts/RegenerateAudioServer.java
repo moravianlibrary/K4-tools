@@ -5,6 +5,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by rumanekm on 7.5.14.
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class RegenerateAudioServer implements Script {
 
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(RegenerateAudioServer.class);
+    private static final Logger LOGGER = LogManager.getLogger(RegenerateAudioServer.class);
 
     @Override
     public void run(List<String> args) {

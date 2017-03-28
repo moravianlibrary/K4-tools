@@ -9,7 +9,8 @@ import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by holmanj on 21.12.15.
  */
 public class SwitchImages implements Script {
-    public static final Logger LOGGER = Logger.getLogger(SwitchImages.class);
+    public static final Logger LOGGER = LogManager.getLogger(SwitchImages.class);
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     ProcessRemoteApi k5RemoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

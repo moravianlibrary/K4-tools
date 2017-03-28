@@ -7,7 +7,7 @@
 //import cz.mzk.k4.tools.utils.fedora.Constants;
 //import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 //import org.apache.commons.io.FileUtils;
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.Logger;
 //import org.w3c.dom.Document;
 //import org.w3c.dom.Element;
 //import javax.xml.transform.TransformerConfigurationException;

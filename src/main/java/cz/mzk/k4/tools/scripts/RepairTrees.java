@@ -8,7 +8,8 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 
 import java.io.File;
@@ -35,7 +36,7 @@ public class RepairTrees implements Script {
     private KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private SolrUtils solr = new SolrUtils(accessProvider);
     private ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
-    public static final Logger LOGGER = Logger.getLogger(RepairTrees.class);
+    public static final Logger LOGGER = LogManager.getLogger(RepairTrees.class);
 
     public RepairTrees() throws FileNotFoundException {
     }

@@ -3,7 +3,8 @@ package cz.mzk.k4.tools.ocr.listeners;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -16,7 +17,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
 
 public class JobCompletionNotificationListener implements JobExecutionListener {
 
-    private static final Logger LOGGER = Logger.getLogger(JobCompletionNotificationListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(JobCompletionNotificationListener.class);
 
     private ProcessRemoteApi krameriusApi;
     private FedoraUtils fedoraUtils;

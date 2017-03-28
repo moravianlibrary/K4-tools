@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.ocr.listeners;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
@@ -19,7 +20,7 @@ import java.nio.file.StandardOpenOption;
 @Component
 public class StepCompletionStatisticsListener extends StepExecutionListenerSupport {
 
-    private static final Logger LOGGER = Logger.getLogger(StepCompletionStatisticsListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(StepCompletionStatisticsListener.class);
 
     @Override
     @AfterStep

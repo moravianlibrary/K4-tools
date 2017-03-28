@@ -3,7 +3,8 @@ package cz.mzk.k4.tools.utils;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class KrameriusUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(KrameriusUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(KrameriusUtils.class);
     private AccessProvider accessProvider;
 
     public KrameriusUtils(AccessProvider accessProvider) {

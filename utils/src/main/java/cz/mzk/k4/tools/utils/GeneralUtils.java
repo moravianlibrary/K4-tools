@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.OutputKeys;
@@ -27,7 +28,7 @@ import java.util.Set;
  * Created by holmanj on 11.3.15.
  */
 public class GeneralUtils {
-    private static final Logger LOGGER = Logger.getLogger(GeneralUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(GeneralUtils.class);
 
     public static List<String> loadUuidsFromFile(String filePath) {
         List<String> uuidList = new ArrayList<>();

@@ -5,7 +5,8 @@ import cz.mzk.k4.tools.ocr.domain.Ocr;
 import cz.mzk.k4.tools.ocr.exceptions.BadRequestException;
 import cz.mzk.k4.tools.ocr.exceptions.InternalServerErroException;
 import cz.mzk.k4.tools.ocr.exceptions.ItemNotFoundException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.item.ItemProcessor;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.io.IOException;
 
 public class MockProcessor implements ItemProcessor<Img, Ocr> {
 
-    private static final Logger LOGGER = Logger.getLogger(MockProcessor.class);
+    private static final Logger LOGGER = LogManager.getLogger(MockProcessor.class);
 
     public MockProcessor() {
     }

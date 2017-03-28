@@ -3,7 +3,8 @@ package cz.mzk.k4.tools;
 import cz.mzk.k4.tools.scripts.*;
 import cz.mzk.k4.tools.scripts.lidovky.OdpojeniVadnychClanku;
 import cz.mzk.k4.tools.utils.ScriptRunner;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.List;
  * @version 30.7.13
  */
 public class Tools {
-    private static final Logger LOGGER = Logger.getLogger(Tools.class);
+    private static final Logger LOGGER = LogManager.getLogger(Tools.class);
 
     public static void main(String[] args) {
         ScriptRunner runner = new ScriptRunner();
@@ -31,7 +32,6 @@ public class Tools {
             runner.register("uuidMetsBalik", new GetUuidFromMetsPackages());
             runner.register("pridatOCR", new AddOcr());
             runner.register("hledaniHaluzi", new WtfSearch());
-//        runner.register("kontrolaRajhradu", new RajhradValidate());
 //        runner.register("djvuNaJp2", new ConvertDJvuToJp2());
             runner.register("regenerateAudioServer", new RegenerateAudioServer());
             runner.register("stazeniObrazku", new DownloadImages());

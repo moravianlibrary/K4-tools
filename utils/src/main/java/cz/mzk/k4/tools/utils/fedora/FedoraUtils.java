@@ -17,7 +17,8 @@ import cz.mzk.k4.tools.utils.util.XMLUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fedora.api.DatastreamDef;
 import org.fedora.api.RelationshipTuple;
 import org.jsoup.Jsoup;
@@ -53,7 +54,7 @@ import java.util.concurrent.Semaphore;
  */
 public class FedoraUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(FedoraUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(FedoraUtils.class);
     private AccessProvider accessProvider;
 
     public static final String MZK = "MZK";

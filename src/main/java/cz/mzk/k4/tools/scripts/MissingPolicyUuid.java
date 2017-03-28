@@ -7,7 +7,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.workers.SetPolicyWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.ws.rs.core.MediaType;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class MissingPolicyUuid implements Script {
 
-    private static final Logger LOGGER = Logger.getLogger(MissingPolicyUuid.class);
+    private static final Logger LOGGER = LogManager.getLogger(MissingPolicyUuid.class);
     private AccessProvider accessProvider;
     public MissingPolicyUuid() throws FileNotFoundException {
         accessProvider = AccessProvider.getInstance();

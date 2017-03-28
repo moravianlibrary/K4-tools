@@ -6,7 +6,8 @@ import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class FindBadCharacterInOcr extends UuidWorker implements Script {
 
-    private static final Logger LOGGER = Logger.getLogger(FindBadCharacterInOcr.class);
+    private static final Logger LOGGER = LogManager.getLogger(FindBadCharacterInOcr.class);
     private boolean repair;
     FedoraUtils fedoraUtils;
 

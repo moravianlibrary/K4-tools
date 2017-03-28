@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.utils.util;
 
 import cz.mzk.k4.tools.utils.domain.DCConent;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,7 +18,7 @@ import java.util.Stack;
 public class DCContentUtils {
 
     public static final String DC_NAMESPACE_URI = "http://purl.org/dc/elements/1.1/";
-    private static final Logger LOGGER = Logger.getLogger(DCContentUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(DCContentUtils.class);
 
     /**
      * Returns dc content from given document

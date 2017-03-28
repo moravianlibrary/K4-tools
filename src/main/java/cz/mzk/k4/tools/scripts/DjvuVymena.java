@@ -13,7 +13,8 @@ import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
  * Created by jan on 25.3.16.
  */
 public class DjvuVymena implements Script {
-    private static final Logger LOGGER = Logger.getLogger(ChangeImgs.class);
+    private static final Logger LOGGER = LogManager.getLogger(ChangeImgs.class);
     private AccessProvider accessProvider = AccessProvider.getInstance();
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

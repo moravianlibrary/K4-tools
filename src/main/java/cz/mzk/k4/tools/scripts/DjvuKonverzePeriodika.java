@@ -15,7 +15,8 @@ import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.common.K5ApiException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +35,7 @@ import java.util.List;
  * Similar to DjvuKonverze but splits periodical document to volumes and allow to skip selected ones
  */
 public class DjvuKonverzePeriodika implements Script {
-    public static final Logger LOGGER = Logger.getLogger(DjvuKonverzePeriodika.class);
+    public static final Logger LOGGER = LogManager.getLogger(DjvuKonverzePeriodika.class);
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);

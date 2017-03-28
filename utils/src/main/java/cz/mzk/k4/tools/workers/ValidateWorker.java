@@ -2,7 +2,8 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.OutputKeys;
@@ -20,7 +21,7 @@ import java.io.StringWriter;
  */
 public class ValidateWorker extends UuidWorker {
 
-    private static final Logger LOGGER = Logger.getLogger(ValidateWorker.class);
+    private static final Logger LOGGER = LogManager.getLogger(ValidateWorker.class);
     private FedoraUtils fedoraUtils;
 
     public ValidateWorker(AccessProvider accessProvider) {

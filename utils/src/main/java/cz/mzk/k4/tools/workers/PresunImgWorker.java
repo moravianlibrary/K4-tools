@@ -3,7 +3,8 @@ package cz.mzk.k4.tools.workers;
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.FormatConvertor;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.List;
  * Created by holmanj on 3/19/14.
  */
 public class PresunImgWorker {
-    private static final Logger LOGGER = Logger.getLogger(PresunImgWorker.class);
+    private static final Logger LOGGER = LogManager.getLogger(PresunImgWorker.class);
     private AccessProvider accessProvider;
     private FedoraUtils fedoraUtils;
     private boolean writeEnabled;

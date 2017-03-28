@@ -8,7 +8,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public class RepairLinksForReplication implements Script {
 
-    private static org.apache.log4j.Logger LOGGER = Logger.getLogger(RepairLinksForReplication.class);
+    private static Logger LOGGER = LogManager.getLogger(RepairLinksForReplication.class);
 
     public static final String IMAGES_PATH = "jpg" + File.separator;
     public static final String OCR_PATH = "txt" + File.separator;

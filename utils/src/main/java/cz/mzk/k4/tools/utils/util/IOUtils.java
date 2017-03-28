@@ -27,7 +27,8 @@
 
 package cz.mzk.k4.tools.utils.util;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,7 +49,7 @@ import java.security.MessageDigest;
 public class IOUtils {
 
     /** The Constant LOGGER. */
-    private static final Logger LOGGER = Logger.getLogger(IOUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(IOUtils.class);
 
     /**
      * Instantiates a new iO utils.

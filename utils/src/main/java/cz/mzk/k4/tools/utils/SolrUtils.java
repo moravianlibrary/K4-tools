@@ -1,6 +1,7 @@
 package cz.mzk.k4.tools.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class SolrUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(SolrUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(SolrUtils.class);
     private AccessProvider accessProvider;
 
     public SolrUtils(AccessProvider accessProvider) {

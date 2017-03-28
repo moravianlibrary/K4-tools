@@ -6,7 +6,7 @@
 //import cz.mzk.k4.tools.utils.domain.KrameriusProcess;
 //import cz.mzk.k4.tools.utils.domain.ProcessLog;
 //import org.apache.commons.lang.NullArgumentException;
-//import org.apache.log4j.Logger;
+//import org.apache.logging.log4j.Logger;
 //
 //import javax.ws.rs.core.MediaType;
 //import javax.ws.rs.core.MultivaluedMap;

@@ -15,7 +15,8 @@ import cz.mzk.k5.api.client.domain.Item;
 import cz.mzk.k5.api.common.K5ApiException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +36,7 @@ import java.util.Map;
  * Can be used for any document type, converts all pages under given uuid
  */
 public class DjvuKonverze implements Script {
-    public static final Logger LOGGER = Logger.getLogger(DjvuKonverze.class);
+    public static final Logger LOGGER = LogManager.getLogger(DjvuKonverze.class);
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
     FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);

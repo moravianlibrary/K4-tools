@@ -4,7 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -22,7 +23,7 @@ import java.util.List;
  * Created by Jan on 2.8.14.
  */
 public class ImageUrlWorker {
-    private static final Logger LOGGER = Logger.getLogger(ImageUrlWorker.class);
+    private static final Logger LOGGER = LogManager.getLogger(ImageUrlWorker.class);
     private AccessProvider accessProvider;
     private FedoraUtils fedoraUtils;
     private boolean writeEnabled;

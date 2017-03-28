@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.ocr.listeners;
 
 import cz.mzk.k4.tools.ocr.domain.Img;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.annotation.OnProcessError;
 
@@ -10,7 +11,7 @@ import org.springframework.batch.core.annotation.OnProcessError;
  */
 public class PollingListener implements ItemProcessListener {
 
-    private static final Logger LOGGER = Logger.getLogger(ItemProcessListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(ItemProcessListener.class);
 
     @Override
     public void beforeProcess(Object item) {

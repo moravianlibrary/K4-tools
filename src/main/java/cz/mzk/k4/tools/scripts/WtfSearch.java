@@ -10,7 +10,8 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.RelationshipCounterWorker;
 import cz.mzk.k4.tools.workers.UuidWorker;
 import cz.mzk.k4.tools.workers.ValidateWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by holmanj on 12/12/13.
  */
 public class WtfSearch implements Script {
-    private static final Logger LOGGER = Logger.getLogger(WtfSearch.class);
+    private static final Logger LOGGER = LogManager.getLogger(WtfSearch.class);
     private UuidWorker worker = new RelationshipCounterWorker(false);
     private AccessProvider accessProvider;
     private KrameriusUtils krameriusUtils;

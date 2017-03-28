@@ -3,7 +3,8 @@ package cz.mzk.k4.tools.ocr.step;
 import cz.mzk.k4.tools.ocr.domain.Ocr;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.item.ItemWriter;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class OcrWriter implements ItemWriter<Ocr> {
 
-    private static final Logger LOGGER = Logger.getLogger(OcrWriter.class);
+    private static final Logger LOGGER = LogManager.getLogger(OcrWriter.class);
 
     private FedoraUtils fedoraUtils;
 

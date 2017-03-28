@@ -9,7 +9,8 @@ import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class BatchK5Process implements Script {
 
-    private static final Logger LOGGER = Logger.getLogger(BatchK5Process.class);
+    private static final Logger LOGGER = LogManager.getLogger(BatchK5Process.class);
     private FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

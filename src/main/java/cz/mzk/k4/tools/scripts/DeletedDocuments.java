@@ -4,7 +4,8 @@ import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.workers.UuidWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class DeletedDocuments implements Script {
 
-    public static final Logger LOGGER = Logger.getLogger(DeletedDocuments.class);
+    public static final Logger LOGGER = LogManager.getLogger(DeletedDocuments.class);
     FedoraUtils fedoraUtils;
 
     public DeletedDocuments() throws FileNotFoundException {

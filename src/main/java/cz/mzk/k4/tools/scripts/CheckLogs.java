@@ -7,7 +7,8 @@ import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import cz.mzk.k5.api.remote.domain.Process;
 import cz.mzk.k5.api.remote.domain.ProcessLog;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,7 +24,7 @@ public class CheckLogs implements Script {
 
     private static ProcessRemoteApi krameriusApi;
     private static Integer defSize; // default number of processes fetched from Kramerius
-    private static org.apache.log4j.Logger LOGGER = Logger.getLogger(CheckLogs.class);
+    private static Logger LOGGER = LogManager.getLogger(CheckLogs.class);
 
     public CheckLogs() throws FileNotFoundException {
         AccessProvider accessProvider = AccessProvider.getInstance();

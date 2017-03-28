@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.ocr.step;
 
 import cz.mzk.k4.tools.ocr.domain.Img;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
@@ -18,7 +19,7 @@ import java.util.List;
 @Scope("Step")
 public class MockReader implements ItemReader<Img> {
 
-    private static final Logger LOGGER = Logger.getLogger(MockReader.class);
+    private static final Logger LOGGER = LogManager.getLogger(MockReader.class);
     private List<String> uuids;
 
     public MockReader(String rootPid) {

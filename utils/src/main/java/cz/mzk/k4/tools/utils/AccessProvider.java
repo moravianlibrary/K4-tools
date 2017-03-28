@@ -2,7 +2,8 @@ package cz.mzk.k4.tools.utils;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fedora.api.FedoraAPIA;
 import org.fedora.api.FedoraAPIAService;
 import org.fedora.api.FedoraAPIM;
@@ -49,7 +50,7 @@ public class AccessProvider {
     private Client client;
     private String confFileName = "k4_tools_config.properties";
     private Properties properties;
-    private static Logger LOGGER = Logger.getLogger(AccessProvider.class);
+    private static Logger LOGGER = LogManager.getLogger(AccessProvider.class);
     public static String K4_REMOTE_API_PATH = "/search/api/v4.6/processes";
 
     public AccessProvider() throws FileNotFoundException {

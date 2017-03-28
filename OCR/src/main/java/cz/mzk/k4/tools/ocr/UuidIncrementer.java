@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.ocr;
 
 import cz.mzk.k4.tools.utils.GeneralUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
@@ -20,7 +21,7 @@ import java.util.List;
 public class UuidIncrementer implements JobParametersIncrementer {
 
     private static final String LISTFILE = "IO/ocr-list";
-    private static final Logger LOGGER = Logger.getLogger(UuidIncrementer.class);
+    private static final Logger LOGGER = LogManager.getLogger(UuidIncrementer.class);
 
 
     public JobParameters getNext(JobParameters parameters) {

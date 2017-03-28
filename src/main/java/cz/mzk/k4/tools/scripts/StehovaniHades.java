@@ -8,7 +8,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.domain.Item;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.xml.transform.TransformerException;
 import java.io.*;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class StehovaniHades implements Script {
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
 //    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
-    public static final Logger LOGGER = Logger.getLogger(StehovaniHades.class);
+    public static final Logger LOGGER = LogManager.getLogger(StehovaniHades.class);
 
     public StehovaniHades() throws FileNotFoundException {
     }

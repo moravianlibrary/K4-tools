@@ -8,7 +8,8 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k4.tools.utils.util.DCContentUtils;
 import cz.mzk.k4.tools.workers.ImageUrlWorker;
 import cz.mzk.k4.tools.workers.PresunImgWorker;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import javax.ws.rs.core.MediaType;
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ public class FsvPresunImg implements Script {
     //    private static String ROCNIK;
     private static final int LAST_ITEM = 0;
     private static final String PERIODIKUM = "ss";
-    private static final Logger LOGGER = Logger.getLogger(FindLonelyMonographs.class);
+    private static final Logger LOGGER = LogManager.getLogger(FindLonelyMonographs.class);
     private PresunImgWorker stehovak;
     private ImageUrlWorker prepisovakUrl;
     private AccessProvider accessProvider;

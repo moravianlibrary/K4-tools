@@ -2,7 +2,8 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.AccessProvider;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 
@@ -14,7 +15,7 @@ import java.io.FileNotFoundException;
  */
 public class RelationshipCounterWorker extends UuidWorker {
 
-    private static final Logger LOGGER = Logger.getLogger(RelationshipCounterWorker.class);
+    private static final Logger LOGGER = LogManager.getLogger(RelationshipCounterWorker.class);
     private FedoraUtils fedoraUtils;
     private int counter;
 

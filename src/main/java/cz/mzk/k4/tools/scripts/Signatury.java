@@ -9,7 +9,8 @@ import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.Map;
  * Created by jan on 28.1.16.
  */
 public class Signatury implements Script {
-    private static final Logger LOGGER = Logger.getLogger(Signatury.class);
+    private static final Logger LOGGER = LogManager.getLogger(Signatury.class);
     private AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi k5Api = KrameriusClientRemoteApiFactory.getClientRemoteApi(
             accessProvider.getKrameriusHost(),

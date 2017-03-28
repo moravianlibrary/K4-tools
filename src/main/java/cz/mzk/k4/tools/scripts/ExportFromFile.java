@@ -6,7 +6,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * Created by hradskam on 1.7.14.
  */
 public class ExportFromFile implements Script {
-    private static final Logger LOGGER = Logger.getLogger(ExportFromFile.class);
+    private static final Logger LOGGER = LogManager.getLogger(ExportFromFile.class);
     private AccessProvider accessProvider = AccessProvider.getInstance();
 //    private static KrameriusUtils krameriusUtils = new KrameriusUtils(accessProvider);
     private ProcessRemoteApi krameriusApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

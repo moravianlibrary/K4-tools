@@ -1,7 +1,8 @@
 package cz.mzk.k4.tools.fedoraApi;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import retrofit.converter.ConversionException;
 import retrofit.converter.Converter;
 import retrofit.mime.TypedInput;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class RdfConverter implements Converter {
 
-    private static final Logger LOGGER = Logger.getLogger(RdfConverter.class);
+    private static final Logger LOGGER = LogManager.getLogger(RdfConverter.class);
 
     @Override
     public Object fromBody(TypedInput body, Type type) throws ConversionException {

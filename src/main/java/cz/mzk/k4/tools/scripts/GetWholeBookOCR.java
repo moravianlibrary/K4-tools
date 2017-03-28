@@ -6,7 +6,8 @@ import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.common.K5ApiException;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.client.domain.Item;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class GetWholeBookOCR implements Script {
     private ClientRemoteApi api;
-    private static final Logger LOGGER = Logger.getLogger(GetWholeBookOCR.class);
+    private static final Logger LOGGER = LogManager.getLogger(GetWholeBookOCR.class);
 
     public GetWholeBookOCR() throws FileNotFoundException {
         AccessProvider accessProvider = new AccessProvider();

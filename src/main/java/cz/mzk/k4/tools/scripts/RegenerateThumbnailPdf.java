@@ -5,7 +5,8 @@ import cz.mzk.k4.tools.utils.Script;
 import cz.mzk.k4.tools.utils.exception.CreateObjectException;
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class RegenerateThumbnailPdf implements Script {
 
-    private static final Logger LOGGER = Logger.getLogger(RegenerateThumbnailPdf.class);
+    private static final Logger LOGGER = LogManager.getLogger(RegenerateThumbnailPdf.class);
     FedoraUtils fedoraUtils;
 
     public RegenerateThumbnailPdf() throws FileNotFoundException {

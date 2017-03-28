@@ -2,7 +2,9 @@ package cz.mzk.k4.tools.workers;
 
 import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.*;
@@ -19,7 +21,7 @@ public class XMLStarletWorker extends UuidWorker {
 
     private FedoraUtils fedoraUtils;
     private List<String> args;
-    private static final Logger LOGGER = Logger.getLogger(XMLStarletWorker.class);
+    private static final Logger LOGGER = LogManager.getLogger(XMLStarletWorker.class);
 
     public XMLStarletWorker(FedoraUtils fedoraUtils, List<String> args) {
         super(false);

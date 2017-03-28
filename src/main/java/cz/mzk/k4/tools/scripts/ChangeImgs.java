@@ -12,7 +12,8 @@ import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.remote.KrameriusProcessRemoteApiFactory;
 import cz.mzk.k5.api.remote.ProcessRemoteApi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import javax.ws.rs.core.MediaType;
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Created by holmanj on 3/19/14.
  */
 public class ChangeImgs implements Script {
-    private static final Logger LOGGER = Logger.getLogger(ChangeImgs.class);
+    private static final Logger LOGGER = LogManager.getLogger(ChangeImgs.class);
     private AccessProvider accessProvider = AccessProvider.getInstance();
     private FedoraUtils fedoraUtils = new FedoraUtils(accessProvider);
     private ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());

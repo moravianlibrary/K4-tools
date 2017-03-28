@@ -11,7 +11,8 @@ import cz.mzk.k4.tools.utils.fedora.FedoraUtils;
 import cz.mzk.k5.api.client.ClientRemoteApi;
 import cz.mzk.k5.api.client.KrameriusClientRemoteApiFactory;
 import cz.mzk.k5.api.common.K5ApiException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -31,7 +32,7 @@ import java.util.Map;
  * Created by jan on 12.6.16.
  */
 public class IdentificatorSearch implements Script {
-    private static final Logger LOGGER = Logger.getLogger(IdentificatorSearch.class);
+    private static final Logger LOGGER = LogManager.getLogger(IdentificatorSearch.class);
     private FedoraUtils fedoraUtils = new FedoraUtils(AccessProvider.getInstance());
     AccessProvider accessProvider = AccessProvider.getInstance();
     ClientRemoteApi clientApi = KrameriusClientRemoteApiFactory.getClientRemoteApi(accessProvider.getKrameriusHost(), accessProvider.getKrameriusUser(), accessProvider.getKrameriusPassword());
