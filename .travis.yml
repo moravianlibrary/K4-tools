@@ -5,8 +5,4 @@ sudo: false
 
 notifications:
   email: false
-
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: "curl --ftp-create-dirs -T K5-API/build/libs/K5-API-1.0.jar -u $FTP_USER:$FTP_PASSWORD ftp://ftp-devel.mzk.cz/mvnrepo/cz/mzk/k5/api/K5-API/1.0/"
+  
