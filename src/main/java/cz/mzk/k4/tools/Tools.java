@@ -58,6 +58,7 @@ public class Tools {
             runner.register("sort", new Sorter());
             runner.register("test", new TestScript());
             runner.register("vcrepair", new VCGhosts());
+            runner.register("manifestChecker", new ManifestCheckerScript());
         } catch (FileNotFoundException e) {
             LOGGER.error(e.getMessage());
             return;
