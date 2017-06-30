@@ -70,12 +70,13 @@ public class SolrUtils {
 
 
     public List<String> solrQuery(String query, String returnField) throws MalformedURLException, SolrServerException {
-        HttpSolrServer solr = new HttpSolrServer("http://" + accessProvider.getSolrHost());
+        HttpSolrServer solr = new HttpSolrServer("http://" + accessProvider.getSolrHost() + "/kramerius");
         SolrQuery parameters = new SolrQuery();
         parameters.setQuery(query);
         parameters.setFields(returnField);
         // deep paging: https://cwiki.apache.org/confluence/display/solr/Pagination+of+Results
         parameters.set("rows", "1000000000");
+        parameters.setRequestHandler("select");
 
         LOGGER.info("Calling solr url: " + solr.getBaseURL() + " query: " + parameters.getQuery() + " return field: " + returnField);
         QueryResponse response = solr.query(parameters);
