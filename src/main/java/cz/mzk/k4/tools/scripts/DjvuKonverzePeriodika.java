@@ -121,7 +121,7 @@ public class DjvuKonverzePeriodika implements Script {
                 //vazba na dlaždice
                 fedoraUtils.repairImageserverTilesRelation(page.getPid());
             }
-            LOGGER.info("Odkaz na obrázky z ročníku " + volume.getYear() + " byly doplněny do fedory.");
+            LOGGER.info("Odkazy na obrázky z ročníku " + volume.getYear() + " byly doplněny do fedory.");
         }
     }
 
