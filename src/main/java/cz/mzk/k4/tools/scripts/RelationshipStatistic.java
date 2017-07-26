@@ -1,4 +1,4 @@
-package cz.mzk.k4.tools.scripts.my_scripts;
+package cz.mzk.k4.tools.scripts;
 
 import cz.mzk.k4.tools.utils.domain.DigitalObjectModel;
 import cz.mzk.k4.tools.exceptions.K4ToolsException;
@@ -22,10 +22,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
-
-
-//periodical : uuid:da5f3a10-65eb-11e2-9d9f-005056827e52, parents number 1
-//        uuid:60253fb0-65eb-11e2-bc24-005056827e51
 
 
 /**
