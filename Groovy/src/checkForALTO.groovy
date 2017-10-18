@@ -1,4 +1,3 @@
-
 /**
  * Created by grman on 16.10.17.
  */
@@ -29,12 +28,14 @@ def getRiSearchResponse = { String query ->
     return new XmlSlurper(false, true).parseText(response)
 }
 
-File file = new File('cesta k suboru s uuid')
+File file = new File('/home/grman/Code/k4Tools/kontrolaAlta.txt')
 def lines = file.readLines()
 int numOfLines = lines.size()
-
+int flag;
 for (int i = 0; i< numOfLines; i++) {
+    flag = 0
     lines[i] = lines[i].replace(" ", "")
+    outputFile << "${lines[i]} "
     def pagesXml = getRiSearchResponse("<info:fedora/${lines[i]}> <http://www.nsdl.org/ontologies/relationships#hasPage> *")
     for (int j = 0; j< pagesXml.Description.hasPage.'@rdf:resource'.size(); j++) {
         def pageUuid = pagesXml.Description.hasPage[j].'@rdf:resource'.toString()
@@ -42,7 +43,15 @@ for (int i = 0; i< numOfLines; i++) {
         try {
             def ocrStream = FedoraClient.getDatastream(pageUuid, "ALTO").execute().getDatastreamProfile()
         } catch (Exception e) {
-            outputFile << "${pageUuid} $ln"
+            flag = 1
+            // outputFile << "${pageUuid} $ln"
         }
     }
+    if (flag == 1){
+        outputFile << "BAD"
+    }
+    else{
+        outputFile << "OK"
+    }
+    outputFile << "$ln"
 }
