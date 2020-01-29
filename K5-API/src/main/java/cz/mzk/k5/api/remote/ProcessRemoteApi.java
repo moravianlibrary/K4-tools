@@ -159,4 +159,8 @@ public class ProcessRemoteApi {
         api.planProcess("k4_replication",
                 new Parameters(handleUrl, srcKrameriusUser, srcKrameriusPswd, "false", "false"));
     }
+
+    public void importFromDir(String dir) throws K5ApiException {
+        api.planProcess("parametrizedimport", new Parameters(dir, "true", "true"));
+    }
 }
