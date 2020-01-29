@@ -154,4 +154,9 @@ public class ProcessRemoteApi {
         Process process = this.getProcess(processUuid);
         return !(RUNNING.equals(process.getState()) || BATCH_STARTED.equals(process.getBatchState()) || PLANNED.equals(process.getState()));
     }
+
+    public void replicate(String handleUrl, String srcKrameriusUser, String srcKrameriusPswd) throws K5ApiException {
+        api.planProcess("k4_replication",
+                new Parameters(handleUrl, srcKrameriusUser, srcKrameriusPswd, "false", "false"));
+    }
 }
