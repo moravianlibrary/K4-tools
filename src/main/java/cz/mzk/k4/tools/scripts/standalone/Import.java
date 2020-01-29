@@ -7,6 +7,7 @@ import cz.mzk.k5.api.remote.ProcessRemoteApi;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -29,17 +30,19 @@ import java.util.List;
 public class Import {
 
     public static final Logger logger = LogManager.getLogger(Replicate.class);
-    private static AccessProvider accessProvider = AccessProvider.getInstance();
-    private static ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
-            accessProvider.getKrameriusHost(),
-            accessProvider.getKrameriusUser(),
-            accessProvider.getKrameriusPassword()
-    );
 
     private static String filename = "IO/import.txt";
     private static String dirNamePrefix = "/root/.kramerius4/import/";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+
+        AccessProvider accessProvider = AccessProvider.getInstance();
+        ProcessRemoteApi remoteApi = KrameriusProcessRemoteApiFactory.getProcessRemoteApi(
+                accessProvider.getKrameriusHost(),
+                accessProvider.getKrameriusUser(),
+                accessProvider.getKrameriusPassword()
+        );
+
         List<String> uuids = GeneralUtils.loadUuidsFromFile(filename);
 
         for (String uuid : uuids) {
